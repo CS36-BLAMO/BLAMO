@@ -9,9 +9,27 @@ void main() {
   ));
 }
 
+/* Builds the initial page for the user
+*  Using Scaffolding to follow a fairly traditional layout for familiarity
+*  The drawer needs to house the other pages our team is working on (Settings, Export, etc)
+*/
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    /* Scaffolding constructor is as follows, and can be filled out of order using the precursor of
+    
+    * X: new Y(),
+    *
+    * Scaffold(key, appBar, Widget body, Widget floatingActionButton, FloatingActionButtonLocation
+    * floatingActionButtonLocation, FloatingActionButtonAnimator floatingActionButtonAnimator,
+    * List<Widget> persistentFooterButtons, Widget drawer, Widget endDrawer,
+    * Widget bottomNavigationBar, Widget bottomSheet, Color backgroundColor,
+    * bool resizeToAvoidBottomPadding, bool resizeToAvoidBottomInset, bool primary: true,
+    * DragStartBehavior drawerDragStartBehavior: DragStartBehavior.start,
+    * bool extendBody: false, bool extendBodyBehindAppBar: false, Color drawerScrimColor,
+    * double drawerEdgeDragWidth )
+    *
+    * */
     return new Scaffold(
         drawer: new Drawer(),
         appBar: new AppBar(
@@ -39,6 +57,9 @@ class HomePage extends StatelessWidget {
   }
 }
 
+/* This is where Users will be creating and filling out documents for logging
+* This second page will house the text fields and (presumably) imaging options
+*/
 class SecondPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
