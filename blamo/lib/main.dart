@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+ /* the idea behind the home page is a series of existing logs will appear in the white space, While the button in 
+  * the bottom right will allow users to create a new log 
+  * (the "second page" in this code is mostly a demonstration and can/should be removed in later implimentation) additionally, 
+  * the drawer will provide easy familiar navigation between setting, export, etc. Activities/pages of the project
+  */
 void main() {
   runApp(new MaterialApp(
       home: new HomePage(),
