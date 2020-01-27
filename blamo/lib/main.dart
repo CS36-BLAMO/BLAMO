@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:blamo/Export/index.dart';
 
  /* the idea behind the home page is a series of existing logs will appear in the white space, While the button in 
   * the bottom right will allow users to create a new log 
@@ -9,7 +10,8 @@ void main() {
   runApp(new MaterialApp(
       home: new HomePage(),
       routes: <String, WidgetBuilder> {
-        "/SecondPage": (BuildContext context) => new SecondPage()
+        "/SecondPage": (BuildContext context) => new SecondPage(),
+        "/ExportPage": (BuildContext context) => new ExportPage()
       }
   ));
 }
@@ -36,11 +38,46 @@ class HomePage extends StatelessWidget {
     *
     * */
     return new Scaffold(
-        drawer: new Drawer(),
+        drawer: new Drawer(
+          child: new ListView(
+            children: <Widget> [
+              new UserAccountsDrawerHeader(
+                  decoration: new BoxDecoration(
+                    image: new DecorationImage(
+                      fit: BoxFit.fill,
+                      image: new AssetImage('assets/images/OSU-eng-logo.png')
+                    )
+                  ),
+              ),
+              new ListTile(
+                title: new Text("Home"),
+                leading: Icon(
+                  Icons.home,
+                  color: Colors.blue
+                )
+              ),
+              Divider(),
+              new ListTile(
+                title: new Text("Export"),
+                leading: Icon(
+                  Icons.import_export,
+                  color: Colors.blue
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ExportPage()),
+                  );
+                },
+              ),
+              Divider()
+            ]
+          )
+        ),
         appBar: new AppBar(
             title: new Text("Home"),
             actions: <Widget>[
-
             ],
             backgroundColor: Colors.deepOrange
         ),
@@ -51,7 +88,7 @@ class HomePage extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SecondPage()),
+              MaterialPageRoute(builder: (context) => ExportPage()),
             );
           },
           child: Icon(Icons.create),
