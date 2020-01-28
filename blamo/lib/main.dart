@@ -76,7 +76,6 @@ class SecondPage extends StatelessWidget {
       appBar: new AppBar(
           title: new Text("Page #2"),
           actions: <Widget>[
-
           ],
           backgroundColor: Colors.deepOrange
       ),
@@ -90,7 +89,6 @@ class SecondPage extends StatelessWidget {
         child: Icon(Icons.create),
         backgroundColor: Colors.amber,
       ),
-
     );
   }
 }
@@ -118,7 +116,7 @@ class _SideMenuState extends State<SideMenu> {
               title: new Text("Home"),
               leading: Icon(
                 Icons.home,
-                color: Colors.orange
+                color: Colors.blue
             ),
             onTap: () {
               Navigator.push(
@@ -134,7 +132,7 @@ class _SideMenuState extends State<SideMenu> {
               title: new Text("Export"),
               leading: Icon(
                   Icons.import_export,
-                  color: Colors.orange
+                  color: Colors.blue
               ),
               onTap: () {
                 Navigator.push(
