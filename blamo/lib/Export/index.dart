@@ -2,7 +2,7 @@ import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
 
 
-/*This page will serve as a manual export option for both email and cloud save
+/*This page will serve as a manual export option all different avenues
  *
  */
 class ExportPage extends StatefulWidget {
@@ -17,45 +17,7 @@ class _ExportPageState extends State<ExportPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       drawer: new Drawer(
-       child: new ListView(
-           children: <Widget> [
-             new UserAccountsDrawerHeader(
-               decoration: new BoxDecoration(
-                   image: new DecorationImage(
-                       image: new AssetImage('assets/images/OSU-eng-logo.png')
-                   )
-               ),
-             ),
-             new ListTile(
-                 title: new Text("Home"),
-                 leading: Icon(
-                     Icons.home,
-                     color: Colors.blue
-                 ),
-                 onTap: () {
-                    Navigator.push(
-                        context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                    );
-                  },
-             ),
-             Divider(),
-             new ListTile(
-               title: new Text("Export"),
-               leading: Icon(
-                   Icons.import_export,
-                   color: Colors.blue
-               ),
-               onTap: () {
-                 Navigator.push(
-                   context,
-                   MaterialPageRoute(builder: (context) => ExportPage()),
-                 );
-               },
-             ),
-             Divider()
-           ]
-       )
+        child: SideMenu(),
       ),
       appBar: new AppBar(
           title: new Text("Export"),

@@ -24,7 +24,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     /* Scaffolding constructor is as follows, and can be filled out of order using the precursor of
-    
     * X: new Y(),
     *
     * Scaffold(key, appBar, Widget body, Widget floatingActionButton, FloatingActionButtonLocation
@@ -38,62 +37,29 @@ class HomePage extends StatelessWidget {
     *
     * */
     return new Scaffold(
-        drawer: new Drawer(
-          child: new ListView(
-            children: <Widget> [
-              new UserAccountsDrawerHeader(
-                  decoration: new BoxDecoration(
-                    image: new DecorationImage(
-                      fit: BoxFit.fill,
-                      image: new AssetImage('assets/images/OSU-eng-logo.png')
-                    )
-                  ),
-              ),
-              new ListTile(
-                title: new Text("Home"),
-                leading: Icon(
-                  Icons.home,
-                  color: Colors.blue
-                )
-              ),
-              Divider(),
-              new ListTile(
-                title: new Text("Export"),
-                leading: Icon(
-                  Icons.import_export,
-                  color: Colors.blue
-                ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ExportPage()),
-                  );
-                },
-              ),
-              Divider()
-            ]
-          )
-        ),
-        appBar: new AppBar(
-            title: new Text("Home"),
-            actions: <Widget>[
-            ],
-            backgroundColor: Colors.deepOrange
-        ),
-        body: Center(
-           child: Text("COWBOY BEAN BOWL")
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ExportPage()),
-            );
-          },
-          child: Icon(Icons.create),
-          backgroundColor: Colors.amber,
-        ),
+      drawer: Drawer(
+        child:SideMenu(),
+      ),
+      appBar: new AppBar(
+          title: new Text("Home"),
+          actions: <Widget>[
+
+          ],
+          backgroundColor: Colors.deepOrange
+      ),
+      body: Center(
+         child: Text("COWBOY BEAN BOWL")
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ExportPage()),
+          );
+        },
+        child: Icon(Icons.create),
+        backgroundColor: Colors.amber,
+      ),
 
     );
   }
@@ -126,5 +92,60 @@ class SecondPage extends StatelessWidget {
       ),
 
     );
+  }
+}
+
+class SideMenu extends StatefulWidget {
+
+  @override
+  _SideMenuState createState() => _SideMenuState();
+}
+
+class _SideMenuState extends State<SideMenu> {
+  @override
+  Widget build(BuildContext context) {
+      return Container(
+        child: new ListView(
+          children: <Widget> [
+            new UserAccountsDrawerHeader(accountName: null, accountEmail: null,
+              decoration: new BoxDecoration(
+                image: new DecorationImage(
+                  image: new AssetImage('assets/images/OSU-eng-logo.png')
+                )
+              ),
+            ),
+            new ListTile(
+              title: new Text("Home"),
+              leading: Icon(
+                Icons.home,
+                color: Colors.orange
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
+            },
+            ),
+            Divider(
+              color: Colors.black,
+            ),
+            new ListTile(
+              title: new Text("Export"),
+              leading: Icon(
+                  Icons.import_export,
+                  color: Colors.orange
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ExportPage()),
+                );
+              },
+            ),
+            Divider(),
+          ]
+        )
+      );
   }
 }
