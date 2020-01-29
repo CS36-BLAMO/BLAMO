@@ -93,12 +93,16 @@ class SecondPage extends StatelessWidget {
   }
 }
 
+
+//Side menu class that creates the side menu state
 class SideMenu extends StatefulWidget {
 
   @override
   _SideMenuState createState() => _SideMenuState();
 }
 
+// Side menu nav list state. Container of a ListView that lays out the different pages that can be accessed
+// If you want to add a page just insert your own ListTile under the divider. Navigator.push is on click redirect to page you want
 class _SideMenuState extends State<SideMenu> {
   @override
   Widget build(BuildContext context) {

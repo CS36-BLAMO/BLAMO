@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 
 
 /*This page will serve as a manual export option all different avenues
- *
+ * Only email and Box at the moment for placeholder but can be expanded to others
+ * Each page will live in its own dir for proper file structure.
  */
 class ExportPage extends StatefulWidget {
   @override
   _ExportPageState createState() => _ExportPageState();
 }
 
+// Basic structure for title and skeleton for expanded page
 class _ExportPageState extends State<ExportPage> {
   @override
   Widget build(BuildContext context) {
@@ -29,6 +31,7 @@ class _ExportPageState extends State<ExportPage> {
     );
   }
 }
+//
 Widget _exportList() => ListView(
   children: [
     Center(child:_tile('Email',Icons.email)),
@@ -36,6 +39,8 @@ Widget _exportList() => ListView(
     Center(child:_tile('Box',Icons.cloud_upload))
   ],
 );
+
+//Individual ListView item formatting with passed in icon and export to string
 ListTile _tile(String destination, IconData icon) => ListTile(
   title: Text(destination,
       style: TextStyle(
