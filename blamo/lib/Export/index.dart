@@ -17,7 +17,7 @@ class _ExportPageState extends State<ExportPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       drawer: new Drawer(
-        child: SideMenu(),
+        // child: SideMenu(),
       ),
       appBar: new AppBar(
           title: new Text("Export"),
