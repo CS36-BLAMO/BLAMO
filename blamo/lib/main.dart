@@ -135,7 +135,9 @@ class SecondPage extends StatelessWidget {
 
     final String text = currentState.currentRoute;
     return new Scaffold(
-      drawer: new Drawer(),
+      drawer: new Drawer(
+        //child: SideMenu()
+      ),
       appBar: new AppBar(
           title: new Text("Page #2"),
           actions: <Widget>[
