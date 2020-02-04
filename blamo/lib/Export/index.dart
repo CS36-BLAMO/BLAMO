@@ -25,9 +25,9 @@ class _ExportPageState extends State<ExportPage> {
 
   @override
   Widget build(BuildContext context) {
-    /*if(currentState.currentRoute != null) {
-      //currentState.currentRoute = '/ExportPage'; //Assigns currentState.currentRoute to the name of the current named route
-    }*/
+    if(currentState.currentRoute != null) {
+      currentState.currentRoute = '/ExportPage'; //Assigns currentState.currentRoute to the name of the current named route
+    }
 
     return new Scaffold(
       drawer: new Drawer(

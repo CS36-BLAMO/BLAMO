@@ -59,9 +59,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    /*if(currentState != null) {
-      //currentState.currentRoute='/';//Assigns currentState.currentRoute to the name of the current named route
-    }*/
+    if(currentState != null) {
+      currentState.currentRoute='/';//Assigns currentState.currentRoute to the name of the current named route
+    }
+
     /* Scaffolding constructor is as follows, and can be filled out of order using the precursor of
     * X: new Y(),
     *
