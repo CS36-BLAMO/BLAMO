@@ -1,3 +1,4 @@
+import 'package:blamo/routeGenerator.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/Export/index.dart';
 
@@ -8,6 +9,7 @@ class StateData {
   var list = ["Document 1","Document 2","Document 3","Document 4","Document 5","Document 6"];
 
   StateData(this.currentRoute, [this.randomNumber = 6]);
+
 }
 
  /* the idea behind the home page is a series of existing logs will appear in the white space, While the button in 
@@ -15,23 +17,34 @@ class StateData {
   * (the "second page" in this code is mostly a demonstration and can/should be removed in later implimentation) additionally, 
   * the drawer will provide easy familiar navigation between setting, export, etc. Activities/pages of the project
   */
-void main() {
-  runApp(new MaterialApp(
-      home: new HomePage(),
-      routes: <String, WidgetBuilder> {
-        "/SecondPage": (BuildContext context) => new SecondPage(),
-        "/ExportPage": (BuildContext context) => new ExportPage()
-      }
-  ));
+void main() => runApp(BLAMO());
+
+/* This builds the initial context and offloads
+*  route navigation to the routeGenerator class
+*/
+class BLAMO extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context){
+    return MaterialApp(
+      initialRoute: '/',
+      onGenerateRoute: RouteGenerator.generateRoute,
+    );
+  }
 }
+
 /* All pages must take in state data. The Stateful widget sole job
 *  is to pass the StateData object to the constructor during the
 *  createState() portion. Override for class constructor is needed to
 *  assign the variable to be passed.
 * */
 class HomePage extends StatefulWidget {
+  StateData pass;
+
+  HomePage(this.pass);
+
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState(pass);
 }
 
 /* Builds the initial page for the user
@@ -39,19 +52,16 @@ class HomePage extends StatefulWidget {
 *  The drawer needs to house the other pages our team is working on (Settings, Export, etc)
 */
 class _HomePageState extends State<HomePage> {
-  static const routeName = '/';
-  StateData currentState = StateData(routeName);
+  final routeName = '/';
+  StateData currentState;
+
+  _HomePageState(this.currentState);
 
   @override
   Widget build(BuildContext context) {
-    if(ModalRoute.of(context).settings.arguments != null) {
-      currentState = ModalRoute
-          .of(context)
-          .settings
-          .arguments;
-      currentState.currentRoute = '/'; // Recieves StateData objects from Navbar
-    }
-
+    /*if(currentState != null) {
+      //currentState.currentRoute='/';//Assigns currentState.currentRoute to the name of the current named route
+    }*/
     /* Scaffolding constructor is as follows, and can be filled out of order using the precursor of
     * X: new Y(),
     *
@@ -163,6 +173,7 @@ class SecondPage extends StatelessWidget {
 class SideMenu extends StatefulWidget {
   final StateData pass;
   SideMenu(this.pass);
+
   @override
   _SideMenuState createState() => _SideMenuState(pass);
 }
@@ -213,10 +224,15 @@ class _SideMenuState extends State<SideMenu> {
                   color: Colors.blue
               ),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ExportPage()),
-                );
+                if(currentState.currentRoute != "/ExportPage"){
+                  Navigator.pushReplacementNamed(
+                    context,
+                    "/ExportPage",
+                    arguments: currentState,
+                  );
+                } else {
+                  Navigator.pop(context);
+                }
               },
             ),
             Divider(),
