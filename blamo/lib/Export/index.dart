@@ -7,17 +7,31 @@ import 'package:flutter/material.dart';
  * Each page will live in its own dir for proper file structure.
  */
 class ExportPage extends StatefulWidget {
+  StateData pass; //Passes the StateData object to the stateful constructor
+
+  ExportPage(this.pass);
+
   @override
-  _ExportPageState createState() => _ExportPageState();
+  _ExportPageState createState() => _ExportPageState(pass);
 }
 
 // Basic structure for title and skeleton for expanded page
 class _ExportPageState extends State<ExportPage> {
+  final routeName = '/ExportPage';
+  StateData currentState;
+
+  _ExportPageState(this.currentState);
+
+
   @override
   Widget build(BuildContext context) {
+    if(currentState.currentRoute != null) {
+      currentState.currentRoute = '/ExportPage'; //Assigns currentState.currentRoute to the name of the current named route
+    }
+
     return new Scaffold(
       drawer: new Drawer(
-        child: SideMenu(),
+         child: SideMenu(currentState),
       ),
       appBar: new AppBar(
           title: new Text("Export"),
