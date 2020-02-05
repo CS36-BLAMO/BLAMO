@@ -1,5 +1,8 @@
 import 'package:blamo/routeGenerator.dart';
 import 'package:flutter/material.dart';
+import 'LogInfo/loginfo.dart';
+import 'Unit/unit.dart';
+import 'Test/test.dart';
 import 'package:blamo/Export/index.dart';
 
 //This class will be used to house all the data between each route
@@ -237,6 +240,57 @@ class _SideMenuState extends State<SideMenu> {
               },
             ),
             Divider(),
+          new ListTile(
+            title: new Text("Log Info"),
+            leading: Icon(
+              Icons.info,
+              color: Colors.blue
+            ),
+            onTap: () {
+              if(currentState.currentRoute != "/LogInfoPage"){
+                  Navigator.pushReplacementNamed(
+                    context,
+                    "/LogInfoPage",
+                    arguments: currentState,
+                  );
+                } else {
+                  Navigator.pop(context);
+                }
+            }),
+          new ListTile(
+            title: new Text("Unit X Info"),
+            leading: Icon(
+              Icons.assessment,
+              color: Colors.blue
+            ),
+            onTap: () {
+              if(currentState.currentRoute != "/UnitPage"){
+                  Navigator.pushReplacementNamed(
+                    context,
+                    "/UnitPage",
+                    arguments: currentState,
+                  );
+                } else {
+                  Navigator.pop(context);
+                }
+            }),
+          new ListTile(
+            title: new Text("Test X"),
+            leading: Icon(
+              Icons.assignment,
+              color: Colors.blue
+            ),
+            onTap: () {
+              if(currentState.currentRoute != "/TestPage"){
+                  Navigator.pushReplacementNamed(
+                    context,
+                    "/TestPage",
+                    arguments: currentState,
+                  );
+                } else {
+                  Navigator.pop(context);
+                }
+            })
           ]
         )
       );

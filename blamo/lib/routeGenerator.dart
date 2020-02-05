@@ -1,6 +1,9 @@
+import 'package:blamo/LogInfo/loginfo.dart';
 import 'package:flutter/material.dart';
+import 'package:blamo/Unit/unit.dart';
 import 'package:blamo/main.dart';
 import 'package:blamo/Export/index.dart';
+import 'package:blamo/Test/test.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings){
@@ -19,6 +22,16 @@ class RouteGenerator {
       case "/ExportPage":
         return MaterialPageRoute(builder: (_) => ExportPage(args));
         break;
+      case "/LogInfoPage":
+        return MaterialPageRoute(builder: (_) => LogInfoPage(args));
+        break;
+      case "/UnitPage":
+        return MaterialPageRoute(builder: (_) => UnitPage(args));
+        break;
+      case "/TestPage":
+        return MaterialPageRoute(builder: (_) => TestPage(args));
+        break;
+
     }
     return null;
   }

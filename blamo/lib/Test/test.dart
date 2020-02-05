@@ -1,0 +1,94 @@
+import 'package:blamo/main.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+class TestPage extends StatefulWidget {
+  StateData pass; //Passes the StateData object to the stateful constructor
+
+  TestPage(this.pass);
+  @override
+  _TestPageState createState() => new _TestPageState(pass);
+}
+
+class _TestPageState extends State<TestPage> {
+  final routeName = '/TestPage';
+  StateData currentState;
+  _TestPageState(this.currentState);
+
+  @override
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  Widget build(BuildContext context) {
+    if(currentState.currentRoute != null) {
+      currentState.currentRoute = '/TestPage'; //Assigns currentState.currentRoute to the name of the current named route
+    }
+    return new Scaffold(
+        backgroundColor: Colors.white,
+        drawer: new Drawer(
+        child: SideMenu(currentState),
+      ),
+        appBar: new AppBar(
+            title: new Text("Test Page"),
+            actions: <Widget>[
+
+            ],
+            backgroundColor: Colors.deepOrange
+      ),
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(40,0,40,40),
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              FormBuilder(key: _fbKey,
+                initialValue: {
+                  'date': DateTime.now(),
+                  'accept_terms': false,
+                },
+                autovalidate: true,
+                child: Column(
+                children: <Widget>[ 
+                  FormBuilderTextField(
+                    attribute: 'type-no',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Type Number"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'recovery-%',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Recovery %"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'sdr-rdd-rqd',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Soil Driving Resistance / Rock Discontinuity Data or RQD"), //ASK - preferred title?
+                  ),
+                  FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: unit.dart, 51)
+                    attribute: 'material-description',
+                    validators: [],
+                    initialValue: [],
+                    options: [ // TODO need gint's set of tags, ability for user to make own tags.
+                      FormBuilderFieldOption(value: "Sandy GRAVEL (Shoulder Aggregate)"),
+                      FormBuilderFieldOption(value: "GP"),
+                      FormBuilderFieldOption(value: "Varlegated Gray"),
+                      FormBuilderFieldOption(value: "Nonplastic"),
+                      FormBuilderFieldOption(value: "Moist"),
+                      FormBuilderFieldOption(value: "(FILL)")
+                    ],
+                  )
+                ]
+                )
+              )
+            ],
+          ))),
+          floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                if (_fbKey.currentState.saveAndValidate()) {
+                  print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
+                }
+              },
+              child: Icon(Icons.save),
+          ),
+    );
+  }
+}
