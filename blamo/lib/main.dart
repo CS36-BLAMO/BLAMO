@@ -200,6 +200,7 @@ class _SideMenuState extends State<SideMenu> {
                 )
               ),
             ),
+            Divider(color: Colors.grey),
             new ListTile(
               title: new Text("Home"),
               leading: Icon(
@@ -218,9 +219,7 @@ class _SideMenuState extends State<SideMenu> {
                 }
               },
             ),
-            Divider(
-              color: Colors.black,
-            ),
+            Divider(color: Colors.grey),
             new ListTile(
               title: new Text("Export"),
               leading: Icon(
@@ -239,59 +238,80 @@ class _SideMenuState extends State<SideMenu> {
                 }
               },
             ),
-            Divider(),
-          new ListTile(
-            title: new Text("Log Info"),
-            leading: Icon(
-              Icons.info,
-              color: Colors.blue
-            ),
-            onTap: () {
-              if(currentState.currentRoute != "/LogInfoPage"){
+            Divider( color: Colors.grey),
+            new ListTile(
+              title: new Text("Log Info"),
+              leading: Icon(
+                Icons.info,
+                color: Colors.blue
+              ),
+              onTap: () {
+                if(currentState.currentRoute != "/LogInfoPage"){
+                    Navigator.pushReplacementNamed(
+                      context,
+                      "/LogInfoPage",
+                      arguments: currentState,
+                    );
+                  } else {
+                    Navigator.pop(context);
+                  }
+              }),
+            Divider(color: Colors.grey[900]),
+            new ListTile(
+              title: new Text("Unit X Info"),
+              leading: Icon(
+                Icons.assessment,
+                color: Colors.blue
+              ),
+              onTap: () {
+                if(currentState.currentRoute != "/UnitPage"){
+                    Navigator.pushReplacementNamed(
+                      context,
+                      "/UnitPage",
+                      arguments: currentState,
+                    );
+                  } else {
+                    Navigator.pop(context);
+                  }
+              }),
+            Divider(color: Colors.grey),
+            new ListTile(
+              title: new Text("Test X"),
+              leading: Icon(
+                Icons.assignment,
+                color: Colors.blue
+              ),
+              onTap: () {
+                if(currentState.currentRoute != "/TestPage"){
+                    Navigator.pushReplacementNamed(
+                      context,
+                      "/TestPage",
+                      arguments: currentState,
+                    );
+                  } else {
+                    Navigator.pop(context);
+                  }
+              }),
+            Divider(color: Colors.grey),
+            new ListTile(
+              title: new Text("Settings"),
+              leading: Icon(
+                  Icons.settings,
+                  color: Colors.blue
+              ),
+              onTap: () {
+                if(currentState.currentRoute != "/SettingsPage"){
                   Navigator.pushReplacementNamed(
                     context,
-                    "/LogInfoPage",
+                    "/SettingsPage",
                     arguments: currentState,
                   );
                 } else {
                   Navigator.pop(context);
                 }
-            }),
-          new ListTile(
-            title: new Text("Unit X Info"),
-            leading: Icon(
-              Icons.assessment,
-              color: Colors.blue
-            ),
-            onTap: () {
-              if(currentState.currentRoute != "/UnitPage"){
-                  Navigator.pushReplacementNamed(
-                    context,
-                    "/UnitPage",
-                    arguments: currentState,
-                  );
-                } else {
-                  Navigator.pop(context);
-                }
-            }),
-          new ListTile(
-            title: new Text("Test X"),
-            leading: Icon(
-              Icons.assignment,
-              color: Colors.blue
-            ),
-            onTap: () {
-              if(currentState.currentRoute != "/TestPage"){
-                  Navigator.pushReplacementNamed(
-                    context,
-                    "/TestPage",
-                    arguments: currentState,
-                  );
-                } else {
-                  Navigator.pop(context);
-                }
-            })
-          ]
+              }),
+            Divider(color: Colors.grey),
+            ]
         )
       );
   }

@@ -1,0 +1,91 @@
+Index: blamo/lib/Export/index.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import 'package:blamo/main.dart';\r\nimport 'package:flutter/material.dart';\r\n\r\n\r\n/*This page will serve as a manual export option all different avenues\r\n * Only email and Box at the moment for placeholder but can be expanded to others\r\n * Each page will live in its own dir for proper file structure.\r\n */\r\nclass ExportPage extends StatefulWidget {\r\n  StateData pass; //Passes the StateData object to the stateful constructor\r\n\r\n  ExportPage(this.pass);\r\n\r\n  @override\r\n  _ExportPageState createState() => _ExportPageState(pass);\r\n}\r\n\r\n// Basic structure for title and skeleton for expanded page\r\nclass _ExportPageState extends State<ExportPage> {\r\n  final routeName = '/ExportPage';\r\n  StateData currentState;\r\n\r\n  _ExportPageState(this.currentState);\r\n\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    /*if(currentState.currentRoute != null) {\r\n      //currentState.currentRoute = '/ExportPage'; //Assigns currentState.currentRoute to the name of the current named route\r\n    }*/\r\n\r\n    return new Scaffold(\r\n      drawer: new Drawer(\r\n         child: SideMenu(currentState),\r\n      ),\r\n      appBar: new AppBar(\r\n          title: new Text(\"Export\"),\r\n          actions: <Widget>[\r\n          ],\r\n          backgroundColor: Colors.deepOrangeAccent\r\n      ),\r\n      body: Center(\r\n        child: Center(child:_exportList()),\r\n      ),\r\n    );\r\n  }\r\n}\r\n//\r\nWidget _exportList() => ListView(\r\n  children: [\r\n    Center(child:_tile('Email',Icons.email)),\r\n    Divider(),\r\n    Center(child:_tile('Box',Icons.cloud_upload))\r\n  ],\r\n);\r\n\r\n//Individual ListView item formatting with passed in icon and export to string\r\nListTile _tile(String destination, IconData icon) => ListTile(\r\n  title: Text(destination,\r\n      style: TextStyle(\r\n          fontWeight: FontWeight.w600,\r\n          fontSize:25\r\n      )),\r\n  leading: Padding(\r\n    padding: const EdgeInsets.all(20.0),\r\n    child: Icon(\r\n      icon,\r\n      color: Colors.blue,\r\n    ),\r\n  ),\r\n);\r\n\r\n//TODO Add functionality for onclick to grab CSV and email, text popup for email to send to\r\n//TODO cloud save to Box(Both form AND CSV?)
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- blamo/lib/Export/index.dart	(revision dff413e65f23802cbd1600a1722414a218204eac)
++++ blamo/lib/Export/index.dart	(date 1580790518562)
+@@ -1,7 +1,6 @@
+ import 'package:blamo/main.dart';
+ import 'package:flutter/material.dart';
+ 
+-
+ /*This page will serve as a manual export option all different avenues
+  * Only email and Box at the moment for placeholder but can be expanded to others
+  * Each page will live in its own dir for proper file structure.
+@@ -25,16 +24,16 @@
+ 
+   @override
+   Widget build(BuildContext context) {
+-    /*if(currentState.currentRoute != null) {
+-      //currentState.currentRoute = '/ExportPage'; //Assigns currentState.currentRoute to the name of the current named route
+-    }*/
++    if(currentState.currentRoute != null) {
++      currentState.currentRoute = '/ExportPage'; //Assigns currentState.currentRoute to the name of the current named route
++    }
+ 
+     return new Scaffold(
+       drawer: new Drawer(
+          child: SideMenu(currentState),
+       ),
+       appBar: new AppBar(
+-          title: new Text("Export"),
++          title: new Text(currentState.list[0].toString()),
+           actions: <Widget>[
+           ],
+           backgroundColor: Colors.deepOrangeAccent
+Index: blamo/lib/main.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import 'package:blamo/routeGenerator.dart';\r\nimport 'package:flutter/material.dart';\r\nimport 'package:blamo/Export/index.dart';\r\n\r\n//This class will be used to house all the data between each route\r\nclass StateData {\r\n  String currentRoute;\r\n  int randomNumber;\r\n  var list = [\"Document 1\",\"Document 2\",\"Document 3\",\"Document 4\",\"Document 5\",\"Document 6\"];\r\n\r\n  StateData(this.currentRoute, [this.randomNumber = 6]);\r\n\r\n}\r\n\r\n /* the idea behind the home page is a series of existing logs will appear in the white space, While the button in \r\n  * the bottom right will allow users to create a new log \r\n  * (the \"second page\" in this code is mostly a demonstration and can/should be removed in later implimentation) additionally, \r\n  * the drawer will provide easy familiar navigation between setting, export, etc. Activities/pages of the project\r\n  */\r\nvoid main() => runApp(BLAMO());\r\n\r\n/* This builds the initial context and offloads\r\n*  route navigation to the routeGenerator class\r\n*/\r\nclass BLAMO extends StatelessWidget {\r\n\r\n  @override\r\n  Widget build(BuildContext context){\r\n    return MaterialApp(\r\n      initialRoute: '/',\r\n      onGenerateRoute: RouteGenerator.generateRoute,\r\n    );\r\n  }\r\n}\r\n\r\n/* All pages must take in state data. The Stateful widget sole job\r\n*  is to pass the StateData object to the constructor during the\r\n*  createState() portion. Override for class constructor is needed to\r\n*  assign the variable to be passed.\r\n* */\r\nclass HomePage extends StatefulWidget {\r\n  StateData pass;\r\n\r\n  HomePage(this.pass);\r\n\r\n  @override\r\n  _HomePageState createState() => _HomePageState(pass);\r\n}\r\n\r\n/* Builds the initial page for the user\r\n*  Using Scaffolding to follow a fairly traditional layout for familiarity\r\n*  The drawer needs to house the other pages our team is working on (Settings, Export, etc)\r\n*/\r\nclass _HomePageState extends State<HomePage> {\r\n  final routeName = '/';\r\n  StateData currentState;\r\n\r\n  _HomePageState(this.currentState);\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    /*if(currentState != null) {\r\n      //currentState.currentRoute='/';//Assigns currentState.currentRoute to the name of the current named route\r\n    }*/\r\n    /* Scaffolding constructor is as follows, and can be filled out of order using the precursor of\r\n    * X: new Y(),\r\n    *\r\n    * Scaffold(key, appBar, Widget body, Widget floatingActionButton, FloatingActionButtonLocation\r\n    * floatingActionButtonLocation, FloatingActionButtonAnimator floatingActionButtonAnimator,\r\n    * List<Widget> persistentFooterButtons, Widget drawer, Widget endDrawer,\r\n    * Widget bottomNavigationBar, Widget bottomSheet, Color backgroundColor,\r\n    * bool resizeToAvoidBottomPadding, bool resizeToAvoidBottomInset, bool primary: true,\r\n    * DragStartBehavior drawerDragStartBehavior: DragStartBehavior.start,\r\n    * bool extendBody: false, bool extendBodyBehindAppBar: false, Color drawerScrimColor,\r\n    * double drawerEdgeDragWidth )\r\n    *\r\n    * */\r\n    return new Scaffold(\r\n      drawer: Drawer(\r\n        child:SideMenu(currentState),\r\n      ),\r\n      appBar: new AppBar(\r\n          title: new Text(\"Home\"),\r\n          actions: <Widget>[\r\n\r\n          ],\r\n          backgroundColor: Colors.deepOrange\r\n      ),\r\n      body: GridView.count(\r\n        padding: const EdgeInsets.all(20),\r\n        crossAxisSpacing: 2,\r\n        mainAxisSpacing: 10,\r\n        crossAxisCount: 2,\r\n        children: List.generate(currentState.randomNumber + 1, (index) {\r\n          String toReturn;\r\n          int colorVal = index*100;\r\n          if(index >= 9){\r\n            colorVal = 800;\r\n          }\r\n          if(index == 0){\r\n            toReturn = '+';\r\n            return Center(\r\n              child: Container(\r\n                padding: const EdgeInsets.all(8),\r\n                child: Text(toReturn),\r\n                color: Colors.deepOrange[colorVal],\r\n              ),);\r\n          } else {\r\n            toReturn = currentState.list[index-1];\r\n          }\r\n          return Container(\r\n            padding: const EdgeInsets.all(8),\r\n            child: Text(toReturn),\r\n            color: Colors.orange[colorVal],\r\n          );\r\n        }),\r\n      ),\r\n      floatingActionButton: FloatingActionButton(\r\n        onPressed: () {\r\n          Navigator.pushNamed(\r\n            context,\r\n            SecondPage.routeName,\r\n            arguments: currentState,\r\n          );\r\n        },\r\n        child: Icon(Icons.create),\r\n        backgroundColor: Colors.amber,\r\n      ),\r\n\r\n    );\r\n  }\r\n}\r\n\r\n\r\n/* This is where Users will be creating and filling out documents for logging\r\n* This second page will house the text fields and (presumably) imaging options\r\n*/\r\nclass SecondPage extends StatelessWidget {\r\n  static const routeName = '/SecondPage';\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    StateData currentState = ModalRoute.of(context).settings.arguments;\r\n    currentState.currentRoute='/SecondPage';\r\n\r\n    final String text = currentState.currentRoute;\r\n    return new Scaffold(\r\n      drawer: new Drawer(\r\n        //child: SideMenu()\r\n      ),\r\n      appBar: new AppBar(\r\n          title: new Text(\"Page #2\"),\r\n          actions: <Widget>[\r\n          ],\r\n          backgroundColor: Colors.deepOrange\r\n      ),\r\n      body: Center(\r\n          child: Text('$text')\r\n      ),\r\n      floatingActionButton: FloatingActionButton(\r\n        onPressed: () {\r\n          Navigator.pop(context);\r\n        },\r\n        child: Icon(Icons.create),\r\n        backgroundColor: Colors.amber,\r\n      ),\r\n    );\r\n  }\r\n}\r\n\r\n\r\n//Side menu class that creates the side menu state\r\nclass SideMenu extends StatefulWidget {\r\n  final StateData pass;\r\n  SideMenu(this.pass);\r\n\r\n  @override\r\n  _SideMenuState createState() => _SideMenuState(pass);\r\n}\r\n\r\n// Side menu nav list state. Container of a ListView that lays out the different pages that can be accessed\r\n// If you want to add a page just insert your own ListTile under the divider. Navigator.push is on click redirect to page you want\r\nclass _SideMenuState extends State<SideMenu> {\r\n  StateData currentState;\r\n\r\n  _SideMenuState(this.currentState);\r\n  @override\r\n  Widget build(BuildContext context) {\r\n      return Container(\r\n        child: new ListView(\r\n          children: <Widget> [\r\n            new UserAccountsDrawerHeader(accountName: null, accountEmail: null,\r\n              decoration: new BoxDecoration(\r\n                image: new DecorationImage(\r\n                  image: new AssetImage('assets/images/OSU-eng-logo.png')\r\n                )\r\n              ),\r\n            ),\r\n            new ListTile(\r\n              title: new Text(\"Home\"),\r\n              leading: Icon(\r\n                Icons.home,\r\n                color: Colors.blue\r\n              ),\r\n              onTap: () {\r\n                if(currentState.currentRoute != \"/\"){\r\n                  Navigator.pushReplacementNamed(\r\n                      context,\r\n                      \"/\",\r\n                      arguments: currentState,\r\n                  );\r\n                } else {\r\n                  Navigator.pop(context);\r\n                }\r\n              },\r\n            ),\r\n            Divider(\r\n              color: Colors.black,\r\n            ),\r\n            new ListTile(\r\n              title: new Text(\"Export\"),\r\n              leading: Icon(\r\n                  Icons.import_export,\r\n                  color: Colors.blue\r\n              ),\r\n              onTap: () {\r\n                if(currentState.currentRoute != \"/ExportPage\"){\r\n                  Navigator.pushReplacementNamed(\r\n                    context,\r\n                    \"/ExportPage\",\r\n                    arguments: currentState,\r\n                  );\r\n                } else {\r\n                  Navigator.pop(context);\r\n                }\r\n              },\r\n            ),\r\n            Divider(),\r\n          ]\r\n        )\r\n      );\r\n  }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- blamo/lib/main.dart	(revision dff413e65f23802cbd1600a1722414a218204eac)
++++ blamo/lib/main.dart	(date 1580790601908)
+@@ -26,7 +26,7 @@
+ 
+   @override
+   Widget build(BuildContext context){
+-    return MaterialApp(
++    return new MaterialApp(
+       initialRoute: '/',
+       onGenerateRoute: RouteGenerator.generateRoute,
+     );
+@@ -59,9 +59,9 @@
+ 
+   @override
+   Widget build(BuildContext context) {
+-    /*if(currentState != null) {
+-      //currentState.currentRoute='/';//Assigns currentState.currentRoute to the name of the current named route
+-    }*/
++    if(currentState != null) {
++      currentState.currentRoute='/';//Assigns currentState.currentRoute to the name of the current named route
++    }
+     /* Scaffolding constructor is as follows, and can be filled out of order using the precursor of
+     * X: new Y(),
+     *
+Index: blamo/lib/routeGenerator.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import 'package:flutter/material.dart';\r\nimport 'package:blamo/main.dart';\r\nimport 'package:blamo/Export/index.dart';\r\n\r\nclass RouteGenerator {\r\n  static Route<dynamic> generateRoute(RouteSettings settings){\r\n    var args;\r\n\r\n    if(settings.arguments == null){\r\n      args = StateData('/');\r\n    } else {\r\n      args = settings.arguments;\r\n    }\r\n\r\n    switch (settings.name){\r\n      case '/':\r\n        return MaterialPageRoute(builder: (_) => HomePage(args));\r\n        break;\r\n      case \"/ExportPage\":\r\n        return MaterialPageRoute(builder: (_) => ExportPage(args));\r\n        break;\r\n    }\r\n    return null;\r\n  }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- blamo/lib/routeGenerator.dart	(revision dff413e65f23802cbd1600a1722414a218204eac)
++++ blamo/lib/routeGenerator.dart	(date 1580789790664)
+@@ -14,10 +14,10 @@
+ 
+     switch (settings.name){
+       case '/':
+-        return MaterialPageRoute(builder: (_) => HomePage(args));
++        return MaterialPageRoute(builder: (context) => HomePage(args));
+         break;
+       case "/ExportPage":
+-        return MaterialPageRoute(builder: (_) => ExportPage(args));
++        return MaterialPageRoute(builder: (context) => ExportPage(args));
+         break;
+     }
+     return null;

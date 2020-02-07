@@ -1,4 +1,5 @@
 import 'package:blamo/LogInfo/loginfo.dart';
+import 'package:blamo/Settings/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/Unit/unit.dart';
 import 'package:blamo/main.dart';
@@ -31,7 +32,9 @@ class RouteGenerator {
       case "/TestPage":
         return MaterialPageRoute(builder: (_) => TestPage(args));
         break;
-
+      case "/SettingsPage":
+        return MaterialPageRoute(builder: (_) => SettingsPage(args));
+        break;
     }
     return null;
   }
