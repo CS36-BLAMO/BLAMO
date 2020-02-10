@@ -1,17 +1,14 @@
 import 'package:blamo/routeGenerator.dart';
 import 'package:flutter/material.dart';
-import 'LogInfo/loginfo.dart';
-import 'Unit/unit.dart';
-import 'Test/test.dart';
-import 'package:blamo/Export/index.dart';
+import 'package:blamo/FileHandler.dart';
 
 //This class will be used to house all the data between each route
 class StateData {
   String currentRoute;
   int randomNumber;
-  var list = ["Document 1","Document 2","Document 3","Document 4","Document 5","Document 6"];
+  var list = [""];
 
-  StateData(this.currentRoute, [this.randomNumber = 6]);
+  StateData(this.currentRoute, [this.randomNumber = 0]);
 
 }
 
@@ -26,6 +23,7 @@ void main() => runApp(BLAMO());
 *  route navigation to the routeGenerator class
 */
 class BLAMO extends StatelessWidget {
+
 
   @override
   Widget build(BuildContext context){
@@ -43,7 +41,7 @@ class BLAMO extends StatelessWidget {
 * */
 class HomePage extends StatefulWidget {
   StateData pass;
-
+  final PersistentStorage storage = PersistentStorage();
   HomePage(this.pass);
 
   @override
@@ -61,10 +59,25 @@ class _HomePageState extends State<HomePage> {
   _HomePageState(this.currentState);
 
   @override
+  void initState(){
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
     if(currentState != null) {
       currentState.currentRoute='/';//Assigns currentState.currentRoute to the name of the current named route
     }
+
+    widget.storage.checkForManifest().then((bool doesManifestExist) {
+      if(doesManifestExist){
+        widget.storage.readManifest().then((String toWrite) {
+          debugPrint(toWrite);
+        });
+      } else {
+        widget.storage.overWriteManifest("Document1, Document2, Document3,");
+        debugPrint("Written to the file, have a good one!");
+      }
+    });
 
     /* Scaffolding constructor is as follows, and can be filled out of order using the precursor of
     * X: new Y(),
