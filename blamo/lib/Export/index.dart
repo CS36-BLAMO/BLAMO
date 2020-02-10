@@ -1,6 +1,6 @@
 import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
-import 'package:blamo/Export/pdf.dart';
+import 'package:blamo/Export/pdf_builder.dart';
 
 /*This page will serve as a manual export option all different avenues
  * Only email and Box at the moment for placeholder but can be expanded to others
@@ -87,7 +87,7 @@ ListTile _pdfTile(String destination, IconData icon) => ListTile(
       color: Colors.blue,
     ),
   ),
-  onTap: () {docCreate();},
+  onTap: () {docCreate();}
 );
 //TODO Add functionality for onclick to grab CSV and email, text popup for email to send to
 //TODO cloud save to Box(Both form AND CSV?)
