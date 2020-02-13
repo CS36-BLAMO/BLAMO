@@ -1,4 +1,6 @@
+//import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:blamo/main.dart';
 
 import 'dart:io';
 import 'dart:async';
@@ -46,9 +48,28 @@ class PersistentStorage {
 
   void setFileToDocument(int documentNumber){
     fileName="Document-Meta.txt";
-    pathExtension="Document/$documentNumber";
+    pathExtension="Document$documentNumber/";
     nameIterator = 0;
   }
+
+  /*These next three functions should only be called from when in a document
+  * i.e. pathExtension is already established with a Document$documentNumber
+  * */
+  void setFileToUnit(int unitNumber){
+    fileName="Unit$unitNumber.txt";
+    nameIterator = 0;
+  }
+
+  void setFileToTest(int testNumber){
+    fileName="Test$testNumber.txt";
+    nameIterator = 0;
+  }
+
+  void setFileToLogInfo(){
+    fileName="LogInfo.txt";
+    nameIterator = 0;
+  }
+  /*end document setters*/
 
   /*---End of Navigation Block---*/
 
@@ -85,7 +106,7 @@ class PersistentStorage {
       return contents;
     } catch (e) {
       // If encountering an error, return 0
-      return "Oops!";
+      return "oops!";
     }
   }
 
@@ -101,7 +122,7 @@ class PersistentStorage {
       return contents;
     } catch (e) {
       // If encountering an error, return 0
-      return "Oops!";
+      return "oops!";
     }
   }
 
@@ -117,7 +138,7 @@ class PersistentStorage {
       return contents;
     } catch (e) {
       // If encountering an error, return 0
-      return "Oops!";
+      return "oops!";
     }
   }
 
@@ -133,7 +154,7 @@ class PersistentStorage {
       return contents;
     } catch (e) {
       // If encountering an error, return 0
-      return "Oops!";
+      return "oops!";
     }
   }
 
@@ -182,8 +203,24 @@ class PersistentStorage {
   }
   /*---End OverWrite Block---*/
 
+  /*---Boolean file Checking, checks for the existence of Specific files---
+  * checkForManifest() -> Checks the root directory if the manifest exists
+  * */
   Future<bool> checkForManifest() async {
     setFileToManifest();
     return File(await _localPath + "/Manifest.txt").exists();
+  }
+  /*---End Of file checking functions---*/
+
+  Future<StateData> setStateData(StateData toRead) async{
+    String toParse;
+    toParse = await readManifest();
+    toRead.list = toParse.split(",");
+    if((toRead.list[0] == "") && (toRead.list.length == 1)){
+      toRead.randomNumber = 0;
+    } else {
+      toRead.randomNumber = toRead.list.length;
+    }
+    return toRead;
   }
 }
