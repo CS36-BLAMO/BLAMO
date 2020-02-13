@@ -78,7 +78,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     if (currentState != null) {
       currentState.currentRoute = '/'; //Assigns currentState.currentRoute to the name of the current named route
-      debugPrint(currentState.currentRoute);
+      //---debug
+      //debugPrint(currentState.currentRoute);
     }
 
     widget.storage.checkForManifest().then((bool doesManifestExist) {
@@ -86,7 +87,8 @@ class _HomePageState extends State<HomePage> {
         upDateStateData();
       } else if(!doesManifestExist){
         widget.storage.overWriteManifest("");
-        debugPrint("Written to the file, have a good one!");
+        //---debug
+        //debugPrint("Written to the file, have a good one!");
       }
     });
 
@@ -120,7 +122,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisCount: 2,
         children: List.generate(widget.pass.list.length - 1, (index) {
           String toReturn;
-          int colorVal = /*index */ 100;
+          int colorVal = (index+1) * 100;
           if (index >= 9) {
             colorVal = 800;
           }
