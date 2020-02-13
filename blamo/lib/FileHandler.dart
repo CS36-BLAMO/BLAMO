@@ -85,7 +85,7 @@ class PersistentStorage {
       return contents;
     } catch (e) {
       // If encountering an error, return 0
-      return "fucked up mate";
+      return "Oops!";
     }
   }
 
@@ -101,7 +101,7 @@ class PersistentStorage {
       return contents;
     } catch (e) {
       // If encountering an error, return 0
-      return "fucked up mate";
+      return "Oops!";
     }
   }
 
@@ -117,7 +117,7 @@ class PersistentStorage {
       return contents;
     } catch (e) {
       // If encountering an error, return 0
-      return "fucked up mate";
+      return "Oops!";
     }
   }
 
@@ -133,7 +133,7 @@ class PersistentStorage {
       return contents;
     } catch (e) {
       // If encountering an error, return 0
-      return "fucked up mate";
+      return "Oops!";
     }
   }
 
