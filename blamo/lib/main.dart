@@ -2,19 +2,23 @@ import 'package:blamo/routeGenerator.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/FileHandler.dart';
 
+
 //This class will be used to house all the data between each route
 class StateData {
   String currentRoute;
   int randomNumber;
-  var list = [""];
+  int dirty;
+  List<String> list = [""];
 
-  StateData(this.currentRoute, [this.randomNumber = 0]);
+  StateData(this.currentRoute, [this.randomNumber = 0]){
+    this.dirty = 1;
+  }
 
 }
 
- /* the idea behind the home page is a series of existing logs will appear in the white space, While the button in 
-  * the bottom right will allow users to create a new log 
-  * (the "second page" in this code is mostly a demonstration and can/should be removed in later implimentation) additionally, 
+ /* the idea behind the home page is a series of existing logs will appear in the white space, While the button in
+  * the bottom right will allow users to create a new log
+  * (the "second page" in this code is mostly a demonstration and can/should be removed in later implimentation) additionally,
   * the drawer will provide easy familiar navigation between setting, export, etc. Activities/pages of the project
   */
 void main() => runApp(BLAMO());
@@ -23,8 +27,6 @@ void main() => runApp(BLAMO());
 *  route navigation to the routeGenerator class
 */
 class BLAMO extends StatelessWidget {
-
-
   @override
   Widget build(BuildContext context){
     return MaterialApp(
@@ -42,6 +44,7 @@ class BLAMO extends StatelessWidget {
 class HomePage extends StatefulWidget {
   StateData pass;
   final PersistentStorage storage = PersistentStorage();
+
   HomePage(this.pass);
 
   @override
@@ -59,22 +62,30 @@ class _HomePageState extends State<HomePage> {
   _HomePageState(this.currentState);
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
+    widget.storage.setStateData(currentState).then((StateData recieved) {
+      setState(() {
+        currentState.list = recieved.list;
+        currentState.randomNumber = recieved.randomNumber;
+        currentState.currentRoute = '/';
+        currentState.dirty = 1;
+      });
+    });
   }
+
   @override
   Widget build(BuildContext context) {
-    if(currentState != null) {
-      currentState.currentRoute='/';//Assigns currentState.currentRoute to the name of the current named route
+    if (currentState != null) {
+      currentState.currentRoute = '/'; //Assigns currentState.currentRoute to the name of the current named route
+      debugPrint(currentState.currentRoute);
     }
 
     widget.storage.checkForManifest().then((bool doesManifestExist) {
-      if(doesManifestExist){
-        widget.storage.readManifest().then((String toWrite) {
-          debugPrint(toWrite);
-        });
-      } else {
-        widget.storage.overWriteManifest("Document1, Document2, Document3,");
+      if (doesManifestExist && currentState.dirty == 1) {
+        upDateStateData();
+      } else if(!doesManifestExist){
+        widget.storage.overWriteManifest("");
         debugPrint("Written to the file, have a good one!");
       }
     });
@@ -94,12 +105,11 @@ class _HomePageState extends State<HomePage> {
     * */
     return new Scaffold(
       drawer: Drawer(
-        child:SideMenu(currentState),
+        child: SideMenu(currentState),
       ),
       appBar: new AppBar(
           title: new Text("Home"),
           actions: <Widget>[
-
           ],
           backgroundColor: Colors.deepOrange
       ),
@@ -108,37 +118,50 @@ class _HomePageState extends State<HomePage> {
         crossAxisSpacing: 2,
         mainAxisSpacing: 10,
         crossAxisCount: 2,
-        children: List.generate(currentState.randomNumber + 1, (index) {
+        children: List.generate(widget.pass.list.length - 1, (index) {
           String toReturn;
-          int colorVal = index*100;
-          if(index >= 9){
+          int colorVal = /*index */ 100;
+          if (index >= 9) {
             colorVal = 800;
           }
-          if(index == 0){
-            toReturn = '+';
-            return Center(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                child: Text(toReturn),
-                color: Colors.deepOrange[colorVal],
-              ),);
-          } else {
-            toReturn = currentState.list[index-1];
-          }
+          toReturn = currentState.list[index];
           return Container(
             padding: const EdgeInsets.all(8),
-            child: Text(toReturn),
+            child: Center(
+              child: Text(toReturn,
+              textAlign: TextAlign.center,)
+            ),
             color: Colors.orange[colorVal],
           );
         }),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(
-            context,
-            SecondPage.routeName,
-            arguments: currentState,
-          );
+          int i;
+          String toWrite = '';
+          if(widget.pass.randomNumber == 0){
+            toWrite = "Document0,";
+          }else {
+            for (i = 0; i < widget.pass.randomNumber - 1; i++) {
+              toWrite = toWrite + widget.pass.list[i] + ',';
+            }
+            toWrite = toWrite + "Document$i,";
+          }
+
+          /*
+          //---DubugUsed for debugging prints out the new document contents, and actual doc contents
+          widget.storage.readManifest().then((String read) {
+            debugPrint("Current file string:"+read);
+          });
+          debugPrint("toWrite is:" + toWrite);
+          */
+
+          widget.storage.overWriteManifest(toWrite);
+          currentState.dirty = 1;
+          //widget.storage.overWriteManifest("");
+          setState(() {
+
+          });
         },
         child: Icon(Icons.create),
         backgroundColor: Colors.amber,
@@ -146,45 +169,20 @@ class _HomePageState extends State<HomePage> {
 
     );
   }
-}
 
-
-/* This is where Users will be creating and filling out documents for logging
-* This second page will house the text fields and (presumably) imaging options
-*/
-class SecondPage extends StatelessWidget {
-  static const routeName = '/SecondPage';
-
-  @override
-  Widget build(BuildContext context) {
-    StateData currentState = ModalRoute.of(context).settings.arguments;
-    currentState.currentRoute='/SecondPage';
-
-    final String text = currentState.currentRoute;
-    return new Scaffold(
-      drawer: new Drawer(
-        //child: SideMenu()
-      ),
-      appBar: new AppBar(
-          title: new Text("Page #2"),
-          actions: <Widget>[
-          ],
-          backgroundColor: Colors.deepOrange
-      ),
-      body: Center(
-          child: Text('$text')
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        child: Icon(Icons.create),
-        backgroundColor: Colors.amber,
-      ),
-    );
+  //Updates the currentState object to reflect the manifest document
+  void upDateStateData(){
+    widget.storage.setStateData(currentState).then((StateData recieved) {
+      setState(() {
+        currentState.list = recieved.list;
+        currentState.randomNumber = recieved.randomNumber;
+        currentState.dirty = 0;
+      });
+    });
   }
-}
 
+
+}
 
 //Side menu class that creates the side menu state
 class SideMenu extends StatefulWidget {
@@ -221,11 +219,12 @@ class _SideMenuState extends State<SideMenu> {
                 color: Colors.blue
               ),
               onTap: () {
-                if(currentState.currentRoute != "/"){
+                if(widget.pass.currentRoute != '/'){
+                  widget.pass.currentRoute = '/';
                   Navigator.pushReplacementNamed(
                       context,
                       "/",
-                      arguments: currentState,
+                      arguments: widget.pass,
                   );
                 } else {
                   Navigator.pop(context);
@@ -240,11 +239,12 @@ class _SideMenuState extends State<SideMenu> {
                   color: Colors.blue
               ),
               onTap: () {
-                if(currentState.currentRoute != "/ExportPage"){
+                if(widget.pass.currentRoute != '/ExportPage'){
+                  widget.pass.currentRoute = '/ExportPage';
                   Navigator.pushReplacementNamed(
                     context,
                     "/ExportPage",
-                    arguments: currentState,
+                    arguments: widget.pass,
                   );
                 } else {
                   Navigator.pop(context);
@@ -259,7 +259,7 @@ class _SideMenuState extends State<SideMenu> {
                 color: Colors.blue
               ),
               onTap: () {
-                if(currentState.currentRoute != "/LogInfoPage"){
+                if(currentState.currentRoute != '/LogInfoPage'){
                     Navigator.pushReplacementNamed(
                       context,
                       "/LogInfoPage",
@@ -277,7 +277,7 @@ class _SideMenuState extends State<SideMenu> {
                 color: Colors.blue
               ),
               onTap: () {
-                if(currentState.currentRoute != "/UnitPage"){
+                if(currentState.currentRoute != '/UnitPage'){
                     Navigator.pushReplacementNamed(
                       context,
                       "/UnitPage",
@@ -295,7 +295,7 @@ class _SideMenuState extends State<SideMenu> {
                 color: Colors.blue
               ),
               onTap: () {
-                if(currentState.currentRoute != "/TestPage"){
+                if(currentState.currentRoute != '/TestPage'){
                     Navigator.pushReplacementNamed(
                       context,
                       "/TestPage",
@@ -313,7 +313,7 @@ class _SideMenuState extends State<SideMenu> {
                   color: Colors.blue
               ),
               onTap: () {
-                if(currentState.currentRoute != "/SettingsPage"){
+                if(currentState.currentRoute != '/SettingsPage'){
                   Navigator.pushReplacementNamed(
                     context,
                     "/SettingsPage",
