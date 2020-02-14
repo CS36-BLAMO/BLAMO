@@ -87,7 +87,7 @@ ListTile _pdfTile(String destination, IconData icon) => ListTile(
       color: Colors.blue,
     ),
   ),
-  onTap: () {docCreate();}
+  onTap: () {testDocCreate();}
 );
 //TODO Add functionality for onclick to grab CSV and email, text popup for email to send to
 //TODO cloud save to Box(Both form AND CSV?)

@@ -7,6 +7,167 @@ import 'package:permission_handler/permission_handler.dart';
 
 final pdf = Document();
 
+// victoria data:
+// Log info: ID, test type, project, number, client, lat, long, location, elevation datum, borehold id, start date, end date,
+//          surface elevation, contractor, method, logged by, checked by
+// Test/hole: Begin depth, end depth, soil type, description, moisture content, dry density, liquid limit, plastic limit,
+//            fines, Blows 1, Blows 2, Blows 3, Blows count
+
+// SAMPLE LOG DATA
+String objectID = "1";
+String testType = "SPT";
+String project = "I-5 @ OR214 Interchange (Woodburn) Development Sec.";
+String number = "PE000559";
+String client = "Oregon Department of Transportation";
+String lat = "550129.7734";
+String long = "7590750.9362";
+String location = "MP 33.75";
+String elevationDatum = "[Elevation Datum]";
+String boreholeID = "12518-01";
+String startDate = "5/1/2010";
+String endDate = "5/1/2010";
+String surfaceElevation = "186.51";
+String contractor = "Adonis - Western States";
+String method = "MUD ROTARY - AUTO HAMMER";
+String loggedBy = "Castelli";
+String checkedBy = "HSK / GAF / JFF";
+
+//TEST SAMPLE DATA
+String beginTestDepth = "0";
+String endTestDepth = "-2.5";
+String soilType = "ML";
+String description = "SILT with trace to some Sand";
+String moistureContent = "38-31";
+String dryDensity = "dry density";
+String liquidLimit = "liquid limit";
+String plasticLimit = "plastic limit";
+String fines = "fines";
+String blows1 = "5";
+String blows2 = "7";
+String blows3 = "11"; //are there variable amounts of blows?
+String blowCount = "18";
+
+//UNIT SAMPLE DATA
+String beginUnitDepth = "0";
+String endUnitDepth = "-2.5";
+String unitDescription = "Sandy GRAVEL (Shoulder Aggregate), GP";
+String unitMethods = "Unit Drilling Method";
+
+void testDocCreate() {
+
+  pdf.addPage(MultiPage(
+    pageFormat:
+        PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
+                                      marginTop: 0.5 * PdfPageFormat.cm,
+                                      marginLeft: 0.5 * PdfPageFormat.cm,
+                                      marginRight: 0.5 * PdfPageFormat.cm), 
+    crossAxisAlignment: CrossAxisAlignment.start,
+    header: (Context context){
+      if (context.pageNumber == 1){
+          return null;
+      }
+      return Container(
+        alignment: Alignment.centerRight,
+        margin: const EdgeInsets.only(bottom: 3.0 * PdfPageFormat.mm),
+        padding: const EdgeInsets.only(bottom: 3.0 * PdfPageFormat.mm),
+        decoration: const BoxDecoration(
+            border: BoxBorder(bottom: true, width: 0.5, color: PdfColors.grey)),
+        child: Text('DRILL LOG'+ client.toUpperCase(),
+            style: Theme.of(context)
+                .defaultTextStyle
+                .copyWith(color: PdfColors.grey, fontSize: 12)));
+    },
+    footer: (Context context) {
+      return Container(
+        alignment: Alignment.centerRight,
+        margin: const EdgeInsets.only(top: 1.0 * PdfPageFormat.cm),
+        child: Text('Page ${context.pageNumber} of ${context.pagesCount}',
+                style: Theme.of(context)
+                    .defaultTextStyle
+                    .copyWith(color: PdfColors.grey)));
+    },
+    build: (Context context) => <Widget>[
+            Header(
+                level: 0,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text('DRILL LOG\n'+ client.toUpperCase(), textScaleFactor: 1)
+                    ])),
+            Paragraph(
+                text:
+                    project),
+            Table.fromTextArray(context: context, data: <List<String>>[
+              <String>['Object ID', 'Test Type', 'Number', 'Latitude', 'Longitude', 'Location'],
+              <String>[objectID, testType, number, lat, long, location]
+            ]),
+            Table.fromTextArray(context: context, data: <List<String>>[
+              <String>['Borehole ID', 'Start Date', 'End Date', 'Surface Elevation', 'Contractor'],
+              <String>[boreholeID, startDate, endDate, surfaceElevation, contractor]
+            ]),
+            Table.fromTextArray(context: context, data: <List<String>>[
+              <String>['Method', 'Logged By', 'Checked By'],
+              <String>[method, loggedBy, checkedBy],
+            ]),
+            Paragraph(text:"\n"),
+            Row(mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+              Column(mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    child: Text("Soil Layers"),
+                    decoration: BoxDecoration(color: PdfColors.grey, border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                    padding: const EdgeInsets.all(10),
+                    width: 150
+                  ),
+                  Container( // TODO - Iterate for all units. Create custom Unit class?
+                    child: Text(beginUnitDepth + " - " + endUnitDepth + "\n" + unitDescription + "\n" + unitMethods + "\n"),
+                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                    padding: const EdgeInsets.all(10),
+                    width: 150,
+                    height: 250 // TODO - Derive?
+                  ),
+                  Container(
+                    child: Text(beginUnitDepth + " - " + endUnitDepth + "\n" + unitDescription + "\n" + unitMethods + "\n"),
+                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                    padding: const EdgeInsets.all(10),
+                    width: 150,
+                    height: 150 // TODO - Derive?
+                  ),
+                ],
+              ),
+              Column(mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container( // TODO - Iterate for all tests. Create custom Test class?
+                    child: Text(
+                      beginTestDepth + " to " + endTestDepth + " | " + // TODO - Make prettier.
+                      soilType + " | " + 
+                      description + " | " +
+                      moistureContent + " | " +
+                      dryDensity + " | " +
+                      liquidLimit + " | " +
+                      plasticLimit + " | " +
+                      fines + " | " +
+                      blows1 + " | " +
+                      blows2 + " | " + 
+                      blows3 + " | " +
+                      blowCount),
+                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                    padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.all(10),
+                    width: 425
+                  ),
+                ]
+              ),
+            ],
+          ),
+    ]));
+    pdf_write();
+}
+
+
+
+
 void docCreate() {
 
 
@@ -175,7 +336,7 @@ void pdf_write() async{
     //}
   } else {
     final output = await getExternalStorageDirectory();
-    String filepath = "${output.path}/output.pdf";
+    String filepath = "${output.path}/output_test.pdf";
     final file = File(filepath);
     print("writing to file at path"+filepath);
     await file.writeAsBytes(pdf.save()); // TODO - if file exists, it appends data to the file. ex multiple docs tacked onto each other.
