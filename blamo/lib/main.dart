@@ -1,6 +1,6 @@
 import 'package:blamo/routeGenerator.dart';
 import 'package:flutter/material.dart';
-import 'package:blamo/FileHandler.dart';
+import 'package:blamo/File_IO/FileHandler.dart';
 
 
 //This class will be used to house all the data between each route
@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
 
     widget.storage.checkForManifest().then((bool doesManifestExist) {
       if (doesManifestExist && currentState.dirty == 1) {
-        upDateStateData();
+        upDateStateData(0);
       } else if(!doesManifestExist){
         widget.storage.overWriteManifest("");
         //---debug
@@ -109,12 +109,14 @@ class _HomePageState extends State<HomePage> {
       drawer: Drawer(
         child: SideMenu(currentState),
       ),
+
       appBar: new AppBar(
           title: new Text("Home"),
           actions: <Widget>[
           ],
           backgroundColor: Colors.deepOrange
       ),
+
       body: GridView.count(
         padding: const EdgeInsets.all(20),
         crossAxisSpacing: 2,
@@ -127,27 +129,35 @@ class _HomePageState extends State<HomePage> {
             colorVal = 800;
           }
           toReturn = currentState.list[index];
-          return Container(
-            padding: const EdgeInsets.all(8),
-            child: Center(
-              child: Text(toReturn,
-              textAlign: TextAlign.center,)
+          return new InkResponse(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                child: Center(
+                    child: Text(toReturn,
+                    textAlign: TextAlign.center,
+                  )
             ),
             color: Colors.orange[colorVal],
-          );
+          ),
+          enableFeedback: true,
+          onTap: () => _onTileClicked(index));
         }),
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           int i;
           String toWrite = '';
+          int newestDoc;
           if(widget.pass.randomNumber == 0){
             toWrite = "Document0,";
+            newestDoc = 0;
           }else {
             for (i = 0; i < widget.pass.randomNumber - 1; i++) {
               toWrite = toWrite + widget.pass.list[i] + ',';
             }
             toWrite = toWrite + "Document$i,";
+            newestDoc = i;
           }
 
           /*
@@ -156,13 +166,11 @@ class _HomePageState extends State<HomePage> {
             debugPrint("Current file string:"+read);
           });
           debugPrint("toWrite is:" + toWrite);
+          //widget.storage.overWriteManifest("");
           */
 
-          widget.storage.overWriteManifest(toWrite);
-          currentState.dirty = 1;
-          //widget.storage.overWriteManifest("");
-          setState(() {
-
+          widget.storage.overWriteManifest(toWrite).then((Empty){
+            upDateStateData(newestDoc);
           });
         },
         child: Icon(Icons.create),
@@ -172,15 +180,24 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  //Creates a new document manifest
+  void createNewDocument(int docIteration) async{
+    await widget.storage.overWriteDocument(docIteration, "DocumentNumber: $docIteration\n");
+  }
+
   //Updates the currentState object to reflect the manifest document
-  void upDateStateData(){
-    widget.storage.setStateData(currentState).then((StateData recieved) {
-      setState(() {
-        currentState.list = recieved.list;
-        currentState.randomNumber = recieved.randomNumber;
-        currentState.dirty = 0;
-      });
+  void upDateStateData(int num) async{
+    await widget.storage.setStateData(currentState).then((StateData recieved) {
+      currentState.list = recieved.list;
+      currentState.randomNumber = recieved.randomNumber;
+      currentState.dirty = 0;
+      setState((){});
     });
+    createNewDocument(num);
+  }
+
+  void _onTileClicked(int index){
+    debugPrint("Clicked on $index");
   }
 
 
