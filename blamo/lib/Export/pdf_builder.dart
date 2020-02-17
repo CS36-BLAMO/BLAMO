@@ -162,6 +162,22 @@ void docCreate(){
   unit1.init(beginUnitDepth, endUnitDepth, unitDescription, unitMethods);
   Unit unit2 = new Unit();
   unit2.init("-2.5", "-6.0", unitDescription, unitMethods);
+  Unit unit3 = new Unit();
+  unit3.init("-6.0", "-8.0", unitDescription, unitMethods);
+  Unit unit4 = new Unit();
+  unit4.init("-8.0", "-9.0", unitDescription, unitMethods);
+  Unit unit5 = new Unit();
+  unit5.init("-9.0", "-10.0", unitDescription, unitMethods);
+  Unit unit6 = new Unit();
+  unit6.init("-10.0", "-11.0", unitDescription, unitMethods);
+  Unit unit7 = new Unit();
+  unit7.init("-11.0", "-12.0", unitDescription, unitMethods);
+  Unit unit8 = new Unit();
+  unit8.init("-13.0", "-14.0", unitDescription, unitMethods);
+  Unit unit9 = new Unit();
+  unit9.init("-15.0", "-16.0", unitDescription, unitMethods);
+  Unit unit10 = new Unit();
+  unit10.init("-17.0", "-18.0", unitDescription, unitMethods);
 
   Test test1 = new Test();
   test1.init(beginTestDepth, endTestDepth, soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
@@ -169,9 +185,14 @@ void docCreate(){
   test2.init("-2.5", "-3.0", soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
   Test test3 = new Test();
   test3.init("-3.0", "-5.0", soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
+  Test test4 = new Test();
+  test4.init("-3.0", "-5.0", soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
+  Test test5 = new Test();
+  test5.init("-3.0", "-5.0", soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
 
-  List<Test> tests = [test1, test2, test3];
-  List<Unit> units = [unit1, unit2];
+
+  List<Test> tests = [test1, test2, test3, test4, test5];
+  List<Unit> units = [unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8, unit9, unit10];
 
   // Create levels from provided lists of tests and units 
   List<Level> levels = [];
@@ -200,7 +221,7 @@ void docCreate(){
     for(var j = 0; j < levels[i].tests.length; j++){
       widgetTests.add(
         Container( 
-          child: Text(
+          child: Text( // TESTS
             levels[i].tests[j].beginTestDepth.toString() + " to " + levels[i].tests[j].endTestDepth.toString() + " | " + // TODO - Make prettier.
             levels[i].tests[j].soilType + " | " + 
             levels[i].tests[j].description + " | " +
@@ -224,7 +245,7 @@ void docCreate(){
         children: <Widget>[
         Column(mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-              Container( // UNIT
+              Container( // UNIT TODO - Vertical fill
                 constraints: BoxConstraints(maxWidth: 150),
                 child: Text(levels[i].unit.beginUnitDepth.toString() + " to " + levels[i].unit.endUnitDepth.toString() + "\n" + 
                             levels[i].unit.unitDescription + "\n" + 
@@ -249,26 +270,11 @@ void docCreate(){
                                       marginLeft: 0.5 * PdfPageFormat.cm,
                                       marginRight: 0.5 * PdfPageFormat.cm), 
     crossAxisAlignment: CrossAxisAlignment.start,
-    header: (Context context){
-      if (context.pageNumber != 1){
-          return null;
-      }
-      return Container(
-        alignment: Alignment.centerRight,
-        margin: const EdgeInsets.only(bottom: 3.0 * PdfPageFormat.mm),
-        padding: const EdgeInsets.only(bottom: 3.0 * PdfPageFormat.mm),
-        decoration: const BoxDecoration(
-            border: BoxBorder(bottom: true, width: 0.5, color: PdfColors.grey)),
-        child: Text('DRILL LOG'+ client.toUpperCase(),
-            style: Theme.of(context)
-                .defaultTextStyle
-                .copyWith(color: PdfColors.grey, fontSize: 12)));
-    },
     footer: (Context context) {
       return Container(
         alignment: Alignment.centerRight,
         margin: const EdgeInsets.only(top: 1.0 * PdfPageFormat.cm),
-        child: Text('Page ${context.pageNumber} of ${context.pagesCount}',
+        child: Text('DRILL LOG | '+ client.toUpperCase() + ' | Page ${context.pageNumber} of ${context.pagesCount}',
                 style: Theme.of(context)
                     .defaultTextStyle
                     .copyWith(color: PdfColors.grey)));
@@ -297,7 +303,8 @@ void docCreate(){
               <String>[method, loggedBy, checkedBy],
             ]),
             Paragraph(text:"\n"),
-            Column(mainAxisAlignment: MainAxisAlignment.start,
+            //Column(mainAxisAlignment: MainAxisAlignment.start,
+            Wrap( 
               children: widgetLevels)
             ]));
   pdf_write(); //
@@ -309,8 +316,8 @@ void pdf_write() async{
       await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
   if (permission.toString() != "PermissionStatus.granted") {
     Map<PermissionGroup, PermissionStatus> permissions = 
-      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
-    //if (permissions[permission].toString() == "PermissionStatus.granted") { //TODO - fix this. Right now you have to click PDF twice to write.
+      await PermissionHandler().requestPermissions([PermissionGroup.storage]);// TODO - fix permissions. Right now you have to click PDF twice to write.
+    //if (permissions[permission].toString() == "PermissionStatus.granted") { 
     //  final output = await getExternalStorageDirectory();
     //  String filepath = "${output.path}/output.pdf";
     //  final file = File(filepath);
