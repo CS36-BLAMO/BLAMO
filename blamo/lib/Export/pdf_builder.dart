@@ -1,3 +1,4 @@
+
 import 'dart:io';
 import 'dart:async';
 import 'package:pdf/pdf.dart';
@@ -7,11 +8,110 @@ import 'package:permission_handler/permission_handler.dart';
 
 final pdf = Document();
 
-// victoria data:
+class Unit { // TODO - toss these in another file. Touch up inits?
+    double beginUnitDepth;
+    double endUnitDepth;
+    String unitDescription;
+    String unitMethods;
+
+    void init(String beginUnitDepth, endUnitDepth, unitDescription, unitMethods){
+      this.beginUnitDepth = double.parse(beginUnitDepth);
+      this.endUnitDepth = double.parse(endUnitDepth);
+      this.unitDescription = unitDescription;
+      this.unitMethods = unitMethods;
+    }
+}
+
+class Test {
+    double beginTestDepth;
+    double endTestDepth;
+    String soilType;
+    String description;
+    String moistureContent;
+    String dryDensity;
+    String liquidLimit;
+    String plasticLimit;
+    String fines;
+    String blows1;
+    String blows2;
+    String blows3;
+    String blowCount;
+
+    void init(String beginTestDepth, endTestDepth, soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount){
+      this.beginTestDepth = double.parse(beginTestDepth);
+      this.endTestDepth = double.parse(endTestDepth);
+      this.soilType = soilType;
+      this.description = description;
+      this.moistureContent = moistureContent;
+      this.dryDensity = dryDensity;
+      this.liquidLimit = liquidLimit;
+      this.plasticLimit = plasticLimit;
+      this.fines = fines;
+      this.blows1 = blows1;
+      this.blows2 = blows2;
+      this.blows3 = blows3;
+      this.blowCount = blowCount;
+    }
+}
+
+class Level { //class for holding units and associated tests.
+    Unit unit;
+    List<Test> tests = [];
+    double beginDepth; // GOES BY ELEVATION. begindepth is higher elevation, or technically a "lower" bound. i.e. 0.
+    double endDepth; //                      enddepth is lower elevation, or technically a "higher" bound. i.e. -2.5.
+    void setDepth(){
+      this.beginDepth = this.beginDepth ?? this.unit.beginUnitDepth;
+      this.endDepth = this.endDepth ?? this.unit.endUnitDepth;
+    }
+}
+
+class LogInfo {
+    String objectID;
+    String testType;
+    String project;
+    String number;
+    String client;
+    String lat;
+    String long;
+    String location;
+    String elevationDatum;
+    String boreholeID;
+    String startDate;
+    String endDate;
+    String surfaceElevation;
+    String contractor;
+    String method;
+    String loggedBy;
+    String checkedBy;
+    String fakedata;
+
+  void init(String objectID, testType, project, number, client, lat, long, location, elevationDatum, boreholeID, startDate, endDate, surfaceElevation, contractor, method, loggedBy, checkedBy){
+    this.objectID = objectID;
+    this.testType = testType;
+    this.project = project;
+    this.number = number;
+    this.client = client;
+    this.lat = lat;
+    this.long = long;
+    this.location = location;
+    this.elevationDatum = elevationDatum;
+    this.boreholeID = boreholeID;
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.surfaceElevation = surfaceElevation;
+    this.contractor = contractor;
+    this.method = method;
+    this.loggedBy = loggedBy;
+    this.checkedBy = checkedBy;
+  }
+}
+
+// Victoria fields:
 // Log info: ID, test type, project, number, client, lat, long, location, elevation datum, borehold id, start date, end date,
 //          surface elevation, contractor, method, logged by, checked by
 // Test/hole: Begin depth, end depth, soil type, description, moisture content, dry density, liquid limit, plastic limit,
 //            fines, Blows 1, Blows 2, Blows 3, Blows count
+
 
 // SAMPLE LOG DATA
 String objectID = "1";
@@ -44,7 +144,7 @@ String plasticLimit = "plastic limit";
 String fines = "fines";
 String blows1 = "5";
 String blows2 = "7";
-String blows3 = "11"; //are there variable amounts of blows?
+String blows3 = "11"; 
 String blowCount = "18";
 
 //UNIT SAMPLE DATA
@@ -53,8 +153,95 @@ String endUnitDepth = "-2.5";
 String unitDescription = "Sandy GRAVEL (Shoulder Aggregate), GP";
 String unitMethods = "Unit Drilling Method";
 
-void testDocCreate() {
+void docCreate(){
+  // Initialize dummy data
+  LogInfo holeLog = new LogInfo();
+  holeLog.init(objectID, testType, project, number, client, lat, long, location, elevationDatum, boreholeID, startDate, endDate, surfaceElevation, contractor, method, loggedBy, checkedBy);
+  
+  Unit unit1 = new Unit();
+  unit1.init(beginUnitDepth, endUnitDepth, unitDescription, unitMethods);
+  Unit unit2 = new Unit();
+  unit2.init("-2.5", "-6.0", unitDescription, unitMethods);
 
+  Test test1 = new Test();
+  test1.init(beginTestDepth, endTestDepth, soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
+  Test test2 = new Test();
+  test2.init("-2.5", "-3.0", soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
+  Test test3 = new Test();
+  test3.init("-3.0", "-5.0", soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
+
+  List<Test> tests = [test1, test2, test3];
+  List<Unit> units = [unit1, unit2];
+
+  // Create levels from provided lists of tests and units 
+  List<Level> levels = [];
+  List<int> testIndexesStored = [];
+  for (var i = 0; i < units.length; i++){ // TODO - need to add validator in Units page so that no Unit depths overlap.
+    levels.add(new Level());
+    levels[i].unit = units[i];
+    levels[i].setDepth();
+    print("Populating level "+i.toString());
+    for (var k = 0; k < tests.length; k++){
+      
+      if (tests[k].beginTestDepth > levels[i].endDepth && !testIndexesStored.contains(k)){ // TODO - confirm client is ok with this functionality in output. if a test is majority in another level but starts in another, which should it be in?
+        levels[i].tests.add(tests[k]);
+        testIndexesStored.add(k);
+        print("Stored test"+(k+1).toString());
+      }
+    }
+  }
+  
+  // Convert levels to widgets
+  List<Widget> widgetLevels = [];
+  List<Widget> widgetTests = [];
+  // Create test widgets
+  for(var i = 0; i < levels.length; i++){
+    widgetTests = [];
+    for(var j = 0; j < levels[i].tests.length; j++){
+      widgetTests.add(
+        Container( 
+          child: Text(
+            levels[i].tests[j].beginTestDepth.toString() + " to " + levels[i].tests[j].endTestDepth.toString() + " | " + // TODO - Make prettier.
+            levels[i].tests[j].soilType + " | " + 
+            levels[i].tests[j].description + " | " +
+            levels[i].tests[j].moistureContent + " | " +
+            levels[i].tests[j].dryDensity + " | " +
+            levels[i].tests[j].liquidLimit + " | " +
+            levels[i].tests[j].plasticLimit + " | " +
+            levels[i].tests[j].fines + " | " +
+            levels[i].tests[j].blows1 + " | " +
+            levels[i].tests[j].blows2 + " | " + 
+            levels[i].tests[j].blows3 + " | " +
+            levels[i].tests[j].blowCount, textScaleFactor: 0.5),
+          decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+          padding: const EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
+          width: 425
+        ));
+    }
+    widgetLevels.add(
+      Row(mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+        Column(mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+              Container( // UNIT
+                constraints: BoxConstraints(maxWidth: 150),
+                child: Text(levels[i].unit.beginUnitDepth.toString() + " to " + levels[i].unit.endUnitDepth.toString() + "\n" + 
+                            levels[i].unit.unitDescription + "\n" + 
+                            levels[i].unit.unitMethods + "\n"),
+                decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                padding: const EdgeInsets.all(10),
+              ),
+          ],
+        ),
+        Column(mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.start,
+          children: widgetTests
+        )]
+      )
+    );
+  }
+
+  // Build it all
   pdf.addPage(MultiPage(
     pageFormat:
         PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
@@ -63,7 +250,7 @@ void testDocCreate() {
                                       marginRight: 0.5 * PdfPageFormat.cm), 
     crossAxisAlignment: CrossAxisAlignment.start,
     header: (Context context){
-      if (context.pageNumber == 1){
+      if (context.pageNumber != 1){
           return null;
       }
       return Container(
@@ -98,7 +285,7 @@ void testDocCreate() {
                 text:
                     project),
             Table.fromTextArray(context: context, data: <List<String>>[
-              <String>['Object ID', 'Test Type', 'Number', 'Latitude', 'Longitude', 'Location'],
+              <String>['Object ID', 'Test Type', 'Number', 'Latitude', 'Longitude', 'Location'], // TODO - persists across pages, make it not
               <String>[objectID, testType, number, lat, long, location]
             ]),
             Table.fromTextArray(context: context, data: <List<String>>[
@@ -110,213 +297,10 @@ void testDocCreate() {
               <String>[method, loggedBy, checkedBy],
             ]),
             Paragraph(text:"\n"),
-            Row(mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-              Column(mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    child: Text("Soil Layers"),
-                    decoration: BoxDecoration(color: PdfColors.grey, border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-                    padding: const EdgeInsets.all(10),
-                    width: 150
-                  ),
-                  Container( // TODO - Iterate for all units. Create custom Unit class?
-                    child: Text(beginUnitDepth + " - " + endUnitDepth + "\n" + unitDescription + "\n" + unitMethods + "\n"),
-                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-                    padding: const EdgeInsets.all(10),
-                    width: 150,
-                    height: 250 // TODO - Derive?
-                  ),
-                  Container(
-                    child: Text(beginUnitDepth + " - " + endUnitDepth + "\n" + unitDescription + "\n" + unitMethods + "\n"),
-                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-                    padding: const EdgeInsets.all(10),
-                    width: 150,
-                    height: 150 // TODO - Derive?
-                  ),
-                ],
-              ),
-              Column(mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container( // TODO - Iterate for all tests. Create custom Test class?
-                    child: Text(
-                      beginTestDepth + " to " + endTestDepth + " | " + // TODO - Make prettier.
-                      soilType + " | " + 
-                      description + " | " +
-                      moistureContent + " | " +
-                      dryDensity + " | " +
-                      liquidLimit + " | " +
-                      plasticLimit + " | " +
-                      fines + " | " +
-                      blows1 + " | " +
-                      blows2 + " | " + 
-                      blows3 + " | " +
-                      blowCount),
-                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-                    padding: const EdgeInsets.all(10),
-                    margin: const EdgeInsets.all(10),
-                    width: 425
-                  ),
-                ]
-              ),
-            ],
-          ),
-    ]));
-    pdf_write();
-}
-
-
-
-
-void docCreate() {
-
-
-  pdf.addPage(MultiPage(
-      pageFormat:
-          PdfPageFormat.letter.copyWith(marginBottom: 1.5 * PdfPageFormat.cm),
-      crossAxisAlignment: CrossAxisAlignment.start,
-      header: (Context context) {
-        if (context.pageNumber == 1) {
-          return null;
-        }
-        return Container(
-            alignment: Alignment.centerRight,
-            margin: const EdgeInsets.only(bottom: 3.0 * PdfPageFormat.mm),
-            padding: const EdgeInsets.only(bottom: 3.0 * PdfPageFormat.mm),
-            decoration: const BoxDecoration(
-                border:
-                    BoxBorder(bottom: true, width: 0.5, color: PdfColors.grey)),
-            child: Text('Portable Document Format',
-                style: Theme.of(context)
-                    .defaultTextStyle
-                    .copyWith(color: PdfColors.grey)));
-      },
-      footer: (Context context) {
-        return Container(
-            alignment: Alignment.centerRight,
-            margin: const EdgeInsets.only(top: 1.0 * PdfPageFormat.cm),
-            child: Text('Page ${context.pageNumber} of ${context.pagesCount}',
-                style: Theme.of(context)
-                    .defaultTextStyle
-                    .copyWith(color: PdfColors.grey)));
-      },
-      build: (Context context) => <Widget>[
-            Header(
-                level: 0,
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text('Portable Document Format', textScaleFactor: 2),
-                      PdfLogo()
-                    ])),
-            Paragraph(
-                text:
-                    'The Portable Document Format (PDF) is a file format developed by Adobe in the 1990s to present documents, including text formatting and images, in a manner independent of application software, hardware, and operating systems. Based on the PostScript language, each PDF file encapsulates a complete description of a fixed-layout flat document, including the text, fonts, vector graphics, raster images and other information needed to display it. PDF was standardized as an open format, ISO 32000, in 2008, and no longer requires any royalties for its implementation.'),
-            Paragraph(
-                text:
-                    'Today, PDF files may contain a variety of content besides flat text and graphics including logical structuring elements, interactive elements such as annotations and form-fields, layers, rich media (including video content) and three dimensional objects using U3D or PRC, and various other data formats. The PDF specification also provides for encryption and digital signatures, file attachments and metadata to enable workflows requiring these features.'),
-            Header(level: 1, text: 'History and standardization'),
-            Paragraph(
-                text:
-                    "Adobe Systems made the PDF specification available free of charge in 1993. In the early years PDF was popular mainly in desktop publishing workflows, and competed with a variety of formats such as DjVu, Envoy, Common Ground Digital Paper, Farallon Replica and even Adobe's own PostScript format."),
-            Paragraph(
-                text:
-                    'PDF was a proprietary format controlled by Adobe until it was released as an open standard on July 1, 2008, and published by the International Organization for Standardization as ISO 32000-1:2008, at which time control of the specification passed to an ISO Committee of volunteer industry experts. In 2008, Adobe published a Public Patent License to ISO 32000-1 granting royalty-free rights for all patents owned by Adobe that are necessary to make, use, sell, and distribute PDF compliant implementations.'),
-            Paragraph(
-                text:
-                    "PDF 1.7, the sixth edition of the PDF specification that became ISO 32000-1, includes some proprietary technologies defined only by Adobe, such as Adobe XML Forms Architecture (XFA) and JavaScript extension for Acrobat, which are referenced by ISO 32000-1 as normative and indispensable for the full implementation of the ISO 32000-1 specification. These proprietary technologies are not standardized and their specification is published only on Adobe's website. Many of them are also not supported by popular third-party implementations of PDF."),
-            Paragraph(
-                text:
-                    'On July 28, 2017, ISO 32000-2:2017 (PDF 2.0) was published. ISO 32000-2 does not include any proprietary technologies as normative references.'),
-            Header(level: 1, text: 'Technical foundations'),
-            Paragraph(text: 'The PDF combines three technologies:'),
-            Bullet(
-                text:
-                    'A subset of the PostScript page description programming language, for generating the layout and graphics.'),
-            Bullet(
-                text:
-                    'A font-embedding/replacement system to allow fonts to travel with the documents.'),
-            Bullet(
-                text:
-                    'A structured storage system to bundle these elements and any associated content into a single file, with data compression where appropriate.'),
-            Header(level: 2, text: 'PostScript'),
-            Paragraph(
-                text:
-                    'PostScript is a page description language run in an interpreter to generate an image, a process requiring many resources. It can handle graphics and standard features of programming languages such as if and loop commands. PDF is largely based on PostScript but simplified to remove flow control features like these, while graphics commands such as lineto remain.'),
-            Paragraph(
-                text:
-                    'Often, the PostScript-like PDF code is generated from a source PostScript file. The graphics commands that are output by the PostScript code are collected and tokenized. Any files, graphics, or fonts to which the document refers also are collected. Then, everything is compressed to a single file. Therefore, the entire PostScript world (fonts, layout, measurements) remains intact.'),
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Paragraph(
-                      text:
-                          'As a document format, PDF has several advantages over PostScript:'),
-                  Bullet(
-                      text:
-                          'PDF contains tokenized and interpreted results of the PostScript source code, for direct correspondence between changes to items in the PDF page description and changes to the resulting page appearance.'),
-                  Bullet(
-                      text:
-                          'PDF (from version 1.4) supports graphic transparency; PostScript does not.'),
-                  Bullet(
-                      text:
-                          'PostScript is an interpreted programming language with an implicit global state, so instructions accompanying the description of one page can affect the appearance of any following page. Therefore, all preceding pages in a PostScript document must be processed to determine the correct appearance of a given page, whereas each page in a PDF document is unaffected by the others. As a result, PDF viewers allow the user to quickly jump to the final pages of a long document, whereas a PostScript viewer needs to process all pages sequentially before being able to display the destination page (unless the optional PostScript Document Structuring Conventions have been carefully complied with).'),
-                ]),
-            Header(level: 1, text: 'Content'),
-            Paragraph(
-                text:
-                    'A PDF file is often a combination of vector graphics, text, and bitmap graphics. The basic types of content in a PDF are:'),
-            Bullet(
-                text:
-                    'Text stored as content streams (i.e., not encoded in plain text)'),
-            Bullet(
-                text:
-                    'Vector graphics for illustrations and designs that consist of shapes and lines'),
-            Bullet(
-                text:
-                    'Raster graphics for photographs and other types of image'),
-            Bullet(text: 'Multimedia objects in the document'),
-            Paragraph(
-                text:
-                    'In later PDF revisions, a PDF document can also support links (inside document or web page), forms, JavaScript (initially available as plugin for Acrobat 3.0), or any other types of embedded contents that can be handled using plug-ins.'),
-            Paragraph(
-                text:
-                    'PDF 1.6 supports interactive 3D documents embedded in the PDF - 3D drawings can be embedded using U3D or PRC and various other data formats.'),
-            Paragraph(
-                text:
-                    'Two PDF files that look similar on a computer screen may be of very different sizes. For example, a high resolution raster image takes more space than a low resolution one. Typically higher resolution is needed for printing documents than for displaying them on screen. Other things that may increase the size of a file is embedding full fonts, especially for Asiatic scripts, and storing text as graphics. '),
-            Header(level: 1, text: 'File formats and Adobe Acrobat versions'),
-            Paragraph(
-                text:
-                    'The PDF file format has changed several times, and continues to evolve, along with the release of new versions of Adobe Acrobat. There have been nine versions of PDF and the corresponding version of the software:'),
-            Table.fromTextArray(context: context, data: const <List<String>>[
-              <String>['Date', 'PDF Version', 'Acrobat Version'],
-              <String>['1993', 'PDF 1.0', 'Acrobat 1'],
-              <String>['1994', 'PDF 1.1', 'Acrobat 2'],
-              <String>['1996', 'PDF 1.2', 'Acrobat 3'],
-              <String>['1999', 'PDF 1.3', 'Acrobat 4'],
-              <String>['2001', 'PDF 1.4', 'Acrobat 5'],
-              <String>['2003', 'PDF 1.5', 'Acrobat 6'],
-              <String>['2005', 'PDF 1.6', 'Acrobat 7'],
-              <String>['2006', 'PDF 1.7', 'Acrobat 8'],
-              <String>['2008', 'PDF 1.7', 'Acrobat 9'],
-              <String>['2009', 'PDF 1.7', 'Acrobat 9.1'],
-              <String>['2010', 'PDF 1.7', 'Acrobat X'],
-              <String>['2012', 'PDF 1.7', 'Acrobat XI'],
-              <String>['2017', 'PDF 2.0', 'Acrobat DC'],
-            ]),
-            Padding(padding: const EdgeInsets.all(10)),
-            Paragraph(
-                text:
-                    'Text is available under the Creative Commons Attribution Share Alike License.')
-          ]));
-
-  //final output = _localFile;
-  //final file = File("$output/output.pdf");
-  
-  //file.writeAsBytesSync(pdf.save());
-  pdf_write();
-  
+            Column(mainAxisAlignment: MainAxisAlignment.start,
+              children: widgetLevels)
+            ]));
+  pdf_write(); //
 }
 
 void pdf_write() async{
