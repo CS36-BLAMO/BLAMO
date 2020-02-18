@@ -1,6 +1,6 @@
 import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
-import 'package:blamo/Export/pdf_builder.dart';
+import 'package:blamo/PDF/pdf_builder.dart';
 
 /*This page will serve as a manual export option all different avenues
  * Only email and Box at the moment for placeholder but can be expanded to others

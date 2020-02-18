@@ -5,153 +5,16 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:blamo/PDF/pdf_classes.dart';
+import 'package:blamo/PDF/pdf_dummy_data.dart';
 
-final pdf = Document();
-
-class Unit { // TODO - toss these in another file. Touch up inits?
-    double beginUnitDepth;
-    double endUnitDepth;
-    String unitDescription;
-    String unitMethods;
-
-    void init(String beginUnitDepth, endUnitDepth, unitDescription, unitMethods){
-      this.beginUnitDepth = double.parse(beginUnitDepth);
-      this.endUnitDepth = double.parse(endUnitDepth);
-      this.unitDescription = unitDescription;
-      this.unitMethods = unitMethods;
-    }
-}
-
-class Test {
-    double beginTestDepth;
-    double endTestDepth;
-    String soilType;
-    String description;
-    String moistureContent;
-    String dryDensity;
-    String liquidLimit;
-    String plasticLimit;
-    String fines;
-    String blows1;
-    String blows2;
-    String blows3;
-    String blowCount;
-
-    void init(String beginTestDepth, endTestDepth, soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount){
-      this.beginTestDepth = double.parse(beginTestDepth);
-      this.endTestDepth = double.parse(endTestDepth);
-      this.soilType = soilType;
-      this.description = description;
-      this.moistureContent = moistureContent;
-      this.dryDensity = dryDensity;
-      this.liquidLimit = liquidLimit;
-      this.plasticLimit = plasticLimit;
-      this.fines = fines;
-      this.blows1 = blows1;
-      this.blows2 = blows2;
-      this.blows3 = blows3;
-      this.blowCount = blowCount;
-    }
-}
-
-class Level { //class for holding units and associated tests.
-    Unit unit;
-    List<Test> tests = [];
-    double beginDepth; // GOES BY ELEVATION. begindepth is higher elevation, or technically a "lower" bound. i.e. 0.
-    double endDepth; //                      enddepth is lower elevation, or technically a "higher" bound. i.e. -2.5.
-    void setDepth(){
-      this.beginDepth = this.beginDepth ?? this.unit.beginUnitDepth;
-      this.endDepth = this.endDepth ?? this.unit.endUnitDepth;
-    }
-}
-
-class LogInfo {
-    String objectID;
-    String testType;
-    String project;
-    String number;
-    String client;
-    String lat;
-    String long;
-    String location;
-    String elevationDatum;
-    String boreholeID;
-    String startDate;
-    String endDate;
-    String surfaceElevation;
-    String contractor;
-    String method;
-    String loggedBy;
-    String checkedBy;
-    String fakedata;
-
-  void init(String objectID, testType, project, number, client, lat, long, location, elevationDatum, boreholeID, startDate, endDate, surfaceElevation, contractor, method, loggedBy, checkedBy){
-    this.objectID = objectID;
-    this.testType = testType;
-    this.project = project;
-    this.number = number;
-    this.client = client;
-    this.lat = lat;
-    this.long = long;
-    this.location = location;
-    this.elevationDatum = elevationDatum;
-    this.boreholeID = boreholeID;
-    this.startDate = startDate;
-    this.endDate = endDate;
-    this.surfaceElevation = surfaceElevation;
-    this.contractor = contractor;
-    this.method = method;
-    this.loggedBy = loggedBy;
-    this.checkedBy = checkedBy;
-  }
-}
+Document pdf = Document();
 
 // Victoria fields:
 // Log info: ID, test type, project, number, client, lat, long, location, elevation datum, borehold id, start date, end date,
 //          surface elevation, contractor, method, logged by, checked by
 // Test/hole: Begin depth, end depth, soil type, description, moisture content, dry density, liquid limit, plastic limit,
 //            fines, Blows 1, Blows 2, Blows 3, Blows count
-
-
-// SAMPLE LOG DATA
-String objectID = "1";
-String testType = "SPT";
-String project = "I-5 @ OR214 Interchange (Woodburn) Development Sec.";
-String number = "PE000559";
-String client = "Oregon Department of Transportation";
-String lat = "550129.7734";
-String long = "7590750.9362";
-String location = "MP 33.75";
-String elevationDatum = "[Elevation Datum]";
-String boreholeID = "12518-01";
-String startDate = "5/1/2010";
-String endDate = "5/1/2010";
-String surfaceElevation = "186.51";
-String contractor = "Adonis - Western States";
-String method = "MUD ROTARY - AUTO HAMMER";
-String loggedBy = "Castelli";
-String checkedBy = "HSK / GAF / JFF";
-
-//TEST SAMPLE DATA
-String beginTestDepth = "0";
-String endTestDepth = "-2.5";
-String soilType = "ML";
-String description = "SILT with trace to some Sand";
-String moistureContent = "38-31";
-String dryDensity = "dry density";
-String liquidLimit = "liquid limit";
-String plasticLimit = "plastic limit";
-String fines = "fines";
-String blows1 = "5";
-String blows2 = "7";
-String blows3 = "11"; 
-String blowCount = "18";
-
-//UNIT SAMPLE DATA
-String beginUnitDepth = "0";
-String endUnitDepth = "-2.5";
-String unitDescription = "Sandy GRAVEL (Shoulder Aggregate), GP";
-String unitMethods = "Unit Drilling Method";
 
 void docCreate(){
   // Initialize dummy data
@@ -311,26 +174,25 @@ void docCreate(){
 }
 
 void pdf_write() async{
-    await new Future.delayed(new Duration(seconds: 1));
-    PermissionStatus permission =
-      await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+  await new Future.delayed(new Duration(seconds: 1));
+  PermissionStatus permission =
+    await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
   if (permission.toString() != "PermissionStatus.granted") {
     Map<PermissionGroup, PermissionStatus> permissions = 
-      await PermissionHandler().requestPermissions([PermissionGroup.storage]);// TODO - fix permissions. Right now you have to click PDF twice to write.
-    //if (permissions[permission].toString() == "PermissionStatus.granted") { 
-    //  final output = await getExternalStorageDirectory();
-    //  String filepath = "${output.path}/output.pdf";
-    //  final file = File(filepath);
-    //  file.writeAsBytesSync(pdf.save());
-    //  print("done");
-    //  return;
-    //}
-  } else {
+      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+  } 
+  await new Future.delayed(new Duration(seconds: 1));
+  permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+  if (permission.toString() != "PermissionStatus.granted"){
+    print("Permission denied. PDF write cancelled."); // TODO - Better handle permission denied case. 
+    pdf = Document();
+  }
+  else {
     final output = await getExternalStorageDirectory();
     String filepath = "${output.path}/output_test.pdf";
     final file = File(filepath);
     print("writing to file at path"+filepath);
-    await file.writeAsBytes(pdf.save()); // TODO - if file exists, it appends data to the file. ex multiple docs tacked onto each other.
+    await file.writeAsBytes(pdf.save()); // TODO - Name files better
     print("done");
     return;
   }
