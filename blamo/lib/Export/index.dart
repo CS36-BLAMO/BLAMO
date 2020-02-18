@@ -1,11 +1,12 @@
 import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
-
+import 'package:blamo/PDF/pdf_builder.dart';
 
 /*This page will serve as a manual export option all different avenues
  * Only email and Box at the moment for placeholder but can be expanded to others
  * Each page will live in its own dir for proper file structure.
  */
+
 class ExportPage extends StatefulWidget {
   StateData pass; //Passes the StateData object to the stateful constructor
 
@@ -50,7 +51,9 @@ Widget _exportList() => ListView(
   children: [
     Center(child:_tile('Email',Icons.email)),
     Divider(),
-    Center(child:_tile('Box',Icons.cloud_upload))
+    Center(child:_tile('Box',Icons.cloud_upload)),
+    Divider(),
+    Center(child:_pdfTile('PDF',Icons.picture_as_pdf))
   ],
 );
 
@@ -70,5 +73,21 @@ ListTile _tile(String destination, IconData icon) => ListTile(
   ),
 );
 
+
+ListTile _pdfTile(String destination, IconData icon) => ListTile(
+  title: Text(destination,
+      style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize:25
+      )),
+  leading: Padding(
+    padding: const EdgeInsets.all(20.0),
+    child: Icon(
+      icon,
+      color: Colors.blue,
+    ),
+  ),
+  onTap: () {docCreate();}
+);
 //TODO Add functionality for onclick to grab CSV and email, text popup for email to send to
 //TODO cloud save to Box(Both form AND CSV?)
