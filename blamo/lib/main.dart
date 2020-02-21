@@ -6,12 +6,22 @@ import 'package:blamo/File_IO/FileHandler.dart';
 //This class will be used to house all the data between each route
 class StateData {
   String currentRoute;
+  String currentDocument;
+
+  int documentIterator = 0;
+  int unitCount = 0;
+  int testCount = 0;
   int randomNumber;
   int dirty;
-  List<String> list = [""];
 
-  StateData(this.currentRoute, [this.randomNumber = 0]){
-    this.dirty = 1;
+  List<String> list = [""];
+  List<String> testList = [];
+  List<String> unitList = [];
+
+  final PersistentStorage storage = PersistentStorage();
+
+  StateData(this.currentRoute, [this.dirty = 1]){
+    this.currentDocument = "";
   }
 
 }
@@ -43,7 +53,8 @@ class BLAMO extends StatelessWidget {
 * */
 class HomePage extends StatefulWidget {
   StateData pass;
-  final PersistentStorage storage = PersistentStorage();
+  //--Toremove
+  //final PersistentStorage storage = PersistentStorage();
 
   HomePage(this.pass);
 
@@ -64,12 +75,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    widget.storage.setStateData(currentState).then((StateData recieved) {
+    widget.pass.storage.setStateData(currentState).then((StateData recieved) {
       setState(() {
-        currentState.list = recieved.list;
-        currentState.randomNumber = recieved.randomNumber;
-        currentState.currentRoute = '/';
-        currentState.dirty = 1;
+        widget.pass.list = recieved.list;
+        widget.pass.currentRoute = '/';
+        widget.pass.dirty = 1;
       });
     });
   }
@@ -77,18 +87,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     if (currentState != null) {
-      currentState.currentRoute = '/'; //Assigns currentState.currentRoute to the name of the current named route
-      //---debug
-      //debugPrint(currentState.currentRoute);
+      widget.pass.currentRoute = '/'; //Assigns currentState.currentRoute to the name of the current named route
     }
-
-    widget.storage.checkForManifest().then((bool doesManifestExist) {
+    widget.pass.currentDocument="";
+    widget.pass.storage.checkForManifest().then((bool doesManifestExist) {
       if (doesManifestExist && currentState.dirty == 1) {
-        upDateStateData(0);
+        updateStateData();
       } else if(!doesManifestExist){
-        widget.storage.overWriteManifest("");
-        //---debug
-        //debugPrint("Written to the file, have a good one!");
+        widget.pass.storage.overWriteManifest("");
       }
     });
 
@@ -117,90 +123,106 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Colors.deepOrange
       ),
 
-      body: GridView.count(
-        padding: const EdgeInsets.all(20),
-        crossAxisSpacing: 2,
-        mainAxisSpacing: 10,
-        crossAxisCount: 2,
-        children: List.generate(widget.pass.list.length - 1, (index) {
-          String toReturn;
-          int colorVal = (index+1) * 100;
-          if (index >= 9) {
-            colorVal = 800;
-          }
-          toReturn = currentState.list[index];
-          return new InkResponse(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                child: Center(
-                    child: Text(toReturn,
-                    textAlign: TextAlign.center,
-                  )
-            ),
-            color: Colors.orange[colorVal],
-          ),
-          enableFeedback: true,
-          onTap: () => _onTileClicked(index));
-        }),
-      ),
+      body: gridViewBuilder(widget.pass.list),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          int i;
-          String toWrite = '';
-          int newestDoc;
-          if(widget.pass.randomNumber == 0){
-            toWrite = "Document0,";
-            newestDoc = 0;
-          }else {
-            for (i = 0; i < widget.pass.randomNumber - 1; i++) {
-              toWrite = toWrite + widget.pass.list[i] + ',';
-            }
-            toWrite = toWrite + "Document$i,";
-            newestDoc = i;
-          }
-
-          /*
-          //---DubugUsed for debugging prints out the new document contents, and actual doc contents
-          widget.storage.readManifest().then((String read) {
-            debugPrint("Current file string:"+read);
-          });
-          debugPrint("toWrite is:" + toWrite);
-          //widget.storage.overWriteManifest("");
-          */
-
-          widget.storage.overWriteManifest(toWrite).then((Empty){
-            upDateStateData(newestDoc);
-          });
-        },
-        child: Icon(Icons.create),
-        backgroundColor: Colors.amber,
-      ),
+      floatingActionButton: floatingActionButtonBuilder(),
 
     );
   }
 
   //Creates a new document manifest
-  void createNewDocument(int docIteration) async{
-    await widget.storage.overWriteDocument(docIteration, "DocumentNumber: $docIteration\n");
+  void createNewDocument(String docName) async{
+    await widget.pass.storage.overWriteDocument(docName, "$docName\n0\n0");
   }
 
   //Updates the currentState object to reflect the manifest document
-  void upDateStateData(int num) async{
-    await widget.storage.setStateData(currentState).then((StateData recieved) {
-      currentState.list = recieved.list;
-      currentState.randomNumber = recieved.randomNumber;
+  void updateStateData() async{
+    await widget.pass.storage.setStateData(widget.pass).then((StateData recieved) {
+      widget.pass.list = recieved.list;
       currentState.dirty = 0;
-      setState((){});
     });
-    createNewDocument(num);
   }
 
-  void _onTileClicked(int index){
-    debugPrint("Clicked on $index");
+  Future<void> updateStateDataCreateDoc(String docName) async{
+    await updateStateData();
+    await createNewDocument(docName);
   }
 
+  void _onTileClicked(int index) async {
+    widget.pass.documentIterator = index;
+    widget.pass.currentDocument = widget.pass.list[index];
+    widget.pass.dirty = 1;
+    debugPrint("(main)Tapped on: ${widget.pass.currentDocument}");
 
+    Navigator.pushReplacementNamed(
+      context,
+      "/Document",
+      arguments: widget.pass,
+    );
+    //widget.pass.currentDocument = "";
+  }
+
+  /* These are the object builders for the main scaffolding
+   *  FloatingActionButtonBuilder -> Builds the functionalty and style of the FAB in the bottom right of the screen, creates new documents onPressed
+   *  gridViewBuilder             -> Builds the main gridview dynamically on document creation
+   */
+    FloatingActionButton floatingActionButtonBuilder(){
+      return new FloatingActionButton(
+        onPressed: () async {
+          int i;
+          String toWrite = '';
+          String newestDoc;
+          if(widget.pass.list.length == 1){
+            toWrite = "Document0,";
+            newestDoc = "Document0";
+          } else {
+            for (i = 0; i < widget.pass.list.length-1; i++) {
+              toWrite = toWrite + widget.pass.list[i] + ',';
+            }
+            toWrite = toWrite + "Document$i,";
+            //toWrite = "Document$i,";
+            newestDoc = "Document$i";
+          }
+
+          await widget.pass.storage.overWriteManifest(toWrite);
+          await updateStateDataCreateDoc(newestDoc);
+
+          setState(() {});
+        },
+        child: Icon(Icons.create),
+        backgroundColor: Colors.amber,
+      );
+    }
+
+    GridView gridViewBuilder(List<String> listToBuildFrom){
+      return new GridView.count(
+        padding: const EdgeInsets.all(20),
+        crossAxisSpacing: 2,
+        mainAxisSpacing: 10,
+        crossAxisCount: 2,
+        children: List.generate(listToBuildFrom.length - 1, (index) {
+          String toReturn;
+          int colorVal = (index+1) * 100;
+          if (index >= 9) {
+            colorVal = 800;
+          }
+          toReturn = listToBuildFrom[index];
+          return new InkResponse(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                child: Center(
+                    child: Text(toReturn,
+                      textAlign: TextAlign.center,
+                    )
+                ),
+                color: Colors.orange[colorVal],
+              ),
+              enableFeedback: true,
+              onTap: () => _onTileClicked(index));
+        }),
+      );
+    }
+    //---End Builders---
 }
 
 //Side menu class that creates the side menu state

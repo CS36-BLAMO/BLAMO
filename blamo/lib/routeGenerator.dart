@@ -5,6 +5,7 @@ import 'package:blamo/Unit/unit.dart';
 import 'package:blamo/main.dart';
 import 'package:blamo/Export/index.dart';
 import 'package:blamo/Test/test.dart';
+import 'package:blamo/Document/overview.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings){
@@ -34,6 +35,9 @@ class RouteGenerator {
         break;
       case "/SettingsPage":
         return MaterialPageRoute(builder: (_) => SettingsPage(args));
+        break;
+      case "/Document":
+        return MaterialPageRoute(builder: (_) => DocumentPage(args));
         break;
     }
     return null;

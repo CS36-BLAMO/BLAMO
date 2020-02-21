@@ -1,4 +1,4 @@
-//import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'dart:convert';
 
 import 'package:path_provider/path_provider.dart';
@@ -18,7 +18,7 @@ class PersistentStorage {
   int nameIterator;
 
   PersistentStorage(){
-    fileName = "Manifest";
+    fileName = "Manifest.txt";
     pathExtension = "";
     nameIterator = 0;
   }
@@ -48,27 +48,27 @@ class PersistentStorage {
     nameIterator = 0;
   }
 
-  void setFileToDocument(int documentNumber){
+  void setFileToDocument(String documentName){
     fileName="_Document-Meta.txt";
-    pathExtension="Document$documentNumber";
+    pathExtension="$documentName";
     nameIterator = 0;
   }
 
   /*These next three functions should only be called from when in a document
   * i.e. pathExtension is already established with a Document$documentNumber
   * */
-  void setFileToUnit(int unitNumber){
-    fileName="_Unit$unitNumber.txt";
+  void setFileToUnit(String unitName){
+    fileName="_$unitName.txt";
     nameIterator = 0;
   }
 
-  void setFileToTest(int testNumber){
-    fileName="_Test$testNumber.txt";
+  void setFileToTest(String testName){
+    fileName="_$testName.txt";
     nameIterator = 0;
   }
 
   void setFileToLogInfo(){
-    fileName="LogInfo.txt";
+    fileName="_LogInfo.txt";
     nameIterator = 0;
   }
   /*end document setters*/
@@ -112,8 +112,11 @@ class PersistentStorage {
     }
   }
 
-  Future<String> readDocument(int documentNumber) async {
-    changePathExtension('Document$documentNumber');
+  Future<String> readDocument(String documentName) async {
+    //--Debug
+    debugPrint("(FH)Reading from: /$documentName" + "_Document-Meta.txt\n");
+
+    changePathExtension(documentName);
     changeFilename('_Document-Meta.txt');
     try {
       final file = await _localFile;
@@ -128,9 +131,12 @@ class PersistentStorage {
     }
   }
 
-  Future<String> readTest(int documentNumber, int testNumber) async {
-    changePathExtension('Document$documentNumber');
-    changeFilename('_Test$testNumber.txt');
+  Future<String> readTest(String documentName, String testName) async {
+    //--Debug
+    debugPrint("(FH)Reading from: /$documentName" + "_$testName.txt\n");
+
+    changePathExtension(documentName);
+    changeFilename('_$testName.txt');
     try {
       final file = await _localFile;
 
@@ -144,9 +150,12 @@ class PersistentStorage {
     }
   }
 
-  Future<String> readUnit(int documentNumber, int unitNumber) async {
-    changePathExtension('Document$documentNumber');
-    changeFilename('_Unit$unitNumber.txt');
+  Future<String> readUnit(String documentName, String unitName) async {
+    //--Debug
+    debugPrint("(FH)Reading from: /$documentName" + "_$unitName.txt\n");
+
+    changePathExtension(documentName);
+    changeFilename('_$unitName.txt');
     try {
       final file = await _localFile;
 
@@ -169,39 +178,50 @@ class PersistentStorage {
 * overWrite         -> Creates and writes into the unit document (requires: document number and unit number)
 * */
   Future<File> overWriteManifest(String toWrite) async {
+    //--Debug
+    debugPrint("(FH)Printing to manifest: $toWrite");
     setFileToManifest();
     final file = await _localFile;
 
     // Write the file
-    return file.writeAsString(toWrite);
+    return await file.writeAsString(toWrite);
   }
 
-  Future<File> overWriteDocument(int documentNumber, String toWrite) async {
-    changePathExtension('Document$documentNumber');
+  Future<File> overWriteDocument(String documentName, String toWrite) async {
+    //--Debug
+    debugPrint("(FH)Writing to: /$documentName" + "_Document-Meta.txt\n\nContents: $toWrite\n");
+
+    changePathExtension(documentName);
     changeFilename('_Document-Meta.txt');
     final file = await _localFile;
 
     // Write the file
     //return file.writeAsString('Document$documentNumber');
-    return file.writeAsString(toWrite);
+    return await file.writeAsString(toWrite);
   }
 
-  Future<File> overWriteTest(int documentNumber, int testNumber,String toWrite) async {
-    changePathExtension('Document$documentNumber');
-    changeFilename('_Test$testNumber.txt');
+  Future<File> overWriteTest(String documentName, String testName,String toWrite) async {
+    //--Debug
+    debugPrint("(FH)Writing to: /$documentName" + "_$testName.txt\n\nContents: $toWrite\n");
+
+    changePathExtension(documentName);
+    changeFilename('_$testName.txt');
     final file = await _localFile;
 
     // Write the file
-    return file.writeAsString(toWrite);
+    return await file.writeAsString(toWrite);
   }
 
-  Future<File> overWriteUnit(int documentNumber, int unitNumber, String toWrite) async {
-    changePathExtension('Document$documentNumber');
-    changeFilename('_Unit$unitNumber.txt');
+  Future<File> overWriteUnit(String documentName, String unitName, String toWrite) async {
+    //--Debug
+    debugPrint("(FH)Writing to: /$documentName" + "_$unitName.txt\n\nContents: $toWrite\n");
+
+    changePathExtension(documentName);
+    changeFilename('_$unitName.txt');
     final file = await _localFile;
 
     // Write the file
-    return file.writeAsString(toWrite);
+    return await file.writeAsString(toWrite);
   }
   /*---End OverWrite Block---*/
 
@@ -210,35 +230,35 @@ class PersistentStorage {
     final file = await _localFile;
 
     // Write the file
-    return file.writeAsString(toWrite, mode: FileMode.append, encoding: utf8 ,flush: true);
+    return await file.writeAsString(toWrite, mode: FileMode.append, encoding: utf8 ,flush: true);
   }
 
-  Future<File> writeDocument(int documentNumber, String toWrite) async {
-    changePathExtension('Document$documentNumber');
+  Future<File> writeDocument(String documentName, String toWrite) async {
+    changePathExtension(documentName);
     changeFilename('_Document-Meta.txt');
     final file = await _localFile;
 
     // Write the file
     //return file.writeAsString('Document$documentNumber');
-    return file.writeAsString(toWrite, mode: FileMode.append, encoding: utf8 ,flush: true);
+    return await file.writeAsString(toWrite, mode: FileMode.append, encoding: utf8 ,flush: true);
   }
 
-  Future<File> writeTest(int documentNumber, int testNumber,String toWrite) async {
-    changePathExtension('Document$documentNumber');
-    changeFilename('_Test$testNumber.txt');
+  Future<File> writeTest(String documentName, String testName, String toWrite) async {
+    changePathExtension(documentName);
+    changeFilename('_$testName.txt');
     final file = await _localFile;
 
     // Write the file
-    return file.writeAsString(toWrite, mode: FileMode.append, encoding: utf8 ,flush: true);
+    return await file.writeAsString(toWrite, mode: FileMode.append, encoding: utf8 ,flush: true);
   }
 
-  Future<File> writeUnit(int documentNumber, int unitNumber, String toWrite) async {
-    changePathExtension('Document$documentNumber');
-    changeFilename('_Unit$unitNumber.txt');
+  Future<File> writeUnit(String documentName, String unitName, String toWrite) async {
+    changePathExtension(documentName);
+    changeFilename('_$unitName.txt');
     final file = await _localFile;
 
     // Write the file
-    return file.writeAsString(toWrite, mode: FileMode.append, encoding: utf8 ,flush: true);
+    return await file.writeAsString(toWrite, mode: FileMode.append, encoding: utf8 ,flush: true);
   }
 
   /*---Boolean file Checking, checks for the existence of Specific files---
@@ -249,30 +269,73 @@ class PersistentStorage {
     return File(await _localPath + "/Manifest.txt").exists();
   }
 
-  Future<bool> checkDocument(int index) async {
+  Future<bool> checkDocument(String documentName) async {
     setFileToManifest();
-    return File(await _localPath + "/Document$index" + '_Document-Meta.txt').exists();
+    return File(await _localPath + "/$documentName" + '_Document-Meta.txt').exists();
   }
 
-  Future<bool> checkTest(int docIndex, int testIndex) async {
+  Future<bool> checkTest(String documentName, String testName) async {
     setFileToManifest();
-    return File(await _localPath + "/Document$docIndex" + '_Test$testIndex.txt').exists();
+    return File(await _localPath + "/$documentName" + '_$testName.txt').exists();
   }
 
-  Future<bool> checkUnit(int docIndex, int unitIndex) async {
+  Future<bool> checkUnit(String documentName, String unitName) async {
     setFileToManifest();
-    return File(await _localPath + "/Document$docIndex" + '_Test$unitIndex.txt').exists();
+    return File(await _localPath + "/$documentName" + '_$unitName.txt').exists();
   }
   /*---End Of file checking functions---*/
 
+  //Updates the statedata object with the currentDocument
   Future<StateData> setStateData(StateData toRead) async{
     String toParse;
-    toParse = await readManifest();
-    toRead.list = toParse.split(",");
-    if((toRead.list[0] == "") && (toRead.list.length == 1)){
-      toRead.randomNumber = 0;
+    List<String> tempLoc = [];
+    toRead.testList = [];
+    toRead.unitList = [];
+
+    if(toRead.currentRoute == "/") {
+      setFileToManifest();
+      toParse = await readManifest();
+      debugPrint("(FH) readManifest in SD: $toParse");
+
+      toRead.list = toParse.split(",");
+      if ((toRead.list[0] == "") && (toRead.list.length == 1)) {
+        toRead.randomNumber = 0;
+      } else {
+        toRead.randomNumber = toRead.list.length;
+      }
     } else {
-      toRead.randomNumber = toRead.list.length;
+      if (toRead.currentDocument != "") {
+        setFileToDocument(toRead.currentDocument);
+        toParse = await readDocument(toRead.currentDocument);
+        tempLoc = toParse.split('\n');
+
+        //--Debug
+        //debugPrint("(FH)Updating SD: ${toRead.currentDocument}");
+        //debugPrint("(FH)TemplocSize: ${tempLoc.length}");
+
+        for (int i = 0; i < tempLoc.length; i++) {
+          debugPrint("(FH)TempLoc[$i]: ${tempLoc[i]}");
+        }
+
+        toRead.testCount = int.parse(tempLoc[1]);
+        toRead.unitCount = int.parse(tempLoc[2]);
+
+        if (toRead.testCount != 0 || toRead.unitCount != 0) {
+          tempLoc = tempLoc[3].split(',');
+        }
+
+        if (toRead.testCount != 0) {
+          for (int i = 0; i < toRead.testCount; i++) {
+            toRead.testList.add(tempLoc[i]);
+          }
+        }
+
+        if (toRead.unitCount != 0) {
+          for (int j = 0; j < toRead.unitCount; j++) {
+            toRead.unitList.add(tempLoc[j + (toRead.testCount)]);
+          }
+        }
+      }
     }
     return toRead;
   }
