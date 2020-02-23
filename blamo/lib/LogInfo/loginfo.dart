@@ -17,13 +17,13 @@ class _LogInfoPageState extends State<LogInfoPage> {
   final routeName = '/TestPage';
   StateData currentState;
   _LogInfoPageState(this.currentState);
-  var formNodes = new List<FocusNode>(16);
+  var formNodes = new List<FocusNode>(17);
 
   @override
   void initState() {
     super.initState();
 
-    for( var i = 0; i < 16; i++) {
+    for( var i = 0; i < 17; i++) {
       formNodes[i] = FocusNode();
     }
 
@@ -32,7 +32,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
   @override
   void dispose () {
     
-    for(var i = 0; i < 16; i++) {
+    for(var i = 0; i < 17; i++) {
       formNodes[i].dispose();
     }
 
@@ -143,9 +143,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                   FormBuilderTextField(
                     textInputAction: TextInputAction.next,
                     focusNode: formNodes[7],
-                    attribute: 'elevationDatum',
+                    attribute: 'location',
                     validators: [],
-                    decoration: InputDecoration(labelText: "Elevation Datum"),
+                    decoration: InputDecoration(labelText: "Location"),
                     onFieldSubmitted: (v){
                       FocusScope.of(context).requestFocus(formNodes[8]);
                     },
@@ -153,21 +153,19 @@ class _LogInfoPageState extends State<LogInfoPage> {
                   FormBuilderTextField(
                     textInputAction: TextInputAction.next,
                     focusNode: formNodes[8],
-                    attribute: 'boreholeID',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Borehole ID"),
+                    attribute: 'elevationDatum',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Elevation Datum"),
                     onFieldSubmitted: (v){
                       FocusScope.of(context).requestFocus(formNodes[9]);
                     },
                   ),
-                  FormBuilderDateTimePicker(
+                  FormBuilderTextField(
                     textInputAction: TextInputAction.next,
                     focusNode: formNodes[9],
-                    attribute: "startDate",
-                    inputType: InputType.date,
-                    validators: [],
-                    format: DateFormat("dd-MM-yyyy"),
-                    decoration: InputDecoration(labelText: "Start Date"),
+                    attribute: 'boreholeID',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Borehole ID"),
                     onFieldSubmitted: (v){
                       FocusScope.of(context).requestFocus(formNodes[10]);
                     },
@@ -175,21 +173,23 @@ class _LogInfoPageState extends State<LogInfoPage> {
                   FormBuilderDateTimePicker(
                     textInputAction: TextInputAction.next,
                     focusNode: formNodes[10],
+                    attribute: "startDate",
+                    inputType: InputType.date,
+                    validators: [],
+                    format: DateFormat("dd-MM-yyyy"),
+                    decoration: InputDecoration(labelText: "Start Date"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[11]);
+                    },
+                  ),
+                  FormBuilderDateTimePicker(
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[11],
                     attribute: 'endDate',
                     inputType: InputType.date,
                     validators: [],
                     format: DateFormat('dd-MM-yyyy'),
                     decoration: InputDecoration(labelText: "End Date"),
-                    onFieldSubmitted: (v){
-                      FocusScope.of(context).requestFocus(formNodes[11]);
-                    },
-                  ),
-                  FormBuilderTextField(
-                    textInputAction: TextInputAction.next,
-                    focusNode: formNodes[11],
-                    attribute: 'surfaceElevation',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Surface Elevation (ft)"),
                     onFieldSubmitted: (v){
                       FocusScope.of(context).requestFocus(formNodes[12]);
                     },
@@ -197,9 +197,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                   FormBuilderTextField(
                     textInputAction: TextInputAction.next,
                     focusNode: formNodes[12],
-                    attribute: 'contractor',
-                    validators: [],
-                    decoration: InputDecoration(labelText: "Contractor"),
+                    attribute: 'surfaceElevation',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Surface Elevation (ft)"),
                     onFieldSubmitted: (v){
                       FocusScope.of(context).requestFocus(formNodes[13]);
                     },
@@ -207,9 +207,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                   FormBuilderTextField(
                     textInputAction: TextInputAction.next,
                     focusNode: formNodes[13],
-                    attribute: 'method',
+                    attribute: 'contractor',
                     validators: [],
-                    decoration: InputDecoration(labelText: "Method"),
+                    decoration: InputDecoration(labelText: "Contractor"),
                     onFieldSubmitted: (v){
                       FocusScope.of(context).requestFocus(formNodes[14]);
                     },
@@ -217,15 +217,25 @@ class _LogInfoPageState extends State<LogInfoPage> {
                   FormBuilderTextField(
                     textInputAction: TextInputAction.next,
                     focusNode: formNodes[14],
-                    attribute: 'loggedBy',
+                    attribute: 'method',
                     validators: [],
-                    decoration: InputDecoration(labelText: "Logged By"),
+                    decoration: InputDecoration(labelText: "Method"),
                     onFieldSubmitted: (v){
                       FocusScope.of(context).requestFocus(formNodes[15]);
                     },
                   ),
                   FormBuilderTextField(
+                    textInputAction: TextInputAction.next,
                     focusNode: formNodes[15],
+                    attribute: 'loggedBy',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Logged By"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[16]);
+                    },
+                  ),
+                  FormBuilderTextField(
+                    focusNode: formNodes[16],
                     attribute: 'checkedBy',
                     validators: [],
                     decoration: InputDecoration(labelText: "Checked By")

@@ -63,60 +63,11 @@ class _TestPageState extends State<TestPage> {
                     validators: [],
                     decoration: InputDecoration(labelText: "Soil Type"), //ASK - preferred title?
                   ),
-                  FormBuilderTextField(
+
+                  FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: unit.dart, 51)
                     attribute: 'description',
                     validators: [],
                     decoration: InputDecoration(labelText: "Description"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'moistureContent',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Moisture Content (%)"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'dryDensity',
-                    validators: [],
-                    decoration: InputDecoration(labelText: "Dry Density (pcf)"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'liquidLimit',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Liquid Limit (%)"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'plasticLimit',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Plastic Limit (%)"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'fines',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Fines (%)"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'blows1',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Blows 1st"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'blows2',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Blows 2nd"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'blows3',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Blows 3rd"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'blowCount',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Blow Count"),
-                  ),
-                 /*
-                  FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: unit.dart, 51)
-                    attribute: 'material-description',
-                    validators: [],
                     initialValue: [],
                     options: [ // TODO need gint's set of tags, ability for user to make own tags.
                       FormBuilderFieldOption(value: "Asphalt"),
@@ -173,7 +124,53 @@ class _TestPageState extends State<TestPage> {
                       FormBuilderFieldOption(value: "Glacial Till"),
                       FormBuilderFieldOption(value: "Topsoil")
                     ],
-                  )*/
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'moistureContent',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Moisture Content (%)"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'dryDensity',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Dry Density (pcf)"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'liquidLimit',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Liquid Limit (%)"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'plasticLimit',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Plastic Limit (%)"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'fines',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Fines (%)"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'blows1',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Blows 1st"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'blows2',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Blows 2nd"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'blows3',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Blows 3rd"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'blowCount',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Blow Count"),
+                  ),
+
                 ]
                 )
               )
