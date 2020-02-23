@@ -17,6 +17,27 @@ class _LogInfoPageState extends State<LogInfoPage> {
   final routeName = '/TestPage';
   StateData currentState;
   _LogInfoPageState(this.currentState);
+  var formNodes = new List<FocusNode>(17);
+
+  @override
+  void initState() {
+    super.initState();
+
+    for( var i = 0; i < 17; i++) {
+      formNodes[i] = FocusNode();
+    }
+
+  }
+
+  @override
+  void dispose () {
+    
+    for(var i = 0; i < 17; i++) {
+      formNodes[i].dispose();
+    }
+
+    super.dispose();
+  }
 
   @override
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
@@ -50,100 +71,174 @@ class _LogInfoPageState extends State<LogInfoPage> {
                 child: Column(
                 children: <Widget>[ 
                   FormBuilderTextField(
-                    attribute: 'title',
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[0],
+                    attribute: 'objectID',
                     validators: [],
-                    decoration: InputDecoration(labelText: "Project Name"),
+                    decoration: InputDecoration(labelText: "ObjectID"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[1]);
+                    },
+                  ),
+                  FormBuilderTextField(
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[1],
+                    attribute: 'testType',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Test Type"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[2]);
+                    },
+                  ),
+                  FormBuilderTextField(
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[2],
+                    attribute: 'project',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Project"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[3]);
+                    },
+                  ),
+                  FormBuilderTextField(
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[3],
+                    attribute: 'number',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Number"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[4]);
+                    },
+                  ),
+                  FormBuilderTextField(
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[4],
+                    attribute: 'client',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Client"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[5]);
+                    },
+                  ),
+                  FormBuilderTextField(
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[5],
+                    attribute: 'lat',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Latitude"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[6]);
+                    },
+                  ),
+                  FormBuilderTextField(
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[6],
+                    attribute: 'long',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Longitude"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[7]);
+                    },
+                  ),
+                  FormBuilderTextField(
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[7],
+                    attribute: 'location',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Location"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[8]);
+                    },
+                  ),
+                  FormBuilderTextField(
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[8],
+                    attribute: 'elevationDatum',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Elevation Datum"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[9]);
+                    },
+                  ),
+                  FormBuilderTextField(
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[9],
+                    attribute: 'boreholeID',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Borehole ID"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[10]);
+                    },
                   ),
                   FormBuilderDateTimePicker(
-                    attribute: "start-date",
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[10],
+                    attribute: "startDate",
                     inputType: InputType.date,
                     validators: [],
                     format: DateFormat("dd-MM-yyyy"),
                     decoration: InputDecoration(labelText: "Start Date"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[11]);
+                    },
                   ),
                   FormBuilderDateTimePicker(
-                    attribute: 'end-date',
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[11],
+                    attribute: 'endDate',
                     inputType: InputType.date,
                     validators: [],
                     format: DateFormat('dd-MM-yyyy'),
                     decoration: InputDecoration(labelText: "End Date"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[12]);
+                    },
                   ),
                   FormBuilderTextField(
-                    attribute: 'driller',
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[12],
+                    attribute: 'surfaceElevation',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Surface Elevation (ft)"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[13]);
+                    },
+                  ),
+                  FormBuilderTextField(
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[13],
+                    attribute: 'contractor',
                     validators: [],
-                    decoration: InputDecoration(labelText: "Driller"),
+                    decoration: InputDecoration(labelText: "Contractor"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[14]);
+                    },
                   ),
                   FormBuilderTextField(
-                    attribute: 'geologist',
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[14],
+                    attribute: 'method',
                     validators: [],
-                    decoration: InputDecoration(labelText: "Project Geologist"),
+                    decoration: InputDecoration(labelText: "Method"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[15]);
+                    },
                   ),
                   FormBuilderTextField(
-                    attribute: 'recorder',
+                    textInputAction: TextInputAction.next,
+                    focusNode: formNodes[15],
+                    attribute: 'loggedBy',
                     validators: [],
-                    decoration: InputDecoration(labelText: "Recorder"),
+                    decoration: InputDecoration(labelText: "Logged By"),
+                    onFieldSubmitted: (v){
+                      FocusScope.of(context).requestFocus(formNodes[16]);
+                    },
                   ),
                   FormBuilderTextField(
-                    attribute: 'northing',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(
-                      labelText: "Northing",),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'easting',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(
-                      labelText: "Easting"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'highway',
+                    focusNode: formNodes[16],
+                    attribute: 'checkedBy',
                     validators: [],
-                    decoration: InputDecoration(labelText: "Highway"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'county',
-                    validators: [],
-                    decoration: InputDecoration(labelText: "County"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'purpose',
-                    validators: [],
-                    decoration: InputDecoration(labelText: "Purpose"),
-                  ),
-                  FormBuilderTextField( 
-                    attribute: 'hole-no',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Hole No."),
-                  ),
-                  FormBuilderTextField( 
-                    attribute: 'ea-no',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "E.A. No."),
-                  ),
-                  FormBuilderTextField( 
-                    attribute: 'key-no',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Key No."),
-                  ),
-                  FormBuilderTextField( 
-                    attribute: 'start-card-no',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Start Card No."),
-                  ),
-                  FormBuilderTextField( 
-                    attribute: 'elevation',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Ground Elevation (m)"),
-                  ),
-                  FormBuilderTextField( 
-                    attribute: 'tube-height',
-                    validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Tube Height"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'equipment',
-                    validators: [],
-                    decoration: InputDecoration(labelText: "Equipment"),
+                    decoration: InputDecoration(labelText: "Checked By")
                   ),
                 ]
                 )
