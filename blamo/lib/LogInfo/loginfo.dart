@@ -72,6 +72,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                 children: <Widget>[ 
                   FormBuilderTextField(
                     textInputAction: TextInputAction.next,
+                    focusNode: formNodes[0],
                     attribute: 'title',
                     validators: [],
                     decoration: InputDecoration(labelText: "Project Name"),
