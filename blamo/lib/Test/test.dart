@@ -47,42 +47,73 @@ class _TestPageState extends State<TestPage> {
                 },
                 autovalidate: true,
                 child: Column(
-                children: <Widget>[ 
+                children: <Widget>[
                   FormBuilderTextField(
-                    attribute: 'type-no',
-                    validators: [],
-                    decoration: InputDecoration(labelText: "Test Type And Number"),
-                  ),
-                  FormBuilderTextField(
-                    attribute: 'tst-depth-ub',
+                    attribute: 'beginTestDepth',
                     validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Depth Upper Bound (m)"),
+                    decoration: InputDecoration(labelText: "Begin Test Depth (m)"),
                   ),
                   FormBuilderTextField(
-                      attribute: 'tst-depth-lb',
+                      attribute: 'endTestDepth',
                       validators: [FormBuilderValidators.numeric()],
-                      decoration: InputDecoration(labelText: "Depth Lower Bound (m)")
+                      decoration: InputDecoration(labelText: "End Test Depth (m)")
                   ),
                   FormBuilderTextField(
-                    attribute: 'recovery-%',
+                    attribute: 'soilType',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Soil Type"), //ASK - preferred title?
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'description',
+                    validators: [],
+                    decoration: InputDecoration(labelText: "Description"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'moistureContent',
                     validators: [FormBuilderValidators.numeric()],
-                    decoration: InputDecoration(labelText: "Percent Recovery"),
+                    decoration: InputDecoration(labelText: "Moisture Content (%)"),
                   ),
                   FormBuilderTextField(
-                    attribute: 'sdr-rdd-rqd',
+                    attribute: 'dryDensity',
                     validators: [],
-                    decoration: InputDecoration(labelText: "Soil Driving Resistance / Rock Discontinuity Data or RQD"), //ASK - preferred title?
+                    decoration: InputDecoration(labelText: "Dry Density (pcf)"),
                   ),
                   FormBuilderTextField(
-                    attribute: 'prcnt-moisture',
-                    validators: [],
-                    decoration: InputDecoration(labelText: "Percent Natural Moisture"),
+                    attribute: 'liquidLimit',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Liquid Limit (%)"),
                   ),
                   FormBuilderTextField(
-                    attribute: 'user-material-desc',
-                    validators: [],
-                    decoration: InputDecoration(labelText: "Material Description"),
+                    attribute: 'plasticLimit',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Plastic Limit (%)"),
                   ),
+                  FormBuilderTextField(
+                    attribute: 'fines',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Fines (%)"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'blows1',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Blows 1st"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'blows2',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Blows 2nd"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'blows3',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Blows 3rd"),
+                  ),
+                  FormBuilderTextField(
+                    attribute: 'blowCount',
+                    validators: [FormBuilderValidators.numeric()],
+                    decoration: InputDecoration(labelText: "Blow Count"),
+                  ),
+                 /*
                   FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: unit.dart, 51)
                     attribute: 'material-description',
                     validators: [],
@@ -142,7 +173,7 @@ class _TestPageState extends State<TestPage> {
                       FormBuilderFieldOption(value: "Glacial Till"),
                       FormBuilderFieldOption(value: "Topsoil")
                     ],
-                  )
+                  )*/
                 ]
                 )
               )
