@@ -1,0 +1,105 @@
+{
+  "StateData": {
+    "currentRoute": "currentRoute",
+    "randomNumber": 0,
+    "storage": {
+      "devicePath": "local/device/path",
+      "fileName": "currentFile",
+      "pathExtension": "CurrentPathExtension",
+      "nameIterator": 5
+    },
+    "documentManifest": [
+      "Document0",
+      "Document1",
+      "Document2"
+    ],
+    "currentDocument": "currentDocument",
+    "unitList": [
+      {
+      "unit1": "unit1"}
+    ],
+    "testList": [
+      {
+        "test1": "test1"
+      }
+    ]
+  },
+  "documentNameDocument-Meta": "DocumentNamenumTestnumUnitnamesofTestsnamesofUnits",
+  "document": [
+    {
+      "unitList": {},
+      "unitCount": {},
+      "testList": {},
+      "testCount": {},
+      "document1":{
+        "logInfo": {
+          "projectName": "Project Name",
+          "startDate": "Date",
+          "endDate": "date",
+          "driller": "driller",
+          "projectGeologist": "Project Geologist",
+          "recorder": "Recorder",
+          "northing": "northing",
+          "easting": "Easting",
+          "highway": "Highway",
+          "county": "County",
+          "purpose": "Purpose",
+          "holeNo.": 1,
+          "E.A No.": 2,
+          "keyNo.": 4,
+          "startCard No.": 6,
+          "groundElevation(m)": 200,
+          "tubeHeight": 45,
+          "equipment": "Equipment",
+          "objectID": "objectID",
+          "testType": "testType",
+          "project": "project",
+          "number": "number",
+          "client": "client",
+          "lat": "lat",
+          "long": "long",
+          "location": "Location",
+          "elevationDatum": "elevationDatum",
+          "boreholeID": "BoreholeID",
+          "surfaceElevation": "surfaceElevation",
+          "contractor": "Contractor",
+          "method": "Method",
+          "loggedBy": "loggedBy",
+          "checkedBy": "checkedBy",
+          "fakedata": "FakeData"
+        },
+        "Tests": [
+          {
+            "Test1":{
+              "beginTestDepth": 5,
+              "endTestDepth": 6,
+              "soilType": "SoilType",
+              "moistureContent": "Moisture Content",
+              "dryDensity": "dryDensity",
+              "liquidLimit": "Liquid Limit",
+              "plasticLimit": "Plastic Limit",
+              "fines": "fines",
+              "blows1": "Blows1",
+              "blows2": "Blows2",
+              "blows3": "Blows3",
+              "blowCount":"Blow Count",
+              "tags": "String of tags associated with the test"
+              }
+          }
+        ],
+        "Units": [
+          {
+            "Unit1": {
+              "depthUB": 10,
+              "depthLB": 12,
+              "beginUnitDepth": 14,
+              "unitMethods": "unitMethods",
+              "drillingMethods": "Drilling methods",
+              "tags": "String of tags associated with the unit"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

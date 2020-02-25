@@ -69,8 +69,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final routeName = '/';
   StateData currentState;
-
   _HomePageState(this.currentState);
+
+  TextEditingController _textFieldController = TextEditingController();
 
   @override
   void initState() {
@@ -167,30 +168,66 @@ class _HomePageState extends State<HomePage> {
    *  gridViewBuilder             -> Builds the main gridview dynamically on document creation
    */
     FloatingActionButton floatingActionButtonBuilder(){
-      return new FloatingActionButton(
-        onPressed: () async {
-          int i;
-          String toWrite = '';
-          String newestDoc;
-          if(widget.pass.list.length == 1){
-            toWrite = "Document0,";
-            newestDoc = "Document0";
-          } else {
-            for (i = 0; i < widget.pass.list.length-1; i++) {
-              toWrite = toWrite + widget.pass.list[i] + ',';
-            }
-            toWrite = toWrite + "Document$i,";
-            //toWrite = "Document$i,";
-            newestDoc = "Document$i";
-          }
-
-          await widget.pass.storage.overWriteManifest(toWrite);
-          await updateStateDataCreateDoc(newestDoc);
-
-          setState(() {});
+      return new FloatingActionButton.extended(
+        label: Text("New Document"),
+        tooltip: 'New Borehole Document',
+        icon: new Icon(Icons.add),
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.grey,
+        elevation: 50.0,
+        onPressed:(){
+          showDialog(
+            context: context,
+            builder:(context) => AlertDialog(
+              title: Text('Enter Document Name'),
+              content: TextField(
+                maxLength: 50,
+                controller: _textFieldController,
+                decoration: InputDecoration(labelText: 'Name Cannot Be Empty'),
+              ),
+              actions: <Widget> [
+                new FlatButton(
+                     child: new Text('CANCEL'),
+                     textColor: Colors.red,
+                     onPressed: () {
+                       Navigator.of(context).pop();
+                     },
+                ),
+                new FlatButton(
+                  child: new Text('ACCEPT'),
+                  onPressed: () async {
+                    int i;
+                    String toWrite = '';
+                    String newestDoc;
+                    String newNameWithComma = _textFieldController.text + ","; //TODO REGEX TO PARSE INPUT FOR SPECIAL CHARS AND DUP NAMES
+                    print("INPUT FIELD RECIEVED:" + newNameWithComma);
+                    if(_textFieldController.text.isNotEmpty) {
+                        if (widget.pass.list.length == 1) {
+                          toWrite = newNameWithComma;
+                          newestDoc = _textFieldController.text;
+                        } else {
+                          for (i = 0; i < widget.pass.list.length - 1; i++) {
+                            toWrite = toWrite + widget.pass.list[i] + ',';
+                          }
+                          toWrite = toWrite + newNameWithComma;
+                          //toWrite = "Document$i,";
+                          newestDoc = _textFieldController.text;
+                        }
+                        //In order for this to create doc and update homepage there needs to be a comma at the end of the filename
+                        //Or else it will fail to create
+                        await widget.pass.storage.overWriteManifest(toWrite);
+                        await updateStateDataCreateDoc(newestDoc);
+                        setState(() {});
+                        //Remove AlertDialog and allow for another doc to be created
+                        Navigator.of(context).pop();
+                        _textFieldController.text = "";
+                    }
+                  },
+                )
+              ]
+            ),
+          );
         },
-        child: Icon(Icons.create),
-        backgroundColor: Colors.amber,
       );
     }
 

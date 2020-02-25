@@ -51,7 +51,7 @@ class _DocumentPageState extends State<DocumentPage> {
           String title;
           switch(i){
             case 0:
-              title = "Loginfo";
+              title = "LogInfo";
               break;
             case 1:
               title = "Tests";
