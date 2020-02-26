@@ -23,7 +23,12 @@ class ObjectHandler {
   // Or just do a dif parser for each?
   //TODO GENERIC JSON PARSER?
   Unit parseUnitJSON(String unitJSON) {
-    Unit newUnitToBuild = new Unit.fromJSON(gson.decode(unitJSON));
+    Unit newUnitToBuild;
+    if(unitJSON == "oops!"){
+      newUnitToBuild = Unit();
+    } else {
+      newUnitToBuild = new Unit.fromJSON(gson.decode(unitJSON));
+    }
     /*debugPrint("-----unitJSON Decoded-----\n"
         + "Begin Depth: ${newUnitToBuild.depthUB}\n"
         + "End Depth: ${newUnitToBuild.depthLB}\n"
@@ -34,7 +39,12 @@ class ObjectHandler {
   }
 
   Test parseTestJSON(String testJSON) {
-    Test newTestToBuild = new Test.fromJSON(gson.decode(testJSON));
+    Test newTestToBuild;
+    if(testJSON == "oops!"){
+      newTestToBuild = new Test.fromJSON(gson.decode(testJSON));
+    } else {
+      newTestToBuild = Test();
+    }
     /*debugPrint("-----testJSON Decoded-----\n"
       + "beginTest: ${newTestToBuild.beginTest}\n"
       + "endTest: ${newTestToBuild.endTest}\n"
@@ -54,7 +64,12 @@ class ObjectHandler {
   }
 
   LogInfo parseLogInfoJSON(String logInfoJSON) {
-    LogInfo newLogInfoToBuild = new LogInfo.fromJSON(gson.decode(logInfoJSON));
+    LogInfo newLogInfoToBuild;
+    if(logInfoJSON == "oops!"){
+      newLogInfoToBuild = new LogInfo.fromJSON(gson.decode(logInfoJSON));
+    } else {
+      newLogInfoToBuild = LogInfo();
+    }
     /*debugPrint("------logInfoJSON Decoded-----\n"
       + "projectName: ${newLogInfoToBuild.projectName}\n"
       + "startDate: ${newLogInfoToBuild.startDate}\n"
