@@ -18,44 +18,44 @@ Document pdf = Document();
 
 void docCreate(){
   // Initialize dummy data
-  LogInfo holeLog = new LogInfo();
+  LogInfoPDF holeLog = new LogInfoPDF();
   holeLog.init(objectID, testType, project, number, client, lat, long, location, elevationDatum, boreholeID, startDate, endDate, surfaceElevation, contractor, method, loggedBy, checkedBy);
   
-  Unit unit1 = new Unit();
+  UnitPDF unit1 = new UnitPDF();
   unit1.init(beginUnitDepth, endUnitDepth, unitDescription, unitMethods);
-  Unit unit2 = new Unit();
+  UnitPDF unit2 = new UnitPDF();
   unit2.init("-2.5", "-6.0", unitDescription, unitMethods);
-  Unit unit3 = new Unit();
+  UnitPDF unit3 = new UnitPDF();
   unit3.init("-6.0", "-8.0", unitDescription, unitMethods);
-  Unit unit4 = new Unit();
+  UnitPDF unit4 = new UnitPDF();
   unit4.init("-8.0", "-9.0", unitDescription, unitMethods);
-  Unit unit5 = new Unit();
+  UnitPDF unit5 = new UnitPDF();
   unit5.init("-9.0", "-10.0", unitDescription, unitMethods);
-  Unit unit6 = new Unit();
+  UnitPDF unit6 = new UnitPDF();
   unit6.init("-10.0", "-11.0", unitDescription, unitMethods);
-  Unit unit7 = new Unit();
+  UnitPDF unit7 = new UnitPDF();
   unit7.init("-11.0", "-12.0", unitDescription, unitMethods);
-  Unit unit8 = new Unit();
+  UnitPDF unit8 = new UnitPDF();
   unit8.init("-13.0", "-14.0", unitDescription, unitMethods);
-  Unit unit9 = new Unit();
+  UnitPDF unit9 = new UnitPDF();
   unit9.init("-15.0", "-16.0", unitDescription, unitMethods);
-  Unit unit10 = new Unit();
+  UnitPDF unit10 = new UnitPDF();
   unit10.init("-17.0", "-18.0", unitDescription, unitMethods);
 
-  Test test1 = new Test();
+  TestPDF test1 = new TestPDF();
   test1.init(beginTestDepth, endTestDepth, soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
-  Test test2 = new Test();
+  TestPDF test2 = new TestPDF();
   test2.init("-2.5", "-3.0", soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
-  Test test3 = new Test();
+  TestPDF test3 = new TestPDF();
   test3.init("-3.0", "-5.0", soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
-  Test test4 = new Test();
+  TestPDF test4 = new TestPDF();
   test4.init("-3.0", "-5.0", soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
-  Test test5 = new Test();
+  TestPDF test5 = new TestPDF();
   test5.init("-3.0", "-5.0", soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount);
 
 
-  List<Test> tests = [test1, test2, test3, test4, test5];
-  List<Unit> units = [unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8, unit9, unit10];
+  List<TestPDF> tests = [test1, test2, test3, test4, test5];
+  List<UnitPDF> units = [unit1, unit2, unit3, unit4, unit5, unit6, unit7, unit8, unit9, unit10];
 
   // Create levels from provided lists of tests and units 
   List<Level> levels = [];
