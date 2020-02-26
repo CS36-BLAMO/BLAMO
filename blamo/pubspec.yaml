@@ -29,6 +29,7 @@ dependencies:
   pdf: ^1.4.1
   path_provider: ^1.6.0
   permission_handler: '^4.2.0+hotfix.3'
+  gson: ^0.1.4
 
 dev_dependencies:
   flutter_test:

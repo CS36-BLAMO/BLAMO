@@ -169,9 +169,28 @@ class PersistentStorage {
     }
   }
 
+    Future<String> readLogInfo(String documentName) async {
+    //--Debug
+    debugPrint("(FH)Reading from: /$documentName" + "_LogInfo.txt\n");
+
+    changePathExtension(documentName);
+    changeFilename('_LogInfo.txt');
+    try {
+      final file = await _localFile;
+
+      // Read the file
+      String contents = await file.readAsString();
+
+      return contents;
+    } catch (e) {
+      // If encountering an error, return 0
+      return "oops!";
+    }
+  }
+
   /*---End Read Operations Block---*/
 
-/*This block handles all of the creation/overwrite opperations for file IO
+/*This block handles all of the creation/overwrite opperations for file IO 
 * overWriteManifest -> Creates and writes into the manifest doc in the root
 * overWriteDocument -> Creates and writes into the Document-meta.text (requires document number)
 * overWriteTest     -> Creates and writes into the test document (requires: document number and test number)
@@ -200,7 +219,7 @@ class PersistentStorage {
     return await file.writeAsString(toWrite);
   }
 
-  Future<File> overWriteTest(String documentName, String testName,String toWrite) async {
+  Future<void> overWriteTest(String documentName, String testName,String toWrite) async {
     //--Debug
     debugPrint("(FH)Writing to: /$documentName" + "_$testName.txt\n\nContents: $toWrite\n");
 
@@ -212,12 +231,24 @@ class PersistentStorage {
     return await file.writeAsString(toWrite);
   }
 
-  Future<File> overWriteUnit(String documentName, String unitName, String toWrite) async {
+  Future<void> overWriteUnit(String documentName, String unitName, String toWrite) async {
     //--Debug
     debugPrint("(FH)Writing to: /$documentName" + "_$unitName.txt\n\nContents: $toWrite\n");
 
     changePathExtension(documentName);
     changeFilename('_$unitName.txt');
+    final file = await _localFile;
+
+    // Write the file
+    return await file.writeAsString(toWrite);
+  }
+
+  Future<void> overWriteLogInfo(String documentName, String toWrite) async {
+    //--Debug
+    debugPrint("(FH)Writing to: /$documentName" + "_LogInfo.txt\n\nContents: $toWrite\n");
+
+    changePathExtension(documentName);
+    changeFilename('_LogInfo.txt');
     final file = await _localFile;
 
     // Write the file
