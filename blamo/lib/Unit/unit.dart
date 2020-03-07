@@ -54,6 +54,14 @@ class _UnitPageState extends State<UnitPage> {
 
   }
 
+  String formatValue(String value){
+    if(value == "null"){
+      return "";
+    } else {
+      return value;
+    }
+  }
+
   Widget getScaffold(Unit unitToBuildFrom){
     return Scaffold(
       backgroundColor: Colors.white,
@@ -84,19 +92,19 @@ class _UnitPageState extends State<UnitPage> {
                               attribute: 'depth-ub',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Depth Upper Bound (m)"),
-                              initialValue: unitToBuildFrom.depthUB.toString(),
+                              initialValue: formatValue(unitToBuildFrom.depthUB.toString()),
                             ),
                             FormBuilderTextField(
                               attribute: 'depth-lb',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Depth Lower Bound (m)"),
-                              initialValue: unitToBuildFrom.depthLB.toString(),
+                              initialValue: formatValue(unitToBuildFrom.depthLB.toString()),
                             ),
                             FormBuilderTextField(
                               attribute: 'methods',
                               validators: [],
                               decoration: InputDecoration(labelText: "Drilling Methods"),
-                              initialValue: unitToBuildFrom.drillingMethods,
+                              initialValue: formatValue(unitToBuildFrom.drillingMethods),
                             ),
                             FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: test.dart, 56)
                               attribute: 'tags',

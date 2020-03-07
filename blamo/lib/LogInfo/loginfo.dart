@@ -72,6 +72,13 @@ class _LogInfoPageState extends State<LogInfoPage> {
     });
   }
 
+  String formatValue(String value){
+    if(value == "null"){
+      return "";
+    } else {
+      return value;
+    }
+  }
 
   Widget getLogInfoScaffold(LogInfo logInfoToBuildFrom){
     return new Scaffold(
@@ -105,7 +112,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'objectID',
                               validators: [],
                               decoration: InputDecoration(labelText: "ObjectID"),
-                              initialValue: logInfoToBuildFrom.objectID,
+                              initialValue: formatValue(logInfoToBuildFrom.objectID),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[1]);
                               },
@@ -116,7 +123,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'testType',
                               validators: [],
                               decoration: InputDecoration(labelText: "Test Type"),
-                              initialValue: logInfoToBuildFrom.testType,
+                              initialValue: formatValue(logInfoToBuildFrom.testType),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[2]);
                               },
@@ -127,7 +134,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'project',
                               validators: [],
                               decoration: InputDecoration(labelText: "Project"),
-                              initialValue: logInfoToBuildFrom.project,
+                              initialValue: formatValue(logInfoToBuildFrom.project),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[3]);
                               },
@@ -138,7 +145,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'number',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Number"),
-                              initialValue: logInfoToBuildFrom.number,
+                              initialValue: formatValue(logInfoToBuildFrom.number),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[4]);
                               },
@@ -149,7 +156,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'client',
                               validators: [],
                               decoration: InputDecoration(labelText: "Client"),
-                              initialValue: logInfoToBuildFrom.client,
+                              initialValue: formatValue(logInfoToBuildFrom.client),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[5]);
                               },
@@ -160,7 +167,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'lat',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Latitude"),
-                              initialValue: logInfoToBuildFrom.lat,
+                              initialValue: formatValue(logInfoToBuildFrom.lat),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[6]);
                               },
@@ -171,7 +178,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'long',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Longitude"),
-                              initialValue: logInfoToBuildFrom.long,
+                              initialValue: formatValue(logInfoToBuildFrom.long),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[7]);
                               },
@@ -182,7 +189,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'location',
                               validators: [],
                               decoration: InputDecoration(labelText: "Location"),
-                              initialValue: logInfoToBuildFrom.location,
+                              initialValue: formatValue(logInfoToBuildFrom.location),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[8]);
                               },
@@ -193,7 +200,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'elevationDatum',
                               validators: [],
                               decoration: InputDecoration(labelText: "Elevation Datum"),
-                              initialValue: logInfoToBuildFrom.elevationDatum,
+                              initialValue: formatValue(logInfoToBuildFrom.elevationDatum),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[9]);
                               },
@@ -204,7 +211,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'boreholeID',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Borehole ID"),
-                              initialValue: logInfoToBuildFrom.boreholeID,
+                              initialValue: formatValue(logInfoToBuildFrom.boreholeID),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[10]);
                               },
@@ -247,7 +254,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'surfaceElevation',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Surface Elevation (ft)"),
-                              initialValue: logInfoToBuildFrom.surfaceElevation,
+                              initialValue: formatValue(logInfoToBuildFrom.surfaceElevation),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[13]);
                               },
@@ -258,7 +265,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'contractor',
                               validators: [],
                               decoration: InputDecoration(labelText: "Contractor"),
-                              initialValue: logInfoToBuildFrom.contractor,
+                              initialValue: formatValue(logInfoToBuildFrom.contractor),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[14]);
                               },
@@ -269,7 +276,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'method',
                               validators: [],
                               decoration: InputDecoration(labelText: "Method"),
-                              initialValue: logInfoToBuildFrom.method,
+                              initialValue: formatValue(logInfoToBuildFrom.method),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[15]);
                               },
@@ -280,7 +287,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               attribute: 'loggedBy',
                               validators: [],
                               decoration: InputDecoration(labelText: "Logged By"),
-                              initialValue: logInfoToBuildFrom.loggedBy,
+                              initialValue: formatValue(logInfoToBuildFrom.loggedBy),
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[16]);
                               },
@@ -290,7 +297,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 attribute: 'checkedBy',
                                 validators: [],
                                 decoration: InputDecoration(labelText: "Checked By"),
-                                initialValue: logInfoToBuildFrom.checkedBy,
+                                initialValue: formatValue(logInfoToBuildFrom.checkedBy),
                             ),
                           ]
                       )
