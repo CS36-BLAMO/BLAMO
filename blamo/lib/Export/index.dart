@@ -8,7 +8,7 @@ import 'package:blamo/PDF/pdf_builder.dart';
  */
 
 class ExportPage extends StatefulWidget {
-  StateData pass; //Passes the StateData object to the stateful constructor
+  final StateData pass; //Passes the StateData object to the stateful constructor
 
   ExportPage(this.pass);
 

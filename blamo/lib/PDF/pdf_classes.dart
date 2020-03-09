@@ -1,4 +1,4 @@
-class Unit { // TODO - touch up inits? Maybe?
+class UnitPDF { // TODO - touch up inits? Maybe?
     double beginUnitDepth;
     double endUnitDepth;
     String unitDescription;
@@ -12,7 +12,7 @@ class Unit { // TODO - touch up inits? Maybe?
     }
 }
 
-class Test {
+class TestPDF {
     double beginTestDepth;
     double endTestDepth;
     String soilType;
@@ -45,8 +45,8 @@ class Test {
 }
 
 class Level { //class for holding units and associated tests.
-    Unit unit;
-    List<Test> tests = [];
+    UnitPDF unit;
+    List<TestPDF> tests = [];
     double beginDepth; // GOES BY ELEVATION. begindepth is higher elevation, or technically a "lower" bound. i.e. 0.
     double endDepth; //                      enddepth is lower elevation, or technically a "higher" bound. i.e. -2.5.
     void setDepth(){
@@ -55,7 +55,7 @@ class Level { //class for holding units and associated tests.
     }
 }
 
-class LogInfo {
+class LogInfoPDF {
     String objectID;
     String testType;
     String project;

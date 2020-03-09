@@ -1,10 +1,12 @@
-import 'package:blamo/main.dart';
 import 'package:blamo/File_IO/FileHandler.dart';
-import 'package:blamo/PDF/pdf_classes.dart';
 import 'package:gson/gson.dart';
-import 'dart:convert';
+
+
 //TOREMOVE
-import 'package:flutter/cupertino.dart';
+/*import 'package:flutter/cupertino.dart';
+import 'package:blamo/main.dart';
+import 'package:blamo/PDF/pdf_classes.dart';
+import 'dart:convert';*/
 
 //ParseJSON/BUILD OBJECT DONE: OBject -> JSON, JSON->Object
 //Unit,TEST,LogInfo
@@ -23,7 +25,12 @@ class ObjectHandler {
   // Or just do a dif parser for each?
   //TODO GENERIC JSON PARSER?
   Unit parseUnitJSON(String unitJSON) {
-    Unit newUnitToBuild = new Unit.fromJSON(gson.decode(unitJSON));
+    Unit newUnitToBuild;
+    if(unitJSON == "oops!"){
+      newUnitToBuild = Unit();
+    } else {
+      newUnitToBuild = new Unit.fromJSON(gson.decode(unitJSON));
+    }
     /*debugPrint("-----unitJSON Decoded-----\n"
         + "Begin Depth: ${newUnitToBuild.depthUB}\n"
         + "End Depth: ${newUnitToBuild.depthLB}\n"
@@ -34,7 +41,12 @@ class ObjectHandler {
   }
 
   Test parseTestJSON(String testJSON) {
-    Test newTestToBuild = new Test.fromJSON(gson.decode(testJSON));
+    Test newTestToBuild;
+    if(testJSON == "oops!"){
+      newTestToBuild = Test();
+    } else {
+      newTestToBuild = new Test.fromJSON(gson.decode(testJSON));
+    }
     /*debugPrint("-----testJSON Decoded-----\n"
       + "beginTest: ${newTestToBuild.beginTest}\n"
       + "endTest: ${newTestToBuild.endTest}\n"
@@ -54,7 +66,12 @@ class ObjectHandler {
   }
 
   LogInfo parseLogInfoJSON(String logInfoJSON) {
-    LogInfo newLogInfoToBuild = new LogInfo.fromJSON(gson.decode(logInfoJSON));
+    LogInfo newLogInfoToBuild;
+    if(logInfoJSON == "oops!"){
+      newLogInfoToBuild = LogInfo();
+    } else {
+      newLogInfoToBuild = new LogInfo.fromJSON(gson.decode(logInfoJSON));
+    }
     /*debugPrint("------logInfoJSON Decoded-----\n"
       + "projectName: ${newLogInfoToBuild.projectName}\n"
       + "startDate: ${newLogInfoToBuild.startDate}\n"
@@ -231,7 +248,27 @@ class ObjectHandler {
     returnLogInfo = parseLogInfoJSON(logInfoLocal);
     return returnLogInfo;
   }
-  
+
+  // returns list of all units in doc, given list of unit names
+  Future<List<Unit>> getUnitsData(List<String> unitNames, String documentName) async {
+    List<Unit> returnUnitsData = [];
+    for(int i = 0; i < unitNames.length; i++){
+      Unit tempUnit = await getUnitData(unitNames[i], documentName);
+      returnUnitsData.add(tempUnit);
+    }
+    return returnUnitsData;
+  }
+
+  // returns list of all tests in doc, given list of test names
+  Future<List<Test>> getTestsData(List<String> testNames, String documentName) async {
+    List<Test> returnTestsData = [];
+    for(int i = 0; i < testNames.length; i++){
+      Test tempTest = await getTestData(testNames[i], documentName);
+      returnTestsData.add(tempTest);
+    }
+    return returnTestsData;
+  }
+
 }
 class Document {
   LogInfo logInfo;

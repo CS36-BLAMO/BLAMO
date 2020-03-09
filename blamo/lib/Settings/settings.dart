@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
  * Each page will live in its own dir for proper file structure.
  */
 class SettingsPage extends StatefulWidget {
-  StateData pass; //Passes the StateData object to the stateful constructor
+  final StateData pass; //Passes the StateData object to the stateful constructor
 
   SettingsPage(this.pass);
   @override

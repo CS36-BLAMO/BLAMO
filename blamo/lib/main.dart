@@ -7,6 +7,8 @@ import 'package:blamo/File_IO/FileHandler.dart';
 class StateData {
   String currentRoute;
   String currentDocument;
+  String currentUnit;
+  String currentTest;
 
   int documentIterator = 0;
   int unitCount = 0;
@@ -52,7 +54,7 @@ class BLAMO extends StatelessWidget {
 *  assign the variable to be passed.
 * */
 class HomePage extends StatefulWidget {
-  StateData pass;
+  final StateData pass;
   //--Toremove
   //final PersistentStorage storage = PersistentStorage();
 
@@ -76,11 +78,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    widget.pass.storage.setStateData(currentState).then((StateData recieved) {
+    currentState.storage.setStateData(currentState).then((StateData recieved) {
       setState(() {
-        widget.pass.list = recieved.list;
-        widget.pass.currentRoute = '/';
-        widget.pass.dirty = 1;
+        currentState.list = recieved.list;
+        currentState.currentRoute = '/';
+        currentState.dirty = 1;
       });
     });
   }
@@ -88,14 +90,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     if (currentState != null) {
-      widget.pass.currentRoute = '/'; //Assigns currentState.currentRoute to the name of the current named route
+      currentState.currentRoute = '/'; //Assigns currentState.currentRoute to the name of the current named route
     }
-    widget.pass.currentDocument="";
-    widget.pass.storage.checkForManifest().then((bool doesManifestExist) {
+    currentState.currentDocument="";
+    currentState.storage.checkForManifest().then((bool doesManifestExist) {
       if (doesManifestExist && currentState.dirty == 1) {
         updateStateData();
       } else if(!doesManifestExist){
-        widget.pass.storage.overWriteManifest("");
+        currentState.storage.overWriteManifest("");
       }
     });
 
@@ -124,7 +126,7 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Colors.deepOrange
       ),
 
-      body: gridViewBuilder(widget.pass.list),
+      body: gridViewBuilder(currentState.list),
 
       floatingActionButton: floatingActionButtonBuilder(),
 
@@ -133,13 +135,13 @@ class _HomePageState extends State<HomePage> {
 
   //Creates a new document manifest
   void createNewDocument(String docName) async{
-    await widget.pass.storage.overWriteDocument(docName, "$docName\n0\n0");
+    await currentState.storage.overWriteDocument(docName, "$docName\n0\n0");
   }
 
   //Updates the currentState object to reflect the manifest document
   void updateStateData() async{
-    await widget.pass.storage.setStateData(widget.pass).then((StateData recieved) {
-      widget.pass.list = recieved.list;
+    await currentState.storage.setStateData(currentState).then((StateData recieved) {
+      currentState.list = recieved.list;
       currentState.dirty = 0;
     });
   }
@@ -150,17 +152,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onTileClicked(int index) async {
-    widget.pass.documentIterator = index;
-    widget.pass.currentDocument = widget.pass.list[index];
-    widget.pass.dirty = 1;
-    debugPrint("(main)Tapped on: ${widget.pass.currentDocument}");
+    currentState.documentIterator = index;
+    currentState.currentDocument = currentState.list[index];
+    currentState.dirty = 1;
+    debugPrint("(main)Tapped on: ${currentState.currentDocument}");
 
     Navigator.pushReplacementNamed(
       context,
       "/Document",
-      arguments: widget.pass,
+      arguments: currentState,
     );
-    //widget.pass.currentDocument = "";
+    //currentState.currentDocument = "";
   }
 
   /* These are the object builders for the main scaffolding
@@ -202,12 +204,12 @@ class _HomePageState extends State<HomePage> {
                     String newNameWithComma = _textFieldController.text + ","; //TODO REGEX TO PARSE INPUT FOR SPECIAL CHARS AND DUP NAMES
                     print("INPUT FIELD RECIEVED:" + newNameWithComma);
                     if(_textFieldController.text.isNotEmpty) {
-                        if (widget.pass.list.length == 1) {
+                        if (currentState.list.length == 1) {
                           toWrite = newNameWithComma;
                           newestDoc = _textFieldController.text;
                         } else {
-                          for (i = 0; i < widget.pass.list.length - 1; i++) {
-                            toWrite = toWrite + widget.pass.list[i] + ',';
+                          for (i = 0; i < currentState.list.length - 1; i++) {
+                            toWrite = toWrite + currentState.list[i] + ',';
                           }
                           toWrite = toWrite + newNameWithComma;
                           //toWrite = "Document$i,";
@@ -215,7 +217,7 @@ class _HomePageState extends State<HomePage> {
                         }
                         //In order for this to create doc and update homepage there needs to be a comma at the end of the filename
                         //Or else it will fail to create
-                        await widget.pass.storage.overWriteManifest(toWrite);
+                        await currentState.storage.overWriteManifest(toWrite);
                         await updateStateDataCreateDoc(newestDoc);
                         setState(() {});
                         //Remove AlertDialog and allow for another doc to be created
@@ -297,12 +299,13 @@ class _SideMenuState extends State<SideMenu> {
                 color: Colors.blue
               ),
               onTap: () {
-                if(widget.pass.currentRoute != '/'){
-                  widget.pass.currentRoute = '/';
+                if(currentState.currentRoute != '/'){
+                  currentState.currentRoute = '/';
+                  currentState.currentDocument = "";
                   Navigator.pushReplacementNamed(
                       context,
                       "/",
-                      arguments: widget.pass,
+                      arguments: currentState,
                   );
                 } else {
                   Navigator.pop(context);
@@ -317,12 +320,12 @@ class _SideMenuState extends State<SideMenu> {
                   color: Colors.blue
               ),
               onTap: () {
-                if(widget.pass.currentRoute != '/ExportPage'){
-                  widget.pass.currentRoute = '/ExportPage';
+                if(currentState.currentRoute != '/ExportPage'){
+                  currentState.currentRoute = '/ExportPage';
                   Navigator.pushReplacementNamed(
                     context,
                     "/ExportPage",
-                    arguments: widget.pass,
+                    arguments: currentState,
                   );
                 } else {
                   Navigator.pop(context);
@@ -349,7 +352,25 @@ class _SideMenuState extends State<SideMenu> {
               }),
             Divider(color: Colors.grey[900]),
             new ListTile(
-              title: new Text("Unit X Info"),
+              title: new Text("Units"),
+              leading: Icon(
+                Icons.assessment,
+                color: Colors.blue
+              ),
+              onTap: () {
+                if(currentState.currentRoute != '/UnitsPage'){
+                    Navigator.pushReplacementNamed(
+                      context,
+                      "/UnitsPage",
+                      arguments: currentState,
+                    );
+                  } else {
+                    Navigator.pop(context);
+                  }
+              }),
+            Divider(color: Colors.grey[900]),
+            new ListTile(
+              title: new Text("Unit"),
               leading: Icon(
                 Icons.assessment,
                 color: Colors.blue
@@ -367,16 +388,16 @@ class _SideMenuState extends State<SideMenu> {
               }),
             Divider(color: Colors.grey),
             new ListTile(
-              title: new Text("Test X"),
+              title: new Text("Tests"),
               leading: Icon(
                 Icons.assignment,
                 color: Colors.blue
               ),
               onTap: () {
-                if(currentState.currentRoute != '/TestPage'){
+                if(currentState.currentRoute != '/TestsPage'){
                     Navigator.pushReplacementNamed(
                       context,
-                      "/TestPage",
+                      "/TestsPage",
                       arguments: currentState,
                     );
                   } else {
