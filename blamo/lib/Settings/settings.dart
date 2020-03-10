@@ -1,6 +1,7 @@
 import 'package:blamo/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:blamo/SideMenu.dart';
 
 
 /*This page will serve as a manual export option all different avenues

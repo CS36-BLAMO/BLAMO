@@ -2,6 +2,7 @@ import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
+import 'package:blamo/SideMenu.dart';
 
 //TORemove
 /*
@@ -28,7 +29,7 @@ class _TestPageState extends State<TestPage> {
   void initState() {
     super.initState();
     dirty = true;
-    updateTestData(currentState.currentTest, currentState.currentTest);
+    updateTestData(currentState.currentTest, currentState.currentDocument);
   }
 
   @override
@@ -50,7 +51,7 @@ class _TestPageState extends State<TestPage> {
               child: SideMenu(currentState)
           ),
           appBar: new AppBar(
-              title: new Text("Test Page"),
+              title: new Text("Test Page: " + currentState.currentDocument + "/" + currentState.currentTest),
               actions: <Widget>[
 
               ],
@@ -75,7 +76,7 @@ class _TestPageState extends State<TestPage> {
         child: SideMenu(currentState),
       ),
       appBar: new AppBar(
-          title: new Text("Test Page"),
+          title: new Text("Test Page: " + currentState.currentDocument + "/" + currentState.currentTest),
           actions: <Widget>[
 
           ],

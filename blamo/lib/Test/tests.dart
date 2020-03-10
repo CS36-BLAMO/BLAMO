@@ -2,8 +2,8 @@ import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:blamo/SideMenu.dart';
 
 class TestsPage extends StatefulWidget {
   final StateData pass; 
@@ -26,6 +26,7 @@ class _TestsPageState extends State<TestsPage> {
     dirty = true;
     getTestSet(currentState.testList, currentState.currentDocument);
   }
+
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   Widget build(BuildContext context) {
     if(currentState.currentRoute != null) {
@@ -33,12 +34,23 @@ class _TestsPageState extends State<TestsPage> {
     }
 
     if(!dirty){
-      debugPrint("Returning scaffold $tests");
+      //debugPrint("Returning scaffold $tests");
       return getScaffold(tests);
     }
     else {
       debugPrint("Returning empty scaffold");
-      return new Scaffold();
+      return new Scaffold(
+          backgroundColor: Colors.white,
+          drawer: new Drawer(
+              child: SideMenu(currentState)
+          ),
+          appBar: new AppBar(
+              title: new Text("Tests Page"),
+              actions: <Widget>[
+
+              ],
+              backgroundColor: Colors.deepOrange
+          ));
     }
   }
 
@@ -90,10 +102,7 @@ class _TestsPageState extends State<TestsPage> {
               onTap: () {
                 if(currentState.currentRoute != '/TestPage'){ // TODO - dynamically populate test edit page
                   currentState.currentRoute = '/TestPage';
-
                   currentState.currentTest=currentState.testList[i];
-                  debugPrint("(Tests)Clicked on: " + currentState.testList[i] + "\n");
-
                   Navigator.pushReplacementNamed(
                     context,
                     "/TestPage",

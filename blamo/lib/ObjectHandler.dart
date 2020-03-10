@@ -347,12 +347,12 @@ class LogInfo {
   });
   //Returns LogInfo object with mapped values from an already parsed JSON object
   factory LogInfo.fromJSON (Map<String, dynamic> parsedJSON) {
-    double holeNoConverted = null;
-    double eANoConverted = null;
-    double keyNoConverted = null;
-    double startCardNoConverted = null;
-    double groundElevationConverted = null;
-    double tubeHeightConverted = null; 
+    double holeNoConverted;//= null;
+    double eANoConverted;//= null;
+    double keyNoConverted;//= null;
+    double startCardNoConverted;// = null;
+    double groundElevationConverted;//= null;
+    double tubeHeightConverted;//= null;
 
     if(parsedJSON["holeNo"] != "null"){
       holeNoConverted = parsedJSON["holeNo"].value;
@@ -430,9 +430,9 @@ class Unit {
 
   // This returns the object from the JSON
   factory Unit.fromJSON (Map<String, dynamic> parsedJSON) {
-    double depthUBConverted = null;
-    double depthLBConverted = null;
-    double beginUnitDepthConverted = null;
+    double depthUBConverted;
+    double depthLBConverted;
+    double beginUnitDepthConverted;
     if(parsedJSON["depthUB"] != "null"){
       depthUBConverted = parsedJSON["depthUB"].value;
     }
@@ -494,8 +494,8 @@ class Test {
   });
   //Returns Test object from already parsed json(MAPS data to obj)
   factory Test.fromJSON(Map<String, dynamic> parsedJSON){
-    double beginTestConverted = null;
-    double endTestConverted = null;
+    double beginTestConverted;
+    double endTestConverted;
 
     if(parsedJSON["beginTest"] != "null"){
       beginTestConverted = parsedJSON["beginTest"].value;

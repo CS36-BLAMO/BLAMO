@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:blamo/SideMenu.dart';
 
 //ToRemove
 /*
@@ -37,12 +38,23 @@ class _UnitsPageState extends State<UnitsPage> {
     }
 
     if(!dirty){
-      debugPrint("Returning scaffold $units");
+      //debugPrint("Returning scaffold $units");
       return getScaffold(units);
     } 
     else {
       debugPrint("Returning empty Scaffold");
-      return new Scaffold();//getScaffold("","");
+      return new Scaffold(
+          backgroundColor: Colors.white,
+          drawer: new Drawer(
+              child: SideMenu(currentState)
+          ),
+          appBar: new AppBar(
+              title: new Text("Units Page"),
+              actions: <Widget>[
+
+              ],
+              backgroundColor: Colors.deepOrange
+          ));
     }
   }
   //@override

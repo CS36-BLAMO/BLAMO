@@ -2,6 +2,7 @@ import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
+import 'package:blamo/SideMenu.dart';
 
 //TORemove
 /*
@@ -57,12 +58,12 @@ class _UnitPageState extends State<UnitPage> {
               child: SideMenu(currentState)
           ),
           appBar: new AppBar(
-              title: new Text("Unit Page"),
+              title: new Text("Unit Page: ${currentState.currentUnit}"),
               actions: <Widget>[
 
               ],
               backgroundColor: Colors.deepOrange
-          ));//getScaffold("","");
+          ));
     }
 
   }
@@ -83,7 +84,7 @@ class _UnitPageState extends State<UnitPage> {
           child: SideMenu(currentState)
       ),
       appBar: new AppBar(
-          title: new Text("Unit Page"),
+          title: new Text("Unit Page: " + currentState.currentDocument + "/" + currentState.currentUnit),
           actions: <Widget>[
 
           ],
