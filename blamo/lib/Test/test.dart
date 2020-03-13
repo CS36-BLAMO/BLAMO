@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:blamo/SideMenu.dart';
+import 'dart:convert';
+
+import 'package:fluttertoast/fluttertoast.dart';
 
 //TORemove
 /*
@@ -21,9 +24,9 @@ class _TestPageState extends State<TestPage> {
   final routeName = '/TestPage';
   StateData currentState;
   _TestPageState(this.currentState);
-
   bool dirty = true;
   Test testObject;
+  String tags;
 
   @override
   void initState() {
@@ -38,6 +41,7 @@ class _TestPageState extends State<TestPage> {
     if(currentState.currentRoute != null) {
       currentState.currentRoute = '/TestPage'; //Assigns currentState.currentRoute to the name of the current named route
     }
+    currentState.currentRoute = '/TestPage';
 
     if(!dirty){
       debugPrint("After setState: (${testObject.blows1})");
@@ -100,25 +104,28 @@ class _TestPageState extends State<TestPage> {
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Begin Test Depth (m)"),
                               initialValue: formatValue(testObjectToBuildFrom.beginTest.toString()),
-                            ),
+                              onChanged: (void nbd){updateTestObject();},
+                              ),
                             FormBuilderTextField(
-                                attribute: 'endTestDepth',
-                                validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "End Test Depth (m)"),
-                                initialValue: formatValue(testObjectToBuildFrom.endTest.toString()),
+                              attribute: 'endTestDepth',
+                              validators: [FormBuilderValidators.numeric()],
+                              decoration: InputDecoration(labelText: "End Test Depth (m)"),
+                              initialValue: formatValue(testObjectToBuildFrom.endTest.toString()),
+                              onChanged: (void nbd){updateTestObject();},
                             ),
                             FormBuilderTextField(
                               attribute: 'soilType',
                               validators: [],
                               decoration: InputDecoration(labelText: "Soil Type"), //ASK - preferred title?
                               initialValue: formatValue(testObjectToBuildFrom.soilType),
+                              onChanged: (void nbd){testObject.soilType = _fbKey.currentState.fields["soilType"].currentState.value;},
                             ),
 
                             FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: unit.dart, 51)
                               attribute: 'description',
                               validators: [],
                               decoration: InputDecoration(labelText: "Description"),
-                              initialValue: [],
+                              initialValue: getTags(testObjectToBuildFrom),
                               options: [ // TODO need gint's set of tags, ability for user to make own tags.
                                 FormBuilderFieldOption(value: "Asphalt"),
                                 FormBuilderFieldOption(value: "Basalt"),
@@ -174,51 +181,70 @@ class _TestPageState extends State<TestPage> {
                                 FormBuilderFieldOption(value: "Glacial Till"),
                                 FormBuilderFieldOption(value: "Topsoil")
                               ],
+                              onChanged: (void nbd){getTags(testObjectToBuildFrom);},
                             ),
                             FormBuilderTextField(
                               attribute: 'moistureContent',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Moisture Content (%)"),
+                              initialValue: formatValue(testObjectToBuildFrom.moistureContent),
+                              onChanged: (void nbd){updateTestObject();},
                             ),
                             FormBuilderTextField(
                               attribute: 'dryDensity',
                               validators: [],
                               decoration: InputDecoration(labelText: "Dry Density (pcf)"),
+                              initialValue: formatValue(testObjectToBuildFrom.dryDensity),
+                              onChanged: (void nbd){testObject.dryDensity = _fbKey.currentState.fields["dryDensity"].currentState.value;},
                             ),
                             FormBuilderTextField(
                               attribute: 'liquidLimit',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Liquid Limit (%)"),
+                              initialValue: formatValue(testObjectToBuildFrom.liquidLimit),
+                              onChanged: (void nbd){testObject.liquidLimit = _fbKey.currentState.fields["liquidLimit"].currentState.value;},
                             ),
                             FormBuilderTextField(
                               attribute: 'plasticLimit',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Plastic Limit (%)"),
+                              initialValue: formatValue(testObjectToBuildFrom.plasticLimit),
+                              onChanged: (void nbd){testObject.plasticLimit = _fbKey.currentState.fields["plasticLimit"].currentState.value;},
                             ),
                             FormBuilderTextField(
                               attribute: 'fines',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Fines (%)"),
+                              initialValue: formatValue(testObjectToBuildFrom.fines),
+                              onChanged: (void nbd){testObject.fines = _fbKey.currentState.fields["fines"].currentState.value;},
                             ),
                             FormBuilderTextField(
                               attribute: 'blows1',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Blows 1st"),
+                              initialValue: formatValue(testObjectToBuildFrom.blows1),
+                              onChanged: (void nbd){testObject.blows1 = _fbKey.currentState.fields["blows1"].currentState.value;},
                             ),
                             FormBuilderTextField(
                               attribute: 'blows2',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Blows 2nd"),
+                              initialValue: formatValue(testObjectToBuildFrom.blows2),
+                              onChanged: (void nbd){testObject.blows2 = _fbKey.currentState.fields["blows2"].currentState.value;},
                             ),
                             FormBuilderTextField(
                               attribute: 'blows3',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Blows 3rd"),
+                              initialValue: formatValue(testObjectToBuildFrom.blows3),
+                              onChanged: (void nbd){testObject.blows3 = _fbKey.currentState.fields["blows3"].currentState.value;},
                             ),
                             FormBuilderTextField(
                               attribute: 'blowCount',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Blow Count"),
+                              initialValue: formatValue(testObjectToBuildFrom.blowCount),
+                              onChanged: (void nbd){testObject.blowCount = _fbKey.currentState.fields["blowCount"].currentState.value;},
                             ),
 
                 ]
@@ -227,24 +253,86 @@ class _TestPageState extends State<TestPage> {
             ],
           ))),
           floatingActionButton: FloatingActionButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_fbKey.currentState.saveAndValidate()) {
-                  print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
-                }
-                if(currentState.currentRoute != '/TestsPage'){
+                  updateTestObject();
+                  await saveTestObject();
                   currentState.currentRoute = '/TestsPage';
+                  _showToast("Success", Colors.green);
                   Navigator.pushReplacementNamed(
                     context,
                     "/TestsPage",
                     arguments: currentState,
                   );
                 } else {
-                  Navigator.pop(context);
+                  _showToast("Error in Fields", Colors.red);
                 }
               },
               child: Icon(Icons.save),
           ),
     );
+  }
+
+  void _showToast(String toShow, MaterialColor color){
+    Fluttertoast.showToast(
+        msg: toShow,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIos: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
+
+  List<String> getTags(Test testObj) {
+    List<String> toReturn = [];
+    List<dynamic> ba = jsonDecode(testObj.tags);
+    if(ba != null) {
+      for (int i = 0; i < ba.length; i++) {
+        toReturn.add(ba[i].toString());
+      }
+    }
+    return toReturn;
+  }
+
+  void updateTestObject(){
+    try{
+      testObject.beginTest = double.parse(_fbKey.currentState.fields["beginTestDepth"].currentState.value);
+    } catch(e) {
+    }
+    try{
+      testObject.endTest = double.parse(_fbKey.currentState.fields["endTestDepth"].currentState.value);
+    } catch(e) {
+    }
+
+    testObject.dryDensity = _fbKey.currentState.fields["dryDensity"].currentState.value.toString();
+    testObject.liquidLimit = _fbKey.currentState.fields["liquidLimit"].currentState.value.toString();
+    testObject.moistureContent = _fbKey.currentState.fields["moistureContent"].currentState.value.toString();
+    testObject.plasticLimit = _fbKey.currentState.fields["plasticLimit"].currentState.value.toString();
+    testObject.soilType = _fbKey.currentState.fields["soilType"].currentState.value.toString();
+    testObject.blowCount = _fbKey.currentState.fields["blowCount"].currentState.value.toString();
+    testObject.blows1 = _fbKey.currentState.fields["blows1"].currentState.value.toString();
+    testObject.blows2 = _fbKey.currentState.fields["blows2"].currentState.value.toString();
+    testObject.blows3 = _fbKey.currentState.fields["blows3"].currentState.value.toString();
+    testObject.fines = _fbKey.currentState.fields["fines"].currentState.value.toString();
+    testObject.tags = jsonEncode(_fbKey.currentState.fields['description'].currentState.value);
+
+  }
+
+  void saveTestObject() async{
+    ObjectHandler toHandle = new ObjectHandler();
+    //TODO
+    //unitObject.tags = ;
+
+    try {
+      toHandle.saveTestData(
+          currentState.currentTest, currentState.currentDocument, testObject);
+    } finally {
+      debugPrint("Async calls done");
+    }
+
+    //debugPrint("saving the testObject: \nLB = ${testObject.beginTest}\nUB = ${testObject.endTest}\nMethods = ${testObject.blows3}");
   }
 
   void updateTestData(String testName, String documentName) async{

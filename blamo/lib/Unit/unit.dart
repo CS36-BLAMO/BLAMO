@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:blamo/SideMenu.dart';
+import 'dart:convert';
+
+import 'package:fluttertoast/fluttertoast.dart';
 
 //TORemove
 /*
@@ -25,6 +28,8 @@ class _UnitPageState extends State<UnitPage> {
   _UnitPageState(this.currentState);
   Unit unitObject;
   bool dirty;
+  String tags;
+  final myController = TextEditingController();
 
   @override
   void initState() {
@@ -108,23 +113,38 @@ class _UnitPageState extends State<UnitPage> {
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Depth Upper Bound (m)"),
                               initialValue: formatValue(unitToBuildFrom.depthUB.toString()),
+                              onChanged: (void nbd){updateUnitObject();},
+                              /*onEditingComplete: (){
+                                debugPrint("Updating object");
+                                unitObject.depthUB = double.parse(_fbKey.currentState.fields['depth-ub'].currentState.value);
+                              },*/
                             ),
                             FormBuilderTextField(
                               attribute: 'depth-lb',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Depth Lower Bound (m)"),
                               initialValue: formatValue(unitToBuildFrom.depthLB.toString()),
+                              onChanged: (void nbd){updateUnitObject();},
+                              /*onEditingComplete: (){
+                                debugPrint("Updating object");
+                                unitObject.depthLB = double.parse(_fbKey.currentState.fields['depth-lb'].currentState.value);
+                              },*/
                             ),
                             FormBuilderTextField(
                               attribute: 'methods',
                               validators: [],
                               decoration: InputDecoration(labelText: "Drilling Methods"),
                               initialValue: formatValue(unitToBuildFrom.drillingMethods),
+                              onChanged: (void nbd){unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value;},
+                              /*onEditingComplete: (){
+                                debugPrint("Updating object");
+                                unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value;
+                              },*/
                             ),
                             FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: test.dart, 56)
                               attribute: 'tags',
                               validators: [],
-                              initialValue: [],
+                              initialValue: getTags(unitToBuildFrom),
                               options: [ // TODO need gint's set of tags, ability for user to make own tags.
                                 FormBuilderFieldOption(value: "Asphalt"),
                                 FormBuilderFieldOption(value: "Basalt"),
@@ -189,31 +209,85 @@ class _UnitPageState extends State<UnitPage> {
                 )
               ),
           floatingActionButton: FloatingActionButton(
-              onPressed: () { 
+              onPressed: () async {
                 if (_fbKey.currentState.saveAndValidate()) {
                   //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
-                  
-                  //new
-                  testSave();
-                }
-                if(currentState.currentRoute != '/UnitsPage'){ 
-                  currentState.currentRoute = '/UnitsPage';
-                  Navigator.pushReplacementNamed(
-                    context,
-                    "/UnitsPage",
-                    arguments: currentState,
-                  );
+                  updateUnitObject();
+                  await saveObject();
+                    currentState.currentRoute = '/UnitsPage';
+                    _showToast("Success", Colors.green);
+                    Navigator.pushReplacementNamed(
+                      context,
+                      "/UnitsPage",
+                      arguments: currentState,
+                    );
                 } else {
-                  Navigator.pop(context);
+                  _showToast("Error in Fields", Colors.red);
                 }
+
               },
               child: Icon(Icons.save),
           ),
     );
   }
 
+  void _showToast(String toShow, MaterialColor color){
+    Fluttertoast.showToast(
+        msg: toShow,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIos: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
+
+  List<String> getTags(Unit unitObj) {
+    List<String> toReturn = [];
+    List<dynamic> ba = jsonDecode(unitObj.tags);
+    if(ba != null) {
+      for(int i = 0; i < ba.length; i++){
+        toReturn.add(ba[i].toString());
+      }
+    }
+    return toReturn;
+  }
+  
+  void updateUnitObject(){
+    try {
+      unitObject.depthLB = double.parse(
+          _fbKey.currentState.fields['depth-lb'].currentState.value);
+    } catch(e) {
+      unitObject.depthLB = null;
+    }
+    try {
+      unitObject.depthUB = double.parse(
+          _fbKey.currentState.fields['depth-ub'].currentState.value);
+    } catch(e) {
+      unitObject.depthUB = null;
+    }
+    unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value;
+    unitObject.tags = jsonEncode(_fbKey.currentState.fields['tags'].currentState.value);
+  }
+
+  void saveObject() async{
+    ObjectHandler toHandle = new ObjectHandler();
+    //TODO
+    //unitObject.tags = ;
+
+    try {
+      await toHandle.saveUnitData(
+          currentState.currentUnit, currentState.currentDocument, unitObject);
+    } finally {
+      debugPrint("Async calls done");
+    }
+
+    debugPrint("saving the unitObject: \nLB = ${unitObject.depthLB}\nUB = ${unitObject.depthUB}\nMethods = ${unitObject.drillingMethods}");
+  }
+
 //new
-  void testSave() async {
+  /*void testSave() async {
     ObjectHandler toTest = new ObjectHandler();
     Unit testUnit = new Unit();
     Test testTest = new Test();
@@ -361,7 +435,7 @@ class _UnitPageState extends State<UnitPage> {
       + "tubeHeight: ${newLogInfoToBuild.tubeHeight}\n"
     );
     
-  }
+  }*/
 
   void updateUnitData(String unitName, String documentName) async{
     ObjectHandler objectHandler = new ObjectHandler();

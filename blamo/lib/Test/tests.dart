@@ -14,6 +14,7 @@ class TestsPage extends StatefulWidget {
 }
 
 class _TestsPageState extends State<TestsPage> {
+  TextEditingController _textFieldController = TextEditingController();
   final routeName = '/TestPage';
   StateData currentState;
   _TestsPageState(this.currentState);
@@ -78,10 +79,7 @@ class _TestsPageState extends State<TestsPage> {
           }
         )
       ),
-    floatingActionButton: FloatingActionButton(
-        onPressed: () {createTest();},
-        child: Icon(Icons.create)
-      ),
+    floatingActionButton: floatingActionButtonBuilder(),
     );
   }
 
@@ -89,9 +87,72 @@ class _TestsPageState extends State<TestsPage> {
     debugPrint("Create Test button pressed. Create test here"); // TODO
   }
 
+  FloatingActionButton floatingActionButtonBuilder(){
+    return new FloatingActionButton(
+      child: Icon(Icons.add),
+      tooltip: 'New Test Document',
+      foregroundColor: Colors.black,
+      backgroundColor: Colors.grey,
+      elevation: 50.0,
+      onPressed:(){
+        showDialog(
+          context: context,
+          builder:(context) => AlertDialog(
+              title: Text('Enter Test Name'),
+              content: TextField(
+                maxLength: 50,
+                controller: _textFieldController,
+                decoration: InputDecoration(labelText: 'Test Name'),
+              ),
+              actions: <Widget> [
+                new FlatButton(
+                  child: new Text('CANCEL'),
+                  textColor: Colors.red,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                new FlatButton(
+                  child: new Text('ACCEPT'),
+                  onPressed: () async {
+                    String newTest = _textFieldController.text + ',';
+                    String newTestNoComma = _textFieldController.text;
+                    String test = "{beginTest:null,endTest:null,soilType:null,moistureContent:null,dryDensity:null,liquidLimit:null,plasticLimit:null,fines:null,blows1:null,blows2:null,blows3:null,blowCount:null,tags:null}";
+                    String toWrite = '';
+                    if(_textFieldController.text.isNotEmpty){
+                      toWrite = "${currentState.currentDocument}\n${currentState.testList.length + 1}\n${currentState.unitList.length}\n";
+                      for(int i = 0; i < currentState.testList.length; i++){
+                        toWrite = toWrite + currentState.testList[i] + ',';
+                      }
+                      toWrite = toWrite + newTest;
+                      for(int i = 0; i < currentState.unitList.length; i++){
+                        toWrite = toWrite + currentState.unitList[i] + ',';
+                      }
+                      debugPrint(toWrite);
+
+                      await currentState.storage.overWriteDocument(currentState.currentDocument, toWrite);
+                      await currentState.storage.overWriteUnit(currentState.currentDocument,newTestNoComma, test);
+                      currentState.testList.add(newTestNoComma);
+                      currentState.currentTest = newTestNoComma;
+                      currentState.currentRoute = '/TestPage';
+                      Navigator.pushReplacementNamed(
+                        context,
+                        "/TestPage",
+                        arguments: currentState,
+                      );
+                    }
+                  },
+                )
+              ]
+          ),
+        );
+      },
+    );
+  }
+
   List _populateTestList() {
     List<Widget> testsToReturn = [];
-    for (int i = 0; i < currentState.testList.length; i++) {
+    for (int i = 0; i < tests.length; i++) {
         testsToReturn.add(
             new ListTile(
               title: new Container(
@@ -130,7 +191,7 @@ class _TestsPageState extends State<TestsPage> {
         });
       });
     }
-    await new Future.delayed(new Duration(microseconds: 1)).then((onValue){
+    await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
       setState((){
         dirty = false;
       });

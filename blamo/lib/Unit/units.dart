@@ -19,6 +19,7 @@ class UnitsPage extends StatefulWidget {
 }
 
 class _UnitsPageState extends State<UnitsPage> {
+  TextEditingController _textFieldController = TextEditingController();
   final routeName = '/UnitsPage';
   StateData currentState;
   _UnitsPageState(this.currentState);
@@ -83,10 +84,7 @@ Widget getScaffold(List<Unit> units){
           }
         )
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {createUnit();},
-        child: Icon(Icons.create)
-      ),
+      floatingActionButton: floatingActionButtonBuilder(),
     );
   }
 
@@ -94,15 +92,78 @@ Widget getScaffold(List<Unit> units){
     debugPrint("Create Unit button hit. Create unit here."); // TODO
   }
 
+  FloatingActionButton floatingActionButtonBuilder(){
+    return new FloatingActionButton(
+      child: Icon(Icons.add),
+      tooltip: 'New Unit Document',
+      foregroundColor: Colors.black,
+      backgroundColor: Colors.grey,
+      elevation: 50.0,
+      onPressed:(){
+        showDialog(
+          context: context,
+          builder:(context) => AlertDialog(
+              title: Text('Enter Unit Name'),
+              content: TextField(
+                maxLength: 50,
+                controller: _textFieldController,
+                decoration: InputDecoration(labelText: 'Unit Name'),
+              ),
+              actions: <Widget> [
+                new FlatButton(
+                  child: new Text('CANCEL'),
+                  textColor: Colors.red,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                new FlatButton(
+                  child: new Text('ACCEPT'),
+                  onPressed: () async {
+                    String newUnit = _textFieldController.text + ',';
+                    String newUnitNoComma = _textFieldController.text;
+                    String unit = "{depthUB:null,depthLB:null,beginUnitDepth:null,unitMethods:null,drillingMethods:null,tags:null}";
+                    String toWrite = '';
+                    if(_textFieldController.text.isNotEmpty){
+                      toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length + 1}\n";
+                      for(int i = 0; i < currentState.testList.length; i++){
+                        toWrite = toWrite + currentState.testList[i] + ',';
+                      }
+                      for(int i = 0; i < currentState.unitList.length; i++){
+                        toWrite = toWrite + currentState.unitList[i] + ',';
+                      }
+                      toWrite = toWrite + newUnit;
+                      debugPrint(toWrite);
+                      await currentState.storage.overWriteDocument(currentState.currentDocument, toWrite);
+                      await currentState.storage.overWriteUnit(currentState.currentDocument,newUnitNoComma, unit);
+                        currentState.unitList.add(newUnitNoComma);
+                        currentState.currentUnit = newUnitNoComma;
+                        currentState.currentRoute = '/UnitPage';
+                        Navigator.pushReplacementNamed(
+                          context,
+                          "/UnitPage",
+                          arguments: currentState,
+                        );
+
+                    }
+                  },
+                )
+              ]
+          ),
+        );
+      },
+    );
+  }
+
   List _populateUnitList() {
     List<Widget> unitsToReturn = [];
-    for (int i = 0; i < currentState.unitList.length; i++) {
+    for (int i = 0; i < units.length; i++) {
         unitsToReturn.add(
             new ListTile(
               title: new Container(
                 height: 50,
                 color: Colors.brown[100],
-                child: Center(child: Text(units[i].depthUB.toString() + " - " + units[i].depthLB.toString() + ", " + units[i].drillingMethods)),
+                child: Center(child: Text(units[i].depthUB.toString() + " - " + units[i].depthLB.toString())),
               ),
               onTap: () {
                 //testBuiildingList();

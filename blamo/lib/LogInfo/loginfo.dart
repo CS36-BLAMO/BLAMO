@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:blamo/SideMenu.dart';
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:blamo/ObjectHandler.dart';
 
 class LogInfoPage extends StatefulWidget {
@@ -238,7 +239,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               decoration: InputDecoration(labelText: "Start Date"),
 
                               //Todo
-                              //initialValue: formatValue(,
+                              initialValue: DateTime.tryParse(logInfoToBuildFrom.startDate),
 
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[11]);
@@ -254,7 +255,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               decoration: InputDecoration(labelText: "End Date"),
 
                               //Todo
-                              //initialValue: formatValue(,
+                              initialValue: DateTime.tryParse(logInfoToBuildFrom.endDate),
 
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[12]);
@@ -319,12 +320,58 @@ class _LogInfoPageState extends State<LogInfoPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (_fbKey.currentState.saveAndValidate()) {
-            print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
+            //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
+            updateLogObject();
+            saveLogObject();
+            _showToast("Success", Colors.green);
+          } else {
+            _showToast("Error in Fields", Colors.red);
           }
         },
         child: Icon(Icons.save),
       ),
     );
+  }
+
+  void _showToast(String toShow, MaterialColor color){
+    Fluttertoast.showToast(
+        msg: toShow,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIos: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
+
+  void updateLogObject(){
+    logInfoObject.boreholeID = _fbKey.currentState.fields["boreholeID"].currentState.value;
+    logInfoObject.objectID = _fbKey.currentState.fields["objectID"].currentState.value;
+    logInfoObject.testType = _fbKey.currentState.fields["testType"].currentState.value;
+    logInfoObject.project = _fbKey.currentState.fields["project"].currentState.value;
+    logInfoObject.number = _fbKey.currentState.fields["number"].currentState.value;
+    logInfoObject.client = _fbKey.currentState.fields["client"].currentState.value;
+    logInfoObject.lat = _fbKey.currentState.fields["lat"].currentState.value;
+    logInfoObject.long = _fbKey.currentState.fields["long"].currentState.value;
+    logInfoObject.location = _fbKey.currentState.fields["location"].currentState.value;
+    logInfoObject.elevationDatum = _fbKey.currentState.fields["elevationDatum"].currentState.value;
+    logInfoObject.startDate = "" +_fbKey.currentState.fields["startDate"].currentState.value.toString();
+    logInfoObject.endDate = "" +_fbKey.currentState.fields["endDate"].currentState.value.toString();
+    logInfoObject.surfaceElevation = _fbKey.currentState.fields["surfaceElevation"].currentState.value;
+    logInfoObject.contractor = _fbKey.currentState.fields["contractor"].currentState.value;
+    logInfoObject.method = _fbKey.currentState.fields["method"].currentState.value;
+    logInfoObject.loggedBy = _fbKey.currentState.fields["loggedBy"].currentState.value;
+    logInfoObject.checkedBy = _fbKey.currentState.fields["checkedBy"].currentState.value;
+  }
+
+  void saveLogObject() async{
+    ObjectHandler toHandle = new ObjectHandler();
+    try {
+      toHandle.saveLogInfoData(currentState.currentDocument, logInfoObject);
+    } finally {
+      debugPrint("Async calls done");
+    }
   }
 }
 

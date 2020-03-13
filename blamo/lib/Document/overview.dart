@@ -71,21 +71,19 @@ class _DocumentPageState extends State<DocumentPage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {createFudgedData();},
-      ),
 
     );
   }
 
-  void createFudgedData() async{
+  //--DEBUG
+  /*void createFudgedData() async{
     String a, b, c, test, unit, log;
     a = "Banana";
     b = "Strawberry";
     c = "Smoothie";
-    test = "{beginTest:9.9d,endTest:null,soilType:null,moistureContent:\"ITGOINRAIN\",dryDensity:\"itlikethesahara\",liquidLimit:\"Imuptomylimit\",plasticLimit:\"notallthatfake\",fines:\"Imsorryofficer\",blows1:\"Yup\",blows2:\"I think it does\",blows3:\"Not that much\",blowCount:\"25\",tags:\"nonPlastic Woop\"}";
-    unit = "{depthUB:0.0d,depthLB:17.2d,beginUnitDepth:14.11d,unitMethods:null,drillingMethods:\"Drillingmethod\",tags:\"nonPlastic,etc\"}"; 
-    log = "{projectName:\"WAAAAA\",startDate:\"tomorrow\",endDate:\"Today\",driller:\"george\",projectGeologist:\"you\",recorder:null,northing:\"MaybeNorth\",easting:\"east\",highway:\"some data, revenge of the cloud storage\",county:\"Taco tiger\",purpose:\"Hot-a-dogu\",equipment:\"Taco cat\",objectID:\"Oop\",testType:\"..,asdf\",project:\"yeah its a. project\",number:\"This ,,, Is some stuff\",client:\"i r d k\",lat:\"idk2\",long:\"idk\",location:\"Oregon\",elevationDatum:\"Bae-rito\",boreholeID:\"Boo-rito\",surfaceElevation:\"Tacos\",contractor:\"Animals\",method:\"Dogs\",loggedBy:\"Cats\",checkedBy:\"Lammas\",holeNo:7.22d,eANo:6.8d,keyNo:4.4d,startCardNo:2.2d,groundElevation:45.0d,tubeHeight:1.0d}";
+    test = "{beginTest:null,endTest:null,soilType:null,moistureContent:null,dryDensity:null,liquidLimit:null,plasticLimit:null,fines:null,blows1:null,blows2:null,blows3:null,blowCount:null,tags:null}";
+    unit = "{depthUB:null,depthLB:null,beginUnitDepth:null,unitMethods:null,drillingMethods:null,tags:null}";
+    log = "{projectName:null,startDate:null",endDate:null,driller:null,projectGeologist:null,recorder:null,northing:null,easting:null,highway:null,county:null,purpose:null,equipment:null,objectID:null,testType:null,project:null,number:null,client:null,lat:null,long:null,location:null,elevationDatum:null,boreholeID:null,surfaceElevation:null,contractor:null,method:null,loggedBy:null,checkedBy:null,holeNo:null,eANo:null,keyNo:null,startCardNo:null,groundElevation:null,tubeHeight:null}";
 
     await currentState.storage.overWriteTest(currentState.currentDocument, a,test);
     await currentState.storage.overWriteTest(currentState.currentDocument, b,test);
@@ -100,7 +98,7 @@ class _DocumentPageState extends State<DocumentPage> {
     setState(() {
       currentState.dirty = 1;
     });
-  }
+  }*/
 
   //Creates a new document manifest
   void createNewTest(String testName) async{
@@ -138,6 +136,17 @@ class _DocumentPageState extends State<DocumentPage> {
 
   //Builds the collapseable list views for The overview page. The overview page provides a link to the tests, loginfo, and Unit pages
   _buildExpandedContent(String passedTitle) {
+    int testBound = 0;
+    int unitBound = 0;
+
+    if(testBound > 10){
+      testBound = currentState.testList.length - 10;
+    }
+
+    if(unitBound > 10){
+      unitBound = currentState.unitList.length - 10;
+    }
+
     List<Widget> columnContent = [];
     if (passedTitle == "LogInfo") {
       columnContent.add(
@@ -146,7 +155,7 @@ class _DocumentPageState extends State<DocumentPage> {
           )
       );
     } else if (passedTitle == "Tests") {
-      for (int i = 0; i < currentState.testList.length; i++) {
+      for (int i = currentState.testList.length - 1; i >= testBound; i--) {
         columnContent.add(
             new ListTile(
               title: new Text(currentState.testList[i]),
@@ -154,7 +163,7 @@ class _DocumentPageState extends State<DocumentPage> {
         );
       }
     } else {
-      for (int i = 0; i < currentState.unitList.length; i++) {
+      for (int i = currentState.unitList.length - 1; i >= unitBound; i--) {
         columnContent.add(
             new ListTile(
               title: new Text(currentState.unitList[i]),
