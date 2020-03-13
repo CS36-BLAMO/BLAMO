@@ -30,12 +30,24 @@ class _UnitPageState extends State<UnitPage> {
   bool dirty;
   String tags;
   final myController = TextEditingController();
+  var formNodes = new List<FocusNode>(3);
 
   @override
   void initState() {
     super.initState();
+    for( var i = 0; i < 3; i++) {
+      formNodes[i] = FocusNode();
+    }
     dirty = true;
     updateUnitData(currentState.currentUnit, currentState.currentDocument);
+  }
+
+  @override
+  void dispose () {
+    for(var i = 0; i < 3; i++) {
+      formNodes[i].dispose();
+    }
+    super.dispose();
   }
 
 @override
@@ -109,28 +121,39 @@ class _UnitPageState extends State<UnitPage> {
                       child: Column(
                           children: <Widget>[
                             FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[0],
                               attribute: 'depth-ub',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Depth Upper Bound (m)"),
                               initialValue: formatValue(unitToBuildFrom.depthUB.toString()),
                               onChanged: (void nbd){updateUnitObject();},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[1]);
+                              },
                               /*onEditingComplete: (){
                                 debugPrint("Updating object");
                                 unitObject.depthUB = double.parse(_fbKey.currentState.fields['depth-ub'].currentState.value);
                               },*/
                             ),
                             FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[1],
                               attribute: 'depth-lb',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Depth Lower Bound (m)"),
                               initialValue: formatValue(unitToBuildFrom.depthLB.toString()),
                               onChanged: (void nbd){updateUnitObject();},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[2]);
+                              },
                               /*onEditingComplete: (){
                                 debugPrint("Updating object");
                                 unitObject.depthLB = double.parse(_fbKey.currentState.fields['depth-lb'].currentState.value);
                               },*/
                             ),
                             FormBuilderTextField(
+                              focusNode: formNodes[2],
                               attribute: 'methods',
                               validators: [],
                               decoration: InputDecoration(labelText: "Drilling Methods"),

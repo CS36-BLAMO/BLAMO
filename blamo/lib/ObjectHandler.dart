@@ -135,9 +135,13 @@ class ObjectHandler {
   Future<void> saveTestData(String testName, String document, Test testObj) async{
     //TODO SAVE TEST PAGE INTO STORAGE
     String testJSON = gson.encode({
+      "testType": testObj.testType,
       "beginTest": testObj.beginTest,
       "endTest": testObj.endTest,
-      "soilType": testObj.soilType,
+      "percentRecovery": testObj.percentRecovery,
+      "soilDrivingResistance": testObj.soilDrivingResistance,
+      "rockDiscontinuityData": testObj.rockDiscontinuityData,
+      "rockQualityDesignation": testObj.rockQualityDesignation,
       "moistureContent": testObj.moistureContent,
       "dryDensity": testObj.dryDensity,
       "liquidLimit": testObj.liquidLimit,
@@ -157,20 +161,20 @@ class ObjectHandler {
 
   Future<void> saveLogInfoData(String document, LogInfo logInfoObj) async{
     String logInfoJSON = gson.encode({
-      "projectName": logInfoObj.projectName,
+      //"projectName": logInfoObj.projectName,
       "startDate": logInfoObj.startDate,
       "endDate": logInfoObj.endDate,
-      "driller": logInfoObj.driller,
-      "projectGeologist": logInfoObj.projectGeologist,
-      "recorder": logInfoObj.recorder,
-      "northing": logInfoObj.northing,
-      "easting": logInfoObj.easting,
+      //"driller": logInfoObj.driller,
+      //"projectGeologist": logInfoObj.projectGeologist,
+      //"recorder": logInfoObj.recorder,
+      //"northing": logInfoObj.northing,
+      //"easting": logInfoObj.easting,
       "highway": logInfoObj.highway,
       "county": logInfoObj.county,
-      "purpose": logInfoObj.purpose,
+      //"purpose": logInfoObj.purpose,
       "equipment": logInfoObj.equipment,
-      "objectID": logInfoObj.objectID,
-      "testType": logInfoObj.testType,
+      //"objectID": logInfoObj.objectID,
+      //"testType": logInfoObj.testType,
       "project": logInfoObj.project,
       "number": logInfoObj.number,
       "client": logInfoObj.client,
@@ -184,11 +188,11 @@ class ObjectHandler {
       "method": logInfoObj.method,
       "loggedBy": logInfoObj.loggedBy,
       "checkedBy": logInfoObj.checkedBy,
-      "holeNo": logInfoObj.holeNo,
-      "eANo": logInfoObj.eANo,
-      "keyNo": logInfoObj.keyNo,
-      "startCardNo": logInfoObj.startCardNo,
-      "groundElevation": logInfoObj.groundElevation,
+      //"holeNo": logInfoObj.holeNo,
+      //"eANo": logInfoObj.eANo,
+      //"keyNo": logInfoObj.keyNo,
+      //"startCardNo": logInfoObj.startCardNo,
+      //"groundElevation": logInfoObj.groundElevation,
       "tubeHeight": logInfoObj.tubeHeight
     });
     //debugPrint("------LogInfoJSON Encoded------\n" + logInfoJSON + "\n");
@@ -276,20 +280,20 @@ class Document {
   Units units;
 }
 class LogInfo {
-  String projectName;
+  //String projectName;
   String startDate;
   String endDate;
-  String driller;
-  String projectGeologist;
-  String recorder;
-  String northing;
-  String easting;
+  ///String driller;
+  //String projectGeologist;
+  //String recorder;
+  //String northing;
+  //String easting;
   String highway;
   String county;
-  String purpose;
+  //String purpose;
   String equipment;
-  String objectID;
-  String testType;
+  //String objectID;
+  //String testType;
   String project;
   String number;
   String client;
@@ -303,28 +307,28 @@ class LogInfo {
   String method;
   String loggedBy;
   String checkedBy;
-  double holeNo;
-  double eANo;
-  double keyNo;
-  double startCardNo;
-  double groundElevation;
-  double tubeHeight;
+  //double holeNo;
+  //double eANo;
+  //double keyNo;
+  //double startCardNo;
+  //double groundElevation;
+  String tubeHeight;
 
   LogInfo({
-    this.projectName,
+    //this.projectName,
     this.startDate,
     this.endDate,
-    this.driller,
-    this.projectGeologist,
-    this.recorder,
-    this.northing,
-    this.easting,
+    //this.driller,
+    //this.projectGeologist,
+    //this.recorder,
+    //this.northing,
+    //this.easting,
     this.highway,
     this.county,
-    this.purpose,
+    //this.purpose,
     this.equipment,
-    this.objectID,
-    this.testType,
+    //this.objectID,
+    //this.testType,
     this.project,
     this.number,
     this.client,
@@ -338,22 +342,22 @@ class LogInfo {
     this.method,
     this.loggedBy,
     this.checkedBy,
-    this.holeNo,
-    this.eANo,
-    this.keyNo,
-    this.startCardNo,
-    this.groundElevation,
+    //this.holeNo,
+    //this.eANo,
+    //this.keyNo,
+    //this.startCardNo,
+    //this.groundElevation,
     this.tubeHeight,
   });
   //Returns LogInfo object with mapped values from an already parsed JSON object
   factory LogInfo.fromJSON (Map<String, dynamic> parsedJSON) {
-    double holeNoConverted;//= null;
-    double eANoConverted;//= null;
-    double keyNoConverted;//= null;
-    double startCardNoConverted;// = null;
-    double groundElevationConverted;//= null;
-    double tubeHeightConverted;//= null;
-
+    //double holeNoConverted;//= null;
+    //double eANoConverted;//= null;
+    //double keyNoConverted;//= null;
+    //double startCardNoConverted;// = null;
+    //double groundElevationConverted;//= null;
+    //double tubeHeightConverted;//= null;
+/*
     if(parsedJSON["holeNo"] != "null"){
       holeNoConverted = parsedJSON["holeNo"].value;
     }if(parsedJSON["eANo"] != "null"){
@@ -364,31 +368,32 @@ class LogInfo {
       startCardNoConverted = parsedJSON["startCardNo"].value;
     }if(parsedJSON["groundElevation"] != "null"){
       groundElevationConverted = parsedJSON["groundElevation"].value;
-    }if(parsedJSON["tubeHeight"] != "null"){
-      tubeHeightConverted = parsedJSON["tubeHeight"].value;
     }
+    if(parsedJSON["tubeHeight"] != "null"){
+      tubeHeightConverted = parsedJSON["tubeHeight"].value;
+    }*/
 
     return LogInfo(
-      holeNo: holeNoConverted,
-      eANo: eANoConverted,
-      keyNo: keyNoConverted,
-      startCardNo: startCardNoConverted,
-      groundElevation: groundElevationConverted,
-      tubeHeight: tubeHeightConverted,
-      projectName: parsedJSON["projectName"],
+      //holeNo: holeNoConverted,
+      //eANo: eANoConverted,
+      //keyNo: keyNoConverted,
+      //startCardNo: startCardNoConverted,
+      //groundElevation: groundElevationConverted,
+      tubeHeight: parsedJSON["tubeHeight"],
+      //projectName: parsedJSON["projectName"],
       startDate: parsedJSON["startDate"],
       endDate: parsedJSON["endDate"],
-      driller: parsedJSON["driller"],
-      projectGeologist: parsedJSON["projectGeologist"],
-      recorder: parsedJSON["recorder"],
-      northing: parsedJSON["northing"],
-      easting: parsedJSON["easting"],
+      //driller: parsedJSON["driller"],
+      //projectGeologist: parsedJSON["projectGeologist"],
+      //recorder: parsedJSON["recorder"],
+      //northing: parsedJSON["northing"],
+      //easting: parsedJSON["easting"],
       highway: parsedJSON["highway"],
       county: parsedJSON["county"],
-      purpose: parsedJSON["purpose"],
+      //purpose: parsedJSON["purpose"],
       equipment: parsedJSON["equipment"],
-      objectID: parsedJSON["objectID"],
-      testType: parsedJSON["testType"],
+      //objectID: parsedJSON["objectID"],
+      //testType: parsedJSON["testType"],
       project: parsedJSON["project"],
       number: parsedJSON["number"],
       client: parsedJSON["client"],
@@ -462,9 +467,13 @@ class Tests {
 }
 
 class Test {
+  String testType;
   double beginTest;
   double endTest;
-  String soilType;
+  double percentRecovery;
+  String soilDrivingResistance;
+  String rockDiscontinuityData;
+  String rockQualityDesignation;
   String moistureContent;
   String dryDensity;
   String liquidLimit;
@@ -478,9 +487,13 @@ class Test {
 
   //Default constructor
   Test({
+    this.testType,
     this.beginTest,
     this.endTest,
-    this.soilType,
+    this.percentRecovery,
+    this.soilDrivingResistance,
+    this.rockDiscontinuityData,
+    this.rockQualityDesignation,
     this.moistureContent,
     this.dryDensity,
     this.liquidLimit,
@@ -496,17 +509,26 @@ class Test {
   factory Test.fromJSON(Map<String, dynamic> parsedJSON){
     double beginTestConverted;
     double endTestConverted;
+    double percentRecoveryConverted;
 
     if(parsedJSON["beginTest"] != "null"){
       beginTestConverted = parsedJSON["beginTest"].value;
     } 
     if(parsedJSON["endTest"]  != "null") {
       endTestConverted = parsedJSON["endTest"].value;
-    } 
+    }
+    if(parsedJSON["percentRecovery"] != "null") {
+      percentRecoveryConverted = parsedJSON["percentRecovery"].value;
+    }
+
     return Test(
+      testType: parsedJSON["testType"],
       beginTest: beginTestConverted,
       endTest: endTestConverted,
-      soilType: parsedJSON["soilType"],
+      percentRecovery: percentRecoveryConverted,
+      soilDrivingResistance: parsedJSON["soilDrivingResistance"],
+      rockDiscontinuityData: parsedJSON["rockDiscontinuityData"],
+      rockQualityDesignation: parsedJSON["rockQualityDesignation"],
       moistureContent: parsedJSON["moistureContent"],
       dryDensity: parsedJSON["dryDensity"],
       liquidLimit: parsedJSON["liquidLimit"],

@@ -117,7 +117,7 @@ class _TestsPageState extends State<TestsPage> {
                   onPressed: () async {
                     String newTest = _textFieldController.text + ',';
                     String newTestNoComma = _textFieldController.text;
-                    String test = "{beginTest:null,endTest:null,soilType:null,moistureContent:null,dryDensity:null,liquidLimit:null,plasticLimit:null,fines:null,blows1:null,blows2:null,blows3:null,blowCount:null,tags:null}";
+                    String test = "{testType:null,beginTest:null,endTest:null,percentRecovery:null,soilDrivingResistance:null,rockDiscontinuityData:null,rockQualityDesignation:null,moistureContent:null,dryDensity:null,liquidLimit:null,plasticLimit:null,fines:null,blows1:null,blows2:null,blows3:null,blowCount:null,tags:null}";
                     String toWrite = '';
                     if(_textFieldController.text.isNotEmpty){
                       toWrite = "${currentState.currentDocument}\n${currentState.testList.length + 1}\n${currentState.unitList.length}\n";

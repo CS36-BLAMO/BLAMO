@@ -27,12 +27,24 @@ class _TestPageState extends State<TestPage> {
   bool dirty = true;
   Test testObject;
   String tags;
+  var formNodes = new List<FocusNode>(16);
 
   @override
   void initState() {
     super.initState();
+    for( var i = 0; i < 16; i++) {
+      formNodes[i] = FocusNode();
+    }
     dirty = true;
     updateTestData(currentState.currentTest, currentState.currentDocument);
+  }
+
+  @override
+  void dispose () {
+    for(var i = 0; i < 16; i++) {
+      formNodes[i].dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -100,27 +112,193 @@ class _TestPageState extends State<TestPage> {
                       child: Column(
                           children: <Widget>[
                             FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[0],
+                              attribute: 'testType',
+                              validators: [],
+                              decoration: InputDecoration(labelText: "Test Type, No."),
+                              initialValue: formatValue(testObjectToBuildFrom.testType),
+                              onChanged: (void nbd){updateTestObject();},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[1]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[1],
                               attribute: 'beginTestDepth',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Begin Test Depth (m)"),
                               initialValue: formatValue(testObjectToBuildFrom.beginTest.toString()),
                               onChanged: (void nbd){updateTestObject();},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[2]);
+                              },
                               ),
                             FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[2],
                               attribute: 'endTestDepth',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "End Test Depth (m)"),
                               initialValue: formatValue(testObjectToBuildFrom.endTest.toString()),
                               onChanged: (void nbd){updateTestObject();},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[3]);
+                              },
                             ),
                             FormBuilderTextField(
-                              attribute: 'soilType',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Soil Type"), //ASK - preferred title?
-                              initialValue: formatValue(testObjectToBuildFrom.soilType),
-                              onChanged: (void nbd){testObject.soilType = _fbKey.currentState.fields["soilType"].currentState.value;},
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[3],
+                              attribute: 'percentRecovery',
+                              validators: [FormBuilderValidators.numeric()],
+                              decoration: InputDecoration(labelText: "Percent Recovery"),
+                              initialValue: formatValue(testObjectToBuildFrom.percentRecovery.toString()),
+                              onChanged: (void nbd){updateTestObject();},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[4]);
+                              },
                             ),
-
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[4],
+                              attribute: 'soilDrivingResistance',
+                              validators: [],
+                              decoration: InputDecoration(labelText: "Soil Driving Resistance"), //ASK - preferred title?
+                              initialValue: formatValue(testObjectToBuildFrom.soilDrivingResistance),
+                              onChanged: (void nbd){testObject.soilDrivingResistance = _fbKey.currentState.fields["soilDrivingResistance"].currentState.value;},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[5]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[5],
+                              attribute: 'rockDiscontinuityData',
+                              validators: [],
+                              decoration: InputDecoration(labelText: "Rock Discontinuity Data"), //ASK - preferred title?
+                              initialValue: formatValue(testObjectToBuildFrom.rockDiscontinuityData),
+                              onChanged: (void nbd){testObject.rockDiscontinuityData = _fbKey.currentState.fields["rockDiscontinuityData"].currentState.value;},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[6]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[6],
+                              attribute: 'rockQualityDesignation',
+                              validators: [],
+                              decoration: InputDecoration(labelText: "Rock Quality Designation"), //ASK - preferred title?
+                              initialValue: formatValue(testObjectToBuildFrom.rockQualityDesignation),
+                              onChanged: (void nbd){testObject.rockQualityDesignation = _fbKey.currentState.fields["rockQualityDesignation"].currentState.value;},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[7]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[7],
+                              attribute: 'moistureContent',
+                              validators: [FormBuilderValidators.numeric()],
+                              decoration: InputDecoration(labelText: "Moisture Content (%)"),
+                              initialValue: formatValue(testObjectToBuildFrom.moistureContent),
+                              onChanged: (void nbd){updateTestObject();},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[8]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[8],
+                              attribute: 'dryDensity',
+                              validators: [],
+                              decoration: InputDecoration(labelText: "Dry Density (pcf)"),
+                              initialValue: formatValue(testObjectToBuildFrom.dryDensity),
+                              onChanged: (void nbd){testObject.dryDensity = _fbKey.currentState.fields["dryDensity"].currentState.value;},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[9]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[9],
+                              attribute: 'liquidLimit',
+                              validators: [FormBuilderValidators.numeric()],
+                              decoration: InputDecoration(labelText: "Liquid Limit (%)"),
+                              initialValue: formatValue(testObjectToBuildFrom.liquidLimit),
+                              onChanged: (void nbd){testObject.liquidLimit = _fbKey.currentState.fields["liquidLimit"].currentState.value;},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[10]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[10],
+                              attribute: 'plasticLimit',
+                              validators: [FormBuilderValidators.numeric()],
+                              decoration: InputDecoration(labelText: "Plastic Limit (%)"),
+                              initialValue: formatValue(testObjectToBuildFrom.plasticLimit),
+                              onChanged: (void nbd){testObject.plasticLimit = _fbKey.currentState.fields["plasticLimit"].currentState.value;},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[11]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[11],
+                              attribute: 'fines',
+                              validators: [FormBuilderValidators.numeric()],
+                              decoration: InputDecoration(labelText: "Fines (%)"),
+                              initialValue: formatValue(testObjectToBuildFrom.fines),
+                              onChanged: (void nbd){testObject.fines = _fbKey.currentState.fields["fines"].currentState.value;},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[12]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[12],
+                              attribute: 'blows1',
+                              validators: [FormBuilderValidators.numeric()],
+                              decoration: InputDecoration(labelText: "Blows 1st"),
+                              initialValue: formatValue(testObjectToBuildFrom.blows1),
+                              onChanged: (void nbd){testObject.blows1 = _fbKey.currentState.fields["blows1"].currentState.value;},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[13]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[13],
+                              attribute: 'blows2',
+                              validators: [FormBuilderValidators.numeric()],
+                              decoration: InputDecoration(labelText: "Blows 2nd"),
+                              initialValue: formatValue(testObjectToBuildFrom.blows2),
+                              onChanged: (void nbd){testObject.blows2 = _fbKey.currentState.fields["blows2"].currentState.value;},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[14]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              textInputAction: TextInputAction.next,
+                              focusNode: formNodes[14],
+                              attribute: 'blows3',
+                              validators: [FormBuilderValidators.numeric()],
+                              decoration: InputDecoration(labelText: "Blows 3rd"),
+                              initialValue: formatValue(testObjectToBuildFrom.blows3),
+                              onChanged: (void nbd){testObject.blows3 = _fbKey.currentState.fields["blows3"].currentState.value;},
+                              onFieldSubmitted: (v){
+                                FocusScope.of(context).requestFocus(formNodes[15]);
+                              },
+                            ),
+                            FormBuilderTextField(
+                              focusNode: formNodes[15],
+                              attribute: 'blowCount',
+                              validators: [FormBuilderValidators.numeric()],
+                              decoration: InputDecoration(labelText: "Blow Count"),
+                              initialValue: formatValue(testObjectToBuildFrom.blowCount),
+                              onChanged: (void nbd){testObject.blowCount = _fbKey.currentState.fields["blowCount"].currentState.value;},
+                            ),
                             FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: unit.dart, 51)
                               attribute: 'description',
                               validators: [],
@@ -183,70 +361,6 @@ class _TestPageState extends State<TestPage> {
                               ],
                               onChanged: (void nbd){getTags(testObjectToBuildFrom);},
                             ),
-                            FormBuilderTextField(
-                              attribute: 'moistureContent',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Moisture Content (%)"),
-                              initialValue: formatValue(testObjectToBuildFrom.moistureContent),
-                              onChanged: (void nbd){updateTestObject();},
-                            ),
-                            FormBuilderTextField(
-                              attribute: 'dryDensity',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Dry Density (pcf)"),
-                              initialValue: formatValue(testObjectToBuildFrom.dryDensity),
-                              onChanged: (void nbd){testObject.dryDensity = _fbKey.currentState.fields["dryDensity"].currentState.value;},
-                            ),
-                            FormBuilderTextField(
-                              attribute: 'liquidLimit',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Liquid Limit (%)"),
-                              initialValue: formatValue(testObjectToBuildFrom.liquidLimit),
-                              onChanged: (void nbd){testObject.liquidLimit = _fbKey.currentState.fields["liquidLimit"].currentState.value;},
-                            ),
-                            FormBuilderTextField(
-                              attribute: 'plasticLimit',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Plastic Limit (%)"),
-                              initialValue: formatValue(testObjectToBuildFrom.plasticLimit),
-                              onChanged: (void nbd){testObject.plasticLimit = _fbKey.currentState.fields["plasticLimit"].currentState.value;},
-                            ),
-                            FormBuilderTextField(
-                              attribute: 'fines',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Fines (%)"),
-                              initialValue: formatValue(testObjectToBuildFrom.fines),
-                              onChanged: (void nbd){testObject.fines = _fbKey.currentState.fields["fines"].currentState.value;},
-                            ),
-                            FormBuilderTextField(
-                              attribute: 'blows1',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Blows 1st"),
-                              initialValue: formatValue(testObjectToBuildFrom.blows1),
-                              onChanged: (void nbd){testObject.blows1 = _fbKey.currentState.fields["blows1"].currentState.value;},
-                            ),
-                            FormBuilderTextField(
-                              attribute: 'blows2',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Blows 2nd"),
-                              initialValue: formatValue(testObjectToBuildFrom.blows2),
-                              onChanged: (void nbd){testObject.blows2 = _fbKey.currentState.fields["blows2"].currentState.value;},
-                            ),
-                            FormBuilderTextField(
-                              attribute: 'blows3',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Blows 3rd"),
-                              initialValue: formatValue(testObjectToBuildFrom.blows3),
-                              onChanged: (void nbd){testObject.blows3 = _fbKey.currentState.fields["blows3"].currentState.value;},
-                            ),
-                            FormBuilderTextField(
-                              attribute: 'blowCount',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Blow Count"),
-                              initialValue: formatValue(testObjectToBuildFrom.blowCount),
-                              onChanged: (void nbd){testObject.blowCount = _fbKey.currentState.fields["blowCount"].currentState.value;},
-                            ),
-
                 ]
                 )
               )
@@ -305,12 +419,18 @@ class _TestPageState extends State<TestPage> {
       testObject.endTest = double.parse(_fbKey.currentState.fields["endTestDepth"].currentState.value);
     } catch(e) {
     }
-
+    try{
+      testObject.percentRecovery = double.parse(_fbKey.currentState.fields["percentRecovery"].currentState.value);
+    } catch(e) {
+    }
+    testObject.testType = _fbKey.currentState.fields["testType"].currentState.value.toString();
+    testObject.soilDrivingResistance = _fbKey.currentState.fields["soilDrivingResistance"].currentState.value.toString();
+    testObject.rockDiscontinuityData = _fbKey.currentState.fields["rockDiscontinuityData"].currentState.value.toString();
+    testObject.rockQualityDesignation = _fbKey.currentState.fields["rockQualityDesignation"].currentState.value.toString();
     testObject.dryDensity = _fbKey.currentState.fields["dryDensity"].currentState.value.toString();
     testObject.liquidLimit = _fbKey.currentState.fields["liquidLimit"].currentState.value.toString();
     testObject.moistureContent = _fbKey.currentState.fields["moistureContent"].currentState.value.toString();
     testObject.plasticLimit = _fbKey.currentState.fields["plasticLimit"].currentState.value.toString();
-    testObject.soilType = _fbKey.currentState.fields["soilType"].currentState.value.toString();
     testObject.blowCount = _fbKey.currentState.fields["blowCount"].currentState.value.toString();
     testObject.blows1 = _fbKey.currentState.fields["blows1"].currentState.value.toString();
     testObject.blows2 = _fbKey.currentState.fields["blows2"].currentState.value.toString();
