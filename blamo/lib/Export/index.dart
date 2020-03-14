@@ -1,3 +1,4 @@
+import 'package:blamo/Export/CSVExporter.dart';
 import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/PDF/pdf_builder.dart';
@@ -46,49 +47,77 @@ class _ExportPageState extends State<ExportPage> {
       ),
     );
   }
-}
-//
-Widget _exportList() => ListView(
-  children: [
-    Center(child:_tile('Email',Icons.email)),
-    Divider(),
-    Center(child:_tile('Box',Icons.cloud_upload)),
-    Divider(),
-    Center(child:_pdfTile('PDF',Icons.picture_as_pdf))
-  ],
-);
+
+
+  Widget _exportList() => ListView(
+    children: [
+      Center(child:_tile('Email',Icons.email)),
+      Divider(),
+      Center(child:_tile('Box',Icons.cloud_upload)),
+      Divider(),
+      Center(child:_pdfTile('PDF',Icons.picture_as_pdf)),
+      Divider(),
+      Center(child:_csvTile('CSV',Icons.pie_chart))
+    ],
+  );
 
 //Individual ListView item formatting with passed in icon and export to string
-ListTile _tile(String destination, IconData icon) => ListTile(
-  title: Text(destination,
-      style: TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize:25
-      )),
-  leading: Padding(
-    padding: const EdgeInsets.all(20.0),
-    child: Icon(
-      icon,
-      color: Colors.blue,
+  ListTile _tile(String destination, IconData icon) => ListTile(
+    title: Text(destination,
+        style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize:25
+        )),
+    leading: Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Icon(
+        icon,
+        color: Colors.blue,
+      ),
     ),
-  ),
-);
+  );
 
 
-ListTile _pdfTile(String destination, IconData icon) => ListTile(
-  title: Text(destination,
-      style: TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize:25
-      )),
-  leading: Padding(
-    padding: const EdgeInsets.all(20.0),
-    child: Icon(
-      icon,
-      color: Colors.blue,
+  ListTile _csvTile(String destination, IconData icon) => ListTile(
+    title: Text(destination,
+        style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize:25
+        )),
+    leading: Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Icon(
+        icon,
+        color: Colors.blue,
+      ),
     ),
-  ),
-  onTap: () {docCreate();}
-);
+    onTap: () {
+      CSVExporter csvExporter = new CSVExporter(currentState);
+
+      //--DEBUG includes dubugging prints
+      //csvExporter.testStuff();
+      csvExporter.exportToCSV();
+
+    },
+  );
+
+  ListTile _pdfTile(String destination, IconData icon) => ListTile(
+      title: Text(destination,
+          style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize:25
+          )),
+      leading: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Icon(
+          icon,
+          color: Colors.blue,
+        ),
+      ),
+      onTap: () {docCreate();}
+  );
+}
+//
+
 //TODO Add functionality for onclick to grab CSV and email, text popup for email to send to
 //TODO cloud save to Box(Both form AND CSV?)
