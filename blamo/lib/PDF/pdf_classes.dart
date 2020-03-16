@@ -1,3 +1,5 @@
+import 'package:blamo/ObjectHandler.dart';
+
 class UnitPDF { // TODO - touch up inits? Maybe?
     double beginUnitDepth;
     double endUnitDepth;
@@ -45,13 +47,15 @@ class TestPDF {
 }
 
 class Level { //class for holding units and associated tests.
-    UnitPDF unit;
-    List<TestPDF> tests = [];
+    //UnitPDF unit;
+    //List<TestPDF> tests = [];
+    Unit unit;
+    List<Test> tests = [];
     double beginDepth; // GOES BY ELEVATION. begindepth is higher elevation, or technically a "lower" bound. i.e. 0.
     double endDepth; //                      enddepth is lower elevation, or technically a "higher" bound. i.e. -2.5.
     void setDepth(){
-      this.beginDepth = this.beginDepth ?? this.unit.beginUnitDepth;
-      this.endDepth = this.endDepth ?? this.unit.endUnitDepth;
+      this.beginDepth = this.beginDepth ?? this.unit.depthUB;
+      this.endDepth = this.endDepth ?? this.unit.depthLB;
     }
 }
 

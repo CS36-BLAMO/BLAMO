@@ -43,13 +43,13 @@ class _ExportPageState extends State<ExportPage> {
           backgroundColor: Colors.deepOrangeAccent
       ),
       body: Center(
-        child: Center(child:_exportList()),
+        child: Center(child:_exportList(currentState)),
       ),
     );
   }
 
 
-  Widget _exportList() => ListView(
+  Widget _exportList(StateData currentState) => ListView(
     children: [
       Center(child:_tile('Email',Icons.email)),
       Divider(),
@@ -114,7 +114,7 @@ class _ExportPageState extends State<ExportPage> {
           color: Colors.blue,
         ),
       ),
-      onTap: () {docCreate();}
+      onTap: () {docCreate(currentState);}
   );
 }
 //
