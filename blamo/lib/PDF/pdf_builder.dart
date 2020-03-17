@@ -274,9 +274,9 @@ void pdf_write(StateData currentState) async{
   }
   else {
     final output = await getExternalStorageDirectory();
-    String filepath = "${output.path}/${currentState.currentDocument}_" + now.toString() +".pdf";
+    String filepath = "${output.path}/${currentState.currentDocument}" +".pdf"; //Took out + now.toString() can version files later with backend work to find most recent file
     final file = File(filepath);
-    print("writing to file at path"+filepath);
+    print("writing to file at path: "+ filepath);
     await file.writeAsBytes(pdf.save()); // TODO - Name files better
     print("done");
     return;

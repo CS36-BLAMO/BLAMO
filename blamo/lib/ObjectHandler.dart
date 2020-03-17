@@ -1,4 +1,5 @@
 import 'package:blamo/File_IO/FileHandler.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:gson/gson.dart';
 
 
@@ -252,7 +253,6 @@ class ObjectHandler {
     returnLogInfo = parseLogInfoJSON(logInfoLocal);
     return returnLogInfo;
   }
-
   // returns list of all units in doc, given list of unit names
   Future<List<Unit>> getUnitsData(List<String> unitNames, String documentName) async {
     List<Unit> returnUnitsData = [];
@@ -273,6 +273,46 @@ class ObjectHandler {
     return returnTestsData;
   }
 
+  //Functions to get raw JSON data from file
+  Future<String> getLogInfoDataJson(String documentName) async {
+    String logInfoLocal = await retrieveLocalLogInfo(documentName);
+    return logInfoLocal;
+  }
+
+  Future<List<String>> getUnitsDataJSON(List<String> unitNames,String documentName) async {
+    List<String> returnUnitsData = [];
+    for(int i = 0; i < unitNames.length; i++){
+      String testLocal = await retrieveLocalTest(unitNames[i],documentName);
+      returnUnitsData.add(testLocal);
+    }
+    return returnUnitsData;
+  }
+
+  Future<List<String>> getTestsDataJSON(List<String> testNames,String documentName) async{
+    List<String> returnTestsData = [];
+    for(int i = 0; i < testNames.length; i++){
+      String testLocal = await retrieveLocalTest(testNames[i],documentName);
+      returnTestsData.add(testLocal);
+    }
+    return returnTestsData;
+  }
+
+  Future<String> getPathToFile(String documentName, String extension) async {
+    String filePath;
+    bool fileExists = await storage.checkForFile(documentName, extension);
+    if(fileExists){
+      filePath = await storage.getPathToFile(documentName, extension);
+    }
+    debugPrint("(OH)fileExists: $fileExists");
+    debugPrint("(OH)filePath: $filePath");
+    if(fileExists != false){
+      return filePath;
+    } else {
+      debugPrint("OBJECT HANDLER - There is no compiled $extension version for $documentName");
+
+      return null;
+    }
+  }
 }
 class Document {
   LogInfo logInfo;

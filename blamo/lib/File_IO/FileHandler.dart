@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:blamo/main.dart';
-
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'dart:async';
 
@@ -369,5 +369,42 @@ class PersistentStorage {
       }
     }
     return toRead;
+  }
+  Future<bool> checkForFile(String documentName, String extension) async{
+    PermissionStatus permission =
+    await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    if (permission.toString() != "PermissionStatus.granted") {
+      Map<PermissionGroup, PermissionStatus> permissions =
+      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+    }
+    await new Future.delayed(new Duration(milliseconds: 50));
+    permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    if (permission.toString() != "PermissionStatus.granted"){
+      print("Permission denied. PDF write cancelled."); // TODO - Better handle permission denied case.
+    } else {
+      final output = await getExternalStorageDirectory();
+      String filepath = "${output.path}/$documentName.$extension";
+      return File(filepath).exists();
+    }
+    return false;
+  }
+
+  Future<String> getPathToFile(String documentName, String extension) async{
+    PermissionStatus permission =
+    await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    if (permission.toString() != "PermissionStatus.granted") {
+      Map<PermissionGroup, PermissionStatus> permissions =
+      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+    }
+    await new Future.delayed(new Duration(milliseconds: 50));
+    permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    if (permission.toString() != "PermissionStatus.granted"){
+      print("Permission denied. PDF write cancelled."); // TODO - Better handle permission denied case.
+    } else {
+      final output = await getExternalStorageDirectory();
+      String filepath = "${output.path}/$documentName.$extension";
+      return filepath;
+    }
+    return null;
   }
 }
