@@ -1,0 +1,2 @@
+make:
+	pdflatex main.tex

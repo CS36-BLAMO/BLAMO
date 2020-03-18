@@ -1,0 +1,6 @@
+\contentsline {section}{\numberline {1}Project Recap}{2}
+\contentsline {section}{\numberline {2}Current State of Project}{2}
+\contentsline {section}{\numberline {3}Work left to do}{2}
+\contentsline {section}{\numberline {4}Problems and Blockers}{3}
+\contentsline {section}{\numberline {5}Code}{4}
+\contentsline {section}{\numberline {6}Beta Functionality}{7}
