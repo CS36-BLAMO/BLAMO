@@ -3,6 +3,7 @@ import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/PDF/pdf_builder.dart';
 import 'package:blamo/SideMenu.dart';
+import 'package:blamo/CustomActionBar.dart';
 import 'email.dart';
 
 /*This page will serve as a manual export option all different avenues
@@ -26,8 +27,8 @@ class _ExportPageState extends State<ExportPage> {
   //Creating structured list of output types
   List<String> docTypes = ['csv','pdf'];
   //parameters to pass to emailer
-  String pickedDoc = null;
-  String pickedDocType = null;
+  String pickedDoc /*TODO= null*/;
+  String pickedDocType /*= null*/;
   List<String>curDoc = [];
 
   _ExportPageState(this.currentState);
@@ -48,12 +49,7 @@ class _ExportPageState extends State<ExportPage> {
       drawer: new Drawer(
         child: SideMenu(currentState),
       ),
-      appBar: new AppBar(
-          title: new Text("Export"),
-          actions: <Widget>[
-          ],
-          backgroundColor: Colors.deepOrangeAccent
-      ),
+      appBar: CustomActionBar("Export").getAppBar(),
       body: Center(
         child: Center(child:_exportList(currentState,pickedDoc)),
       ),

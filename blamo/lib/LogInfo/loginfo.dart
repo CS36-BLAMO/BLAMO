@@ -4,7 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:blamo/SideMenu.dart';
-
+import 'package:blamo/CustomActionBar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:blamo/ObjectHandler.dart';
 
@@ -63,13 +63,8 @@ class _LogInfoPageState extends State<LogInfoPage> {
           drawer: new Drawer(
               child: SideMenu(currentState)
           ),
-          appBar: new AppBar(
-              title: new Text("Loginfo Page"),
-              actions: <Widget>[
-
-              ],
-              backgroundColor: Colors.deepOrange
-          ));
+        appBar: CustomActionBar("Log Info Page").getAppBar(),
+      );
     }
 
   }
@@ -99,13 +94,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
       drawer: new Drawer(
         child: SideMenu(currentState),
       ),
-      appBar: new AppBar(
-          title: new Text("Log Info Page"),
-          actions: <Widget>[
-
-          ],
-          backgroundColor: Colors.deepOrange
-      ),
+      appBar: CustomActionBar("Log Info Page").getAppBar(),
       body: Padding(
           padding: EdgeInsets.fromLTRB(40,0,40,40),
           child: SingleChildScrollView(

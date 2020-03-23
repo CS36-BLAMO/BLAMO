@@ -28,8 +28,7 @@ Future<String> sendEmail(String documentName,String docType) async {
         .checkPermissionStatus(PermissionGroup.storage);
     if (permission.toString() != "PermissionStatus.granted") {
       Map<PermissionGroup,
-          PermissionStatus> permissions = await PermissionHandler()
-          .requestPermissions([PermissionGroup.storage]);
+          PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
     }
     await new Future.delayed(new Duration(seconds: 1));
     permission =

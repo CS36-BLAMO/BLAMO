@@ -1,9 +1,11 @@
 import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:blamo/SideMenu.dart';
+import 'package:blamo/CustomActionBar.dart';
 
 //ToRemove
 /*
@@ -45,18 +47,12 @@ class _UnitsPageState extends State<UnitsPage> {
     else {
       debugPrint("Returning empty Scaffold");
       return new Scaffold(
-          backgroundColor: Colors.white,
+          appBar: CustomActionBar("Units Page").getAppBar(),
           drawer: new Drawer(
               child: SideMenu(currentState)
           ),
-          appBar: new AppBar(
-              title: new Text("Units Page"),
-              actions: <Widget>[
 
-              ],
-              backgroundColor: Colors.deepOrange
-          ));
-    }
+      );}
   }
   //@override
 Widget getScaffold(List<Unit> units){
@@ -66,13 +62,7 @@ Widget getScaffold(List<Unit> units){
         drawer: new Drawer(
         child: SideMenu(currentState),
       ),
-        appBar: new AppBar(
-            title: new Text("Units Page"),
-            actions: <Widget>[
-
-            ],
-            backgroundColor: Colors.deepOrange
-      ),
+      appBar: CustomActionBar("Units Page").getAppBar(),
       body: Padding(
         padding: EdgeInsets.fromLTRB(20,20,20,20),
         child: ListView.builder(
@@ -108,6 +98,7 @@ Widget getScaffold(List<Unit> units){
                 maxLength: 50,
                 controller: _textFieldController,
                 decoration: InputDecoration(labelText: 'Unit Name'),
+                inputFormatters: [new BlacklistingTextInputFormatter(new RegExp('[\\,]'))],
               ),
               actions: <Widget> [
                 new FlatButton(
@@ -139,6 +130,7 @@ Widget getScaffold(List<Unit> units){
                         currentState.unitList.add(newUnitNoComma);
                         currentState.currentUnit = newUnitNoComma;
                         currentState.currentRoute = '/UnitPage';
+                        Navigator.pop(context);
                         Navigator.pushReplacementNamed(
                           context,
                           "/UnitPage",

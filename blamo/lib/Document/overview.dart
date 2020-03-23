@@ -2,6 +2,7 @@ import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/File_IO/FileHandler.dart';
 import 'package:blamo/SideMenu.dart';
+import 'package:blamo/CustomActionBar.dart';
 
 class DocumentPage extends StatefulWidget {
   final StateData pass;
@@ -39,12 +40,7 @@ class _DocumentPageState extends State<DocumentPage> {
         child: SideMenu(currentState),
       ),
 
-      appBar: new AppBar(
-          title: new Text(currentState.currentDocument),
-          actions: <Widget>[
-          ],
-          backgroundColor: Colors.deepOrange
-      ),
+      appBar: CustomActionBar("Overview: ${currentState.currentDocument}").getAppBar(),
 
       body: ListView.builder(
         itemCount: 3,

@@ -4,7 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:blamo/SideMenu.dart';
 import 'dart:convert';
-
+import 'package:blamo/CustomActionBar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 //TORemove
@@ -66,13 +66,7 @@ class _TestPageState extends State<TestPage> {
           drawer: new Drawer(
               child: SideMenu(currentState)
           ),
-          appBar: new AppBar(
-              title: new Text("Test Page: " + currentState.currentDocument + "/" + currentState.currentTest),
-              actions: <Widget>[
-
-              ],
-              backgroundColor: Colors.deepOrange
-          ));//getScaffold("","");
+        appBar: CustomActionBar("Test Page: ${currentState.currentTest}").getAppBar(),);//getScaffold("","");
     }
 
   }
@@ -91,13 +85,7 @@ class _TestPageState extends State<TestPage> {
       drawer: new Drawer(
         child: SideMenu(currentState),
       ),
-      appBar: new AppBar(
-          title: new Text("Test Page: " + currentState.currentDocument + "/" + currentState.currentTest),
-          actions: <Widget>[
-
-          ],
-          backgroundColor: Colors.deepOrange
-      ),
+      appBar: CustomActionBar("Test Page: ${currentState.currentTest}").getAppBar(),
       body: Padding(
           padding: EdgeInsets.fromLTRB(40,0,40,40),
           child: SingleChildScrollView(
@@ -126,7 +114,7 @@ class _TestPageState extends State<TestPage> {
                             FormBuilderTextField(
                               textInputAction: TextInputAction.next,
                               focusNode: formNodes[1],
-                              attribute: 'beginTestDepth',
+                              attribute: 'beginTestDepth (-)',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "Begin Test Depth (m)"),
                               initialValue: formatValue(testObjectToBuildFrom.beginTest.toString()),
@@ -138,7 +126,7 @@ class _TestPageState extends State<TestPage> {
                             FormBuilderTextField(
                               textInputAction: TextInputAction.next,
                               focusNode: formNodes[2],
-                              attribute: 'endTestDepth',
+                              attribute: 'endTestDepth (-)',
                               validators: [FormBuilderValidators.numeric()],
                               decoration: InputDecoration(labelText: "End Test Depth (m)"),
                               initialValue: formatValue(testObjectToBuildFrom.endTest.toString()),
