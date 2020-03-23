@@ -316,6 +316,23 @@ class PersistentStorage {
   }
   /*---End Of file checking functions---*/
 
+  /* Deletion functions for removing Documents, Units, and Tests
+  *
+  *
+  * */
+
+  void deleteTest(String documentName, String testName) async {
+    File fp = File(await _localPath + "/$documentName" + '_$testName.txt');
+    try {
+      await fp.delete();
+    } catch(e) {
+      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+    }
+
+  }
+
+  /*---End Of file deletion functions---*/
+
   //Updates the statedata object with the currentDocument
   Future<StateData> setStateData(StateData toRead) async{
     String toParse;

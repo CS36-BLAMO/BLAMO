@@ -114,9 +114,9 @@ class _TestPageState extends State<TestPage> {
                             FormBuilderTextField(
                               textInputAction: TextInputAction.next,
                               focusNode: formNodes[1],
-                              attribute: 'beginTestDepth (-)',
+                              attribute: 'beginTestDepth',
                               validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Begin Test Depth (m)"),
+                              decoration: InputDecoration(labelText: "Begin Test Depth (-m)"),
                               initialValue: formatValue(testObjectToBuildFrom.beginTest.toString()),
                               onChanged: (void nbd){updateTestObject();},
                               onFieldSubmitted: (v){
@@ -126,9 +126,9 @@ class _TestPageState extends State<TestPage> {
                             FormBuilderTextField(
                               textInputAction: TextInputAction.next,
                               focusNode: formNodes[2],
-                              attribute: 'endTestDepth (-)',
+                              attribute: 'endTestDepth',
                               validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "End Test Depth (m)"),
+                              decoration: InputDecoration(labelText: "End Test Depth (-m)"),
                               initialValue: formatValue(testObjectToBuildFrom.endTest.toString()),
                               onChanged: (void nbd){updateTestObject();},
                               onFieldSubmitted: (v){
