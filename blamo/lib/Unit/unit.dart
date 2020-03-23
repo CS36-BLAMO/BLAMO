@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:blamo/SideMenu.dart';
 import 'dart:convert';
+import 'package:blamo/CustomActionBar.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -70,17 +71,13 @@ class _UnitPageState extends State<UnitPage> {
     } else {
       debugPrint("Returning empty Scaffold");
       return new Scaffold(
+        appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
           backgroundColor: Colors.white,
           drawer: new Drawer(
               child: SideMenu(currentState)
           ),
-          appBar: new AppBar(
-              title: new Text("Unit Page: ${currentState.currentUnit}"),
-              actions: <Widget>[
 
-              ],
-              backgroundColor: Colors.deepOrange
-          ));
+          );
     }
 
   }
@@ -100,13 +97,7 @@ class _UnitPageState extends State<UnitPage> {
       drawer: new Drawer(
           child: SideMenu(currentState)
       ),
-      appBar: new AppBar(
-          title: new Text("Unit Page: " + currentState.currentDocument + "/" + currentState.currentUnit),
-          actions: <Widget>[
-
-          ],
-          backgroundColor: Colors.deepOrange
-      ),
+      appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
       body: Padding(
           padding: EdgeInsets.fromLTRB(40,0,40,40),
           child: SingleChildScrollView(

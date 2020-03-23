@@ -2,6 +2,8 @@ import 'package:blamo/routeGenerator.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/File_IO/FileHandler.dart';
 import 'package:blamo/SideMenu.dart';
+import 'package:blamo/CustomActionBar.dart';
+import 'package:flutter/services.dart';
 
 //This class will be used to house all the data between each route
 class StateData {
@@ -118,12 +120,7 @@ class _HomePageState extends State<HomePage> {
         child: SideMenu(currentState),
       ),
 
-      appBar: new AppBar(
-          title: new Text("Home"),
-          actions: <Widget>[
-          ],
-          backgroundColor: Colors.deepOrange
-      ),
+      appBar: CustomActionBar("Home").getAppBar(),
 
       body: gridViewBuilder(currentState.list),
 
@@ -164,6 +161,14 @@ class _HomePageState extends State<HomePage> {
     //currentState.currentDocument = "";
   }
 
+  void _onTileLongPressed(int index) async {
+    currentState.documentIterator = index;
+    currentState.currentDocument = currentState.list[index];
+    currentState.dirty = 1;
+    debugPrint("(main)LongPressed on: ${currentState.currentDocument}");
+    //TODO - Delete document
+  }
+
   /* These are the object builders for the main scaffolding
    *  FloatingActionButtonBuilder -> Builds the functionalty and style of the FAB in the bottom right of the screen, creates new documents onPressed
    *  gridViewBuilder             -> Builds the main gridview dynamically on document creation
@@ -182,9 +187,10 @@ class _HomePageState extends State<HomePage> {
             builder:(context) => AlertDialog(
               title: Text('Enter Document Name'),
               content: TextField(
-                maxLength: 50,
+                maxLength: 20,
                 controller: _textFieldController,
                 decoration: InputDecoration(labelText: 'Name Cannot Be Empty'),
+                inputFormatters: [new BlacklistingTextInputFormatter(new RegExp('[\\,]'))],
               ),
               actions: <Widget> [
                 new FlatButton(
@@ -255,18 +261,25 @@ class _HomePageState extends State<HomePage> {
             colorVal = 800;
           }
           toReturn = listToBuildFrom[index];
-          return new InkResponse(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                child: Center(
-                    child: Text(toReturn,
-                      textAlign: TextAlign.center,
-                    )
-                ),
-                color: Colors.orange[colorVal],
+          return new Container(
+            child: new Material(
+              child: InkWell(
+                  onTap: () => _onTileClicked(index),
+                  onLongPress: () => _onTileLongPressed(index),
+                  splashColor: Colors.grey,
+                  child: new Container(
+                    child: Center(
+                        child: Text(toReturn,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                        )
+                    ),
+                  )
               ),
-              enableFeedback: true,
-              onTap: () => _onTileClicked(index));
+              color: Colors.transparent,
+            ),
+            color: Colors.orange[colorVal],
+          );
         }),
       );
     }

@@ -1,9 +1,11 @@
 import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:blamo/SideMenu.dart';
+import 'package:blamo/CustomActionBar.dart';
 
 class TestsPage extends StatefulWidget {
   final StateData pass; 
@@ -45,13 +47,7 @@ class _TestsPageState extends State<TestsPage> {
           drawer: new Drawer(
               child: SideMenu(currentState)
           ),
-          appBar: new AppBar(
-              title: new Text("Tests Page"),
-              actions: <Widget>[
-
-              ],
-              backgroundColor: Colors.deepOrange
-          ));
+        appBar: CustomActionBar("Tests Page").getAppBar(),);
     }
   }
 
@@ -61,13 +57,7 @@ class _TestsPageState extends State<TestsPage> {
         drawer: new Drawer(
         child: SideMenu(currentState),
       ),
-        appBar: new AppBar(
-            title: new Text("Tests Page"),
-            actions: <Widget>[
-
-            ],
-            backgroundColor: Colors.deepOrange
-      ),
+      appBar: CustomActionBar("Tests Page").getAppBar(),
       body: Padding(
         padding: EdgeInsets.fromLTRB(20,20,20,20),
         child: ListView.builder(
@@ -103,6 +93,7 @@ class _TestsPageState extends State<TestsPage> {
                 maxLength: 50,
                 controller: _textFieldController,
                 decoration: InputDecoration(labelText: 'Test Name'),
+                inputFormatters: [new BlacklistingTextInputFormatter(new RegExp('[\\,]'))],
               ),
               actions: <Widget> [
                 new FlatButton(
@@ -135,6 +126,7 @@ class _TestsPageState extends State<TestsPage> {
                       currentState.testList.add(newTestNoComma);
                       currentState.currentTest = newTestNoComma;
                       currentState.currentRoute = '/TestPage';
+                      Navigator.pop(context);
                       Navigator.pushReplacementNamed(
                         context,
                         "/TestPage",
