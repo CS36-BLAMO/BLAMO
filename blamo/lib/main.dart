@@ -262,6 +262,7 @@ class _HomePageState extends State<HomePage> {
           }
           toReturn = listToBuildFrom[index];
           return new Container(
+            child: new Card(
             child: new Material(
               child: InkWell(
                   onTap: () => _onTileClicked(index),
@@ -278,7 +279,10 @@ class _HomePageState extends State<HomePage> {
               ),
               color: Colors.transparent,
             ),
-            color: Colors.orange[colorVal],
+              color: Colors.orange[colorVal],
+              elevation: 10,
+            ),
+
           );
         }),
       );
