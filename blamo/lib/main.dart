@@ -263,26 +263,25 @@ class _HomePageState extends State<HomePage> {
           toReturn = listToBuildFrom[index];
           return new Container(
             child: new Card(
-            child: new Material(
-              child: InkWell(
-                  onTap: () => _onTileClicked(index),
-                  onLongPress: () => _onTileLongPressed(index),
-                  splashColor: Colors.grey,
-                  child: new Container(
-                    child: Center(
-                        child: Text(toReturn,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                        )
-                    ),
-                  )
+              child: new Material(
+                child: InkWell(
+                    onTap: () => _onTileClicked(index),
+                    onLongPress: () => _onTileLongPressed(index),
+                    splashColor: Colors.grey,
+                    child: new Container(
+                      child: Center(
+                          child: Text(toReturn,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                          )
+                      ),
+                    )
+                ),
+                color: Colors.transparent,
               ),
-              color: Colors.transparent,
-            ),
               color: Colors.orange[colorVal],
               elevation: 10,
             ),
-
           );
         }),
       );
