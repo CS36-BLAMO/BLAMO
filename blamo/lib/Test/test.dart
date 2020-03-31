@@ -82,9 +82,9 @@ class _TestPageState extends State<TestPage> {
   Widget getTestScaffold(Test testObjectToBuildFrom){
     return new Scaffold(
       backgroundColor: Colors.white,
-      drawer: new Drawer(
+      /*drawer: new Drawer(
         child: SideMenu(currentState),
-      ),
+      ),*/
       appBar: CustomActionBar("Test Page: ${currentState.currentTest}").getAppBar(),
       body: Padding(
           padding: EdgeInsets.fromLTRB(40,0,40,40),
@@ -361,11 +361,12 @@ class _TestPageState extends State<TestPage> {
                   await saveTestObject();
                   currentState.currentRoute = '/TestsPage';
                   _showToast("Success", Colors.green);
-                  Navigator.pushReplacementNamed(
+                  /*Navigator.pushReplacementNamed(
                     context,
                     "/TestsPage",
                     arguments: currentState,
-                  );
+                  );*/
+                  Navigator.pop(context);
                 } else {
                   _showToast("Error in Fields", Colors.red);
                 }

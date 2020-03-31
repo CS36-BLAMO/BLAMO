@@ -131,7 +131,7 @@ Widget getScaffold(List<Unit> units){
                         currentState.currentUnit = newUnitNoComma;
                         currentState.currentRoute = '/UnitPage';
                         Navigator.pop(context);
-                        Navigator.pushReplacementNamed(
+                        Navigator.pushNamed(
                           context,
                           "/UnitPage",
                           arguments: currentState,
@@ -179,7 +179,7 @@ Widget getScaffold(List<Unit> units){
 
     if(currentState.currentRoute != '/UnitPage'){ // TODO - dynamically populate unit edit page
       currentState.currentRoute = '/UnitPage';
-      Navigator.pushReplacementNamed(
+      Navigator.pushNamed(
         context,
         "/UnitPage",
         arguments: currentState,

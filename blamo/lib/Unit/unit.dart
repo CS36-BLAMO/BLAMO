@@ -94,9 +94,9 @@ class _UnitPageState extends State<UnitPage> {
   Widget getScaffold(Unit unitToBuildFrom){
     return Scaffold(
       backgroundColor: Colors.white,
-      drawer: new Drawer(
+      /*drawer: new Drawer(
           child: SideMenu(currentState)
-      ),
+      ),*/
       appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
       body: Padding(
           padding: EdgeInsets.fromLTRB(40,0,40,40),
@@ -230,11 +230,12 @@ class _UnitPageState extends State<UnitPage> {
                   await saveObject();
                     currentState.currentRoute = '/UnitsPage';
                     _showToast("Success", Colors.green);
-                    Navigator.pushReplacementNamed(
+                    /*Navigator.pushReplacementNamed(
                       context,
                       "/UnitsPage",
                       arguments: currentState,
-                    );
+                    );*/
+                    Navigator.pop(context);
                 } else {
                   _showToast("Error in Fields", Colors.red);
                 }
