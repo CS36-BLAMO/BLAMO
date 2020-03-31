@@ -321,15 +321,84 @@ class PersistentStorage {
   *
   * */
 
-  void deleteTest(String documentName, String testName) async {
+  void deleteDocument(String documentName) async {
+    //getFile arch for document manafest and unit/testlist
+    StateData tempStateData = new StateData('/');
+    tempStateData.currentDocument = documentName;
+    tempStateData = await setStateData(tempStateData);
+    String manifestString;
+
+    //Delete the units from the unitList
+    for(int i = 0; i < tempStateData.unitList.length; i++){
+      await deleteUnit(documentName, tempStateData.unitList[i]);
+    }
+
+    //Delete the tests from the testList
+    for(int i = 0; i < tempStateData.testList.length; i++){
+      await deleteTest(documentName, tempStateData.testList[i]);
+    }
+
+    //Delete documentmeta manifest
+    await deleteDocumentMeta(documentName);
+
+    //Delete logInfo
+    await deleteLogInfo(documentName);
+
+    //Remove documentName from manifest
+    for(int i = 0; i < tempStateData.list.length; i++){
+      if(tempStateData.list[i] != documentName){
+        manifestString += tempStateData.list[i] + ",";
+      }
+    }
+
+
+  }
+
+  Future<int> deleteTest(String documentName, String testName) async {
     File fp = File(await _localPath + "/$documentName" + '_$testName.txt');
     try {
       await fp.delete();
+      return 0;
     } catch(e) {
       debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      return 1;
     }
-
   }
+
+  Future<int> deleteUnit(String documentName, String unitName) async {
+    File fp = File(await _localPath + "/$documentName" + '_$unitName.txt');
+    try {
+      await fp.delete();
+      return 0;
+    } catch(e) {
+      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      return 1;
+    }
+  }
+
+  Future<int> deleteLogInfo(String documentName) async {
+    File fp = File(await _localPath + "/$documentName" + '_LogInfo.txt');
+    try {
+      await fp.delete();
+      return 0;
+    } catch(e) {
+      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      return 1;
+    }
+  }
+
+  Future<int> deleteDocumentMeta(String documentName) async {
+    File fp = File(await _localPath + "/$documentName" + '_Document-Meta.txt');
+    try {
+      await fp.delete();
+      return 0;
+    } catch(e) {
+      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      return 1;
+    }
+  }
+
+
 
   /*---End Of file deletion functions---*/
 

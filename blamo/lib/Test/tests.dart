@@ -41,6 +41,9 @@ class _TestsPageState extends State<TestsPage> {
       return getScaffold(tests);
     }
     else {
+      if(currentState.dirty == 1){
+        getTestSet(currentState.testList, currentState.currentDocument);
+      }
       debugPrint("Returning empty scaffold");
       return new Scaffold(
           backgroundColor: Colors.white,
@@ -146,47 +149,64 @@ class _TestsPageState extends State<TestsPage> {
     List<Widget> testsToReturn = [];
     for (int i = 0; i < tests.length; i++) {
         testsToReturn.add(
-            new ListTile(
-              title: new Container(
-                height: 50,
-                color: Colors.orange[100],
-                child: Center(child: Text(tests[i].beginTest.toString() + " - " + tests[i].endTest.toString() + ", " + tests[i].tags)),
-              ),
-              onTap: () {
-                if(currentState.currentRoute != '/TestPage'){ // TODO - dynamically populate test edit page
-                  currentState.currentRoute = '/TestPage';
-                  currentState.currentTest=currentState.testList[i];
-                  Navigator.pushReplacementNamed(
-                    context,
-                    "/TestPage",
-                    arguments: currentState,
-                  );
-                } else {
-                  Navigator.pop(context);
-                }
-              },
-              onLongPress: () async {
-                //TODO Deletion of test
-                /*currentState.storage.deleteTest(currentState.currentDocument, currentState.testList[i]);
-                currentState.testList.removeAt(i);
+          new Container(
+              height: 50,
+              child: new Card(
+                  elevation: 10,
+                  color: Colors.brown[100],
 
-                String toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length}\n";
-                for(int i = 0; i < currentState.testList.length; i++){
-                  toWrite = toWrite + currentState.testList[i] + ',';
-                }
-                for(int i = 0; i < currentState.unitList.length; i++){
-                  toWrite = toWrite + currentState.unitList[i] + ',';
-                }
-                debugPrint(toWrite);
-
-                await currentState.storage.overWriteDocument(currentState.currentDocument, toWrite);
-
-                setState((){});*/
-              },
-            )
+                  child: new Material(
+                    child: InkWell(
+                      onTap: () => _onTileClicked(i),
+                      onLongPress: () => _onTileLongClicked(i),
+                      splashColor: Colors.grey,
+                      child: Center(child: Text((i+1).toString() + "." + tests[i].beginTest.toString() + " - " + tests[i].endTest.toString())),
+                    ),
+                    color: Colors.transparent,
+                  )
+              )
+          )
         );
       }
     return testsToReturn;
+  }
+
+  void _onTileClicked(int i){
+    if(currentState.currentRoute != '/TestPage'){ // TODO - dynamically populate test edit page
+      currentState.currentRoute = '/TestPage';
+      currentState.currentTest=currentState.testList[i];
+      Navigator.pushReplacementNamed(
+        context,
+        "/TestPage",
+        arguments: currentState,
+      );
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
+  void _onTileLongClicked(int i) async {
+    await currentState.storage.deleteTest(currentState.currentDocument, currentState.testList[i]);
+    currentState.testList.removeAt(i);
+
+    String toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length}\n";
+    for(int i = 0; i < currentState.testList.length; i++){
+      toWrite = toWrite + currentState.testList[i] + ',';
+    }
+    for(int i = 0; i < currentState.unitList.length; i++){
+      toWrite = toWrite + currentState.unitList[i] + ',';
+    }
+    debugPrint(toWrite);
+
+    await currentState.storage.overWriteDocument(currentState.currentDocument, toWrite);
+    tests = [];
+    await getTestSet(currentState.testList, currentState.currentDocument);
+    await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+      setState((){
+        currentState.dirty=0;
+        dirty = false;
+      });
+    });
   }
 
   void getTestSet(List<String> testNames, String documentName) async{
@@ -203,6 +223,7 @@ class _TestsPageState extends State<TestsPage> {
     }
     await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
       setState((){
+        currentState.dirty=0;
         dirty = false;
       });
     });

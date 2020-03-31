@@ -151,33 +151,66 @@ Widget getScaffold(List<Unit> units){
     List<Widget> unitsToReturn = [];
     for (int i = 0; i < units.length; i++) {
         unitsToReturn.add(
-            new ListTile(
-              title: new Container(
-                height: 50,
+          new Container(
+            height: 50,
+            child: new Card(
+                elevation: 10,
                 color: Colors.brown[100],
-                child: Center(child: Text(units[i].depthUB.toString() + " - " + units[i].depthLB.toString())),
-              ),
-              onTap: () {
-                //testBuiildingList();
 
-                currentState.currentUnit=currentState.unitList[i];
-                debugPrint("(Units)Clicked on: " + currentState.unitList[i] + "\n");
-
-                if(currentState.currentRoute != '/UnitPage'){ // TODO - dynamically populate unit edit page
-                  currentState.currentRoute = '/UnitPage';
-                  Navigator.pushReplacementNamed(
-                    context,
-                    "/UnitPage",
-                    arguments: currentState,
-                  );
-                } else {
-                  Navigator.pop(context);
-                }
-              },
+                child: new Material(
+                  child: InkWell(
+                    onTap: () => _onTileClicked(i),
+                    onLongPress: () => _onTileLongClicked(i),
+                    splashColor: Colors.grey,
+                    child: new Center(child: Text(units[i].depthUB.toString() + " - " + units[i].depthLB.toString())),
+                  ),
+                  color: Colors.transparent,
+                )
             )
+          )
         );
       }
     return unitsToReturn;
+  }
+
+  void _onTileClicked(int i){
+    currentState.currentUnit=currentState.unitList[i];
+    debugPrint("(Units)Clicked on: " + currentState.unitList[i] + "\n");
+
+    if(currentState.currentRoute != '/UnitPage'){ // TODO - dynamically populate unit edit page
+      currentState.currentRoute = '/UnitPage';
+      Navigator.pushReplacementNamed(
+        context,
+        "/UnitPage",
+        arguments: currentState,
+      );
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
+  void _onTileLongClicked(int i) async {
+    await currentState.storage.deleteUnit(currentState.currentDocument, currentState.unitList[i]);
+    currentState.unitList.removeAt(i);
+
+    String toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length}\n";
+    for(int i = 0; i < currentState.testList.length; i++){
+      toWrite = toWrite + currentState.testList[i] + ',';
+    }
+    for(int i = 0; i < currentState.unitList.length; i++){
+      toWrite = toWrite + currentState.unitList[i] + ',';
+    }
+    debugPrint(toWrite);
+
+    await currentState.storage.overWriteDocument(currentState.currentDocument, toWrite);
+    units = [];
+    await getUnitSet(currentState.unitList, currentState.currentDocument);
+    await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+      setState((){
+        currentState.dirty=0;
+        dirty = false;
+      });
+    });
   }
 
 void testBuiildingList() async {

@@ -116,7 +116,7 @@ class _UnitPageState extends State<UnitPage> {
                               focusNode: formNodes[0],
                               attribute: 'depth-ub',
                               validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Depth Upper Bound (m)"),
+                              decoration: InputDecoration(labelText: "Depth Upper Bound (-m)"),
                               initialValue: formatValue(unitToBuildFrom.depthUB.toString()),
                               onChanged: (void nbd){updateUnitObject();},
                               onFieldSubmitted: (v){
@@ -132,7 +132,7 @@ class _UnitPageState extends State<UnitPage> {
                               focusNode: formNodes[1],
                               attribute: 'depth-lb',
                               validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Depth Lower Bound (m)"),
+                              decoration: InputDecoration(labelText: "Depth Lower Bound (-m)"),
                               initialValue: formatValue(unitToBuildFrom.depthLB.toString()),
                               onChanged: (void nbd){updateUnitObject();},
                               onFieldSubmitted: (v){
