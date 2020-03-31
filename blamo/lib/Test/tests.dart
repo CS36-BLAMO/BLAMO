@@ -186,7 +186,7 @@ class _TestsPageState extends State<TestsPage> {
   }
 
   void _onTileLongClicked(int i) async {
-    await currentState.storage.deleteTest(currentState.currentDocument, currentState.testList[i]);
+    /*await currentState.storage.deleteTest(currentState.currentDocument, currentState.testList[i]);
     currentState.testList.removeAt(i);
 
     String toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length}\n";
@@ -206,7 +206,7 @@ class _TestsPageState extends State<TestsPage> {
         currentState.dirty=0;
         dirty = false;
       });
-    });
+    });*/
   }
 
   void getTestSet(List<String> testNames, String documentName) async{

@@ -190,7 +190,7 @@ Widget getScaffold(List<Unit> units){
   }
 
   void _onTileLongClicked(int i) async {
-    await currentState.storage.deleteUnit(currentState.currentDocument, currentState.unitList[i]);
+    /*await currentState.storage.deleteUnit(currentState.currentDocument, currentState.unitList[i]);
     currentState.unitList.removeAt(i);
 
     String toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length}\n";
@@ -210,7 +210,7 @@ Widget getScaffold(List<Unit> units){
         currentState.dirty=0;
         dirty = false;
       });
-    });
+    });*/
   }
 
 void testBuiildingList() async {
