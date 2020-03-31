@@ -153,16 +153,42 @@ class _DocumentPageState extends State<DocumentPage> {
     } else if (passedTitle == "Tests") {
       for (int i = currentState.testList.length - 1; i >= testBound; i--) {
         columnContent.add(
-            new ListTile(
-              title: new Text(currentState.testList[i]),
+            new Container(
+                height: 50,
+                child: new Card(
+                    elevation: 10,
+                    color: Colors.brown[100],
+
+                    child: new Material(
+                      child: InkWell(
+                        //onTap: () => _onTileClicked(i),
+                        splashColor: Colors.grey,
+                        child: new Center(child: Text(currentState.testList[i])),
+                      ),
+                      color: Colors.transparent,
+                    )
+                )
             )
         );
       }
     } else {
       for (int i = currentState.unitList.length - 1; i >= unitBound; i--) {
         columnContent.add(
-            new ListTile(
-              title: new Text(currentState.unitList[i]),
+            new Container(
+                height: 50,
+                child: new Card(
+                    elevation: 10,
+                    color: Colors.brown[100],
+
+                    child: new Material(
+                      child: InkWell(
+                        //onTap: () => _onTileClicked(i),
+                        splashColor: Colors.grey,
+                        child: new Center(child: Text(currentState.unitList[i])),
+                      ),
+                      color: Colors.transparent,
+                    )
+                )
             )
         );
       }

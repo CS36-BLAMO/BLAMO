@@ -130,7 +130,7 @@ class _TestsPageState extends State<TestsPage> {
                       currentState.currentTest = newTestNoComma;
                       currentState.currentRoute = '/TestPage';
                       Navigator.pop(context);
-                      Navigator.pushReplacementNamed(
+                      Navigator.pushNamed(
                         context,
                         "/TestPage",
                         arguments: currentState,
@@ -175,7 +175,7 @@ class _TestsPageState extends State<TestsPage> {
     if(currentState.currentRoute != '/TestPage'){ // TODO - dynamically populate test edit page
       currentState.currentRoute = '/TestPage';
       currentState.currentTest=currentState.testList[i];
-      Navigator.pushReplacementNamed(
+      Navigator.pushNamed(
         context,
         "/TestPage",
         arguments: currentState,
@@ -186,7 +186,7 @@ class _TestsPageState extends State<TestsPage> {
   }
 
   void _onTileLongClicked(int i) async {
-    /*await currentState.storage.deleteTest(currentState.currentDocument, currentState.testList[i]);
+    await currentState.storage.deleteTest(currentState.currentDocument, currentState.testList[i]);
     currentState.testList.removeAt(i);
 
     String toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length}\n";
@@ -206,7 +206,7 @@ class _TestsPageState extends State<TestsPage> {
         currentState.dirty=0;
         dirty = false;
       });
-    });*/
+    });
   }
 
   void getTestSet(List<String> testNames, String documentName) async{
