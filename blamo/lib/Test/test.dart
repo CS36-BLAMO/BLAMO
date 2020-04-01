@@ -403,14 +403,17 @@ class _TestPageState extends State<TestPage> {
     try{
       testObject.beginTest = double.parse(_fbKey.currentState.fields["beginTestDepth"].currentState.value);
     } catch(e) {
+      testObject.beginTest = null;
     }
     try{
       testObject.endTest = double.parse(_fbKey.currentState.fields["endTestDepth"].currentState.value);
     } catch(e) {
+      testObject.endTest = null;
     }
     try{
       testObject.percentRecovery = double.parse(_fbKey.currentState.fields["percentRecovery"].currentState.value);
     } catch(e) {
+      testObject.percentRecovery = null;
     }
     testObject.testType = _fbKey.currentState.fields["testType"].currentState.value.toString();
     testObject.soilDrivingResistance = _fbKey.currentState.fields["soilDrivingResistance"].currentState.value.toString();

@@ -42,13 +42,29 @@ class _DocumentPageState extends State<DocumentPage> {
 
       appBar: CustomActionBar("Overview: ${currentState.currentDocument}").getAppBar(),
 
-      body: ListView.builder(
+      body:ListView.builder(
         itemCount: 3,
         itemBuilder: (context, i){
           String title;
           switch(i){
             case 0:
               title = "LogInfo";
+              return  new Container(
+                        height: 50,
+                        child: new Card(
+                            elevation: 3,
+                            borderOnForeground: true,
+                            color: Colors.brown[100],
+                            child: new Material(
+                              child: InkWell(
+                                //onTap: () => _onTileClicked(i),
+                                splashColor: Colors.grey,
+                                child: new Center(child: Text("Log Info")),
+                              ),
+                              color: Colors.transparent,
+                            )
+                        )
+              );
               break;
             case 1:
               title = "Tests";
@@ -57,17 +73,23 @@ class _DocumentPageState extends State<DocumentPage> {
               title = "Units";
               break;
           }
-          return new ExpansionTile(
-            title: new Text(title),
-            children: <Widget>[
-              new Column(
-                children: _buildExpandedContent(title),
+          return
+            new Container(
+              child: new Card(
+              elevation: 5,
+              color: Colors.brown[100],
+              child:new ExpansionTile(
+                  title: new Text(title),
+                  children: <Widget>[
+                    new Column(
+                      children: _buildExpandedContent(title),
+                    )
+                  ],
+                )
               )
-            ],
           );
         },
       ),
-
     );
   }
 
@@ -156,9 +178,9 @@ class _DocumentPageState extends State<DocumentPage> {
             new Container(
                 height: 50,
                 child: new Card(
-                    elevation: 10,
+                    elevation: 3,
+                    borderOnForeground: true,
                     color: Colors.brown[100],
-
                     child: new Material(
                       child: InkWell(
                         //onTap: () => _onTileClicked(i),
@@ -177,9 +199,8 @@ class _DocumentPageState extends State<DocumentPage> {
             new Container(
                 height: 50,
                 child: new Card(
-                    elevation: 10,
+                    elevation: 3,
                     color: Colors.brown[100],
-
                     child: new Material(
                       child: InkWell(
                         //onTap: () => _onTileClicked(i),
