@@ -183,42 +183,77 @@ class _TestsPageState extends State<TestsPage> {
     return testsToReturn;
   }
 
-  void _onTileClicked(int i){
+
+  void _onTileClicked(int i) async {
     if(currentState.currentRoute != '/TestPage'){ // TODO - dynamically populate test edit page
       currentState.currentRoute = '/TestPage';
       currentState.currentTest=currentState.testList[i];
-      Navigator.pushNamed(
+      await Navigator.pushNamed(
         context,
         "/TestPage",
         arguments: currentState,
       );
+      tests = [];
+      await getTestSet(currentState.testList, currentState.currentDocument);
+      await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+        setState((){
+          currentState.dirty=0;
+          dirty = false;
+        });
+      });
     } else {
       Navigator.pop(context);
     }
   }
 
   void _onTileLongClicked(int i) async {
-    await currentState.storage.deleteTest(currentState.currentDocument, currentState.testList[i]);
-    currentState.testList.removeAt(i);
+    String result;
+    result = await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Are you sure you want to delete ${currentState.testList[i]}?"),
+          actions: <Widget>[
+            new FlatButton(
+                child: Text("DELETE"),
+                textColor: Colors.red,
+                onPressed: () {
+                  Navigator.pop(context, "DELETE");
+                }),
+            new FlatButton(
+              child: Text("CANCEL"),
+              onPressed: (){
+                Navigator.pop(context, "CANCEL");
+              },
+            )
+          ],
+        )
+    );
+    if(result == "DELETE") {
+      await currentState.storage.deleteTest(
+          currentState.currentDocument, currentState.testList[i]);
+      currentState.testList.removeAt(i);
 
-    String toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length}\n";
-    for(int i = 0; i < currentState.testList.length; i++){
-      toWrite = toWrite + currentState.testList[i] + ',';
-    }
-    for(int i = 0; i < currentState.unitList.length; i++){
-      toWrite = toWrite + currentState.unitList[i] + ',';
-    }
-    debugPrint(toWrite);
+      String toWrite = "${currentState.currentDocument}\n${currentState.testList
+          .length}\n${currentState.unitList.length}\n";
+      for (int i = 0; i < currentState.testList.length; i++) {
+        toWrite = toWrite + currentState.testList[i] + ',';
+      }
+      for (int i = 0; i < currentState.unitList.length; i++) {
+        toWrite = toWrite + currentState.unitList[i] + ',';
+      }
+      debugPrint(toWrite);
 
-    await currentState.storage.overWriteDocument(currentState.currentDocument, toWrite);
-    tests = [];
-    await getTestSet(currentState.testList, currentState.currentDocument);
-    await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
-      setState((){
-        currentState.dirty=0;
-        dirty = false;
+      await currentState.storage.overWriteDocument(
+          currentState.currentDocument, toWrite);
+      tests = [];
+      await getTestSet(currentState.testList, currentState.currentDocument);
+      await new Future.delayed(new Duration(microseconds: 3)).then((onValue) {
+        setState(() {
+          currentState.dirty = 0;
+          dirty = false;
+        });
       });
-    });
+    }
   }
 
   void getTestSet(List<String> testNames, String documentName) async{

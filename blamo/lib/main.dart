@@ -4,6 +4,7 @@ import 'package:blamo/File_IO/FileHandler.dart';
 import 'package:blamo/SideMenu.dart';
 import 'package:blamo/CustomActionBar.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 //This class will be used to house all the data between each route
 class StateData {
@@ -164,13 +165,51 @@ class _HomePageState extends State<HomePage> {
   void _onTileLongPressed(int index) async {
     currentState.documentIterator = index;
     currentState.currentDocument = currentState.list[index];
-    debugPrint("(main)LongPressed on: ${currentState.currentDocument}");
-    await currentState.storage.deleteDocument(currentState.currentDocument);
-    await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
-      setState((){
-        currentState.dirty=1;
+    String result;
+    result = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Are you sure you want to delete ${currentState.currentDocument}"),
+        actions: <Widget>[
+          new FlatButton(
+              child: Text("DELETE"),
+              textColor: Colors.red,
+              onPressed: () {
+                Navigator.pop(context, "DELETE");
+              }),
+          new FlatButton(
+              child: Text("CANCEL"),
+              onPressed: (){
+                  Navigator.pop(context, "CANCEL");
+              },
+          )
+        ],
+      )
+    );
+    if(result == "DELETE") {
+      debugPrint("(main)LongPressed on: ${currentState.currentDocument}");
+      await currentState.storage.deleteDocument(currentState.currentDocument);
+      _showToast("${currentState.currentDocument} Deleted!", Colors.red);
+      await new Future.delayed(new Duration(microseconds: 3)).then((onValue) {
+        setState(() {
+          currentState.dirty = 1;
+          currentState.list.remove(currentState.currentDocument);
+          currentState.currentDocument = "";
+        });
       });
-    });
+    }
+  }
+
+  void _showToast(String toShow, MaterialColor color){
+    Fluttertoast.showToast(
+        msg: toShow,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIos: 1,
+        backgroundColor: color,
+        textColor: Colors.black,
+        fontSize: 16.0
+    );
   }
 
   /* These are the object builders for the main scaffolding
