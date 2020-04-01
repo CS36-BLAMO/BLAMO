@@ -17,7 +17,7 @@ Document pdf = Document();
 // Test/hole: Begin depth, end depth, soil type, description, moisture content, dry density, liquid limit, plastic limit,
 //            fines, Blows 1, Blows 2, Blows 3, Blows count
 
-void docCreate(StateData currentState) async{
+Future<String> docCreate(StateData currentState) async{
 
   // Create levels from provided lists of tests and units 
   var tests = await getTests(currentState);
@@ -210,7 +210,12 @@ void docCreate(StateData currentState) async{
             Wrap( 
               children: widgetLevels)
             ]));
-  pdf_write(currentState); //
+  String onFinished = await pdf_write(currentState); //
+  if(onFinished == "done"){
+    return "done";
+  } else {
+    return "failed";
+  }
 }
 
 Future<handler.LogInfo> getLogInfo(String currentDocument) async{
@@ -257,7 +262,7 @@ Future<List<handler.Unit>> getUnits(StateData currentState) async{
     return fetchedUnits;
   }
 
-void pdf_write(StateData currentState) async{
+Future<String> pdf_write(StateData currentState) async{
   DateTime now = DateTime.now();
   await new Future.delayed(new Duration(seconds: 1));
   PermissionStatus permission =
@@ -279,7 +284,7 @@ void pdf_write(StateData currentState) async{
     print("writing to file at path: "+ filepath);
     await file.writeAsBytes(pdf.save()); // TODO - Name files better
     print("done");
-    return;
+    return "done";
   }
-  return;
+  return "failed";
 }

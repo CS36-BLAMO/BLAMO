@@ -17,13 +17,14 @@ class CSVExporter {
 
   CSVExporter(this.stateData);
 
-  void exportToCSV() async{
+  Future<String> exportToCSV() async{
     String toWrite;
     await getData();
     buildCSVLines();
     toWrite = formatLinesToString();
     debugPrint("toWrite: $toWrite");
-    csvWrite(toWrite, stateData.currentDocument);
+    String response = await csvWrite(toWrite, stateData.currentDocument);
+    return response;
   }
 
   Future<int> getData() async{
@@ -112,7 +113,7 @@ class CSVExporter {
     return formattedString;
   }
 
-  void csvWrite(String toWrite, String csvName) async {
+  Future<String> csvWrite(String toWrite, String csvName) async {
     await new Future.delayed(new Duration(milliseconds: 50));
     PermissionStatus permission =
     await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
@@ -132,9 +133,9 @@ class CSVExporter {
       debugPrint("(CSV) printing csv to: $filepathCSV");
       await file.writeAsString(toWrite);
       debugPrint("(CSV) done writing csv");
-      return;
+      return "done";
     }
-    return;
+    return "failed";
   }
 
   //testing

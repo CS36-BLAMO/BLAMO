@@ -20,6 +20,7 @@ Future<String> sendEmail(String documentName,String docType) async {
     debugPrint("output path: " + outputPath);
   } catch (e) {
     print("EMAIL.dart - No filepath found for document to send");
+    return "No $docType type file found for $documentName";
   }
 
   if(outputPath != null) {

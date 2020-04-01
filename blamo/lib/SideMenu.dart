@@ -27,7 +27,7 @@ class _SideMenuState extends State<SideMenu> {
                   decoration: new BoxDecoration(
                       image: new DecorationImage(
                           image: new AssetImage(
-                              'assets/images/OSU-eng-logo.png')
+                              'assets/images/OSU-logo.png',)
                       )
                   ),
                 ),
