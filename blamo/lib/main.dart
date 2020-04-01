@@ -162,7 +162,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onTileLongPressed(int index) async {
-
+    currentState.documentIterator = index;
+    currentState.currentDocument = currentState.list[index];
+    debugPrint("(main)LongPressed on: ${currentState.currentDocument}");
+    await currentState.storage.deleteDocument(currentState.currentDocument);
+    await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+      setState((){
+        currentState.dirty=1;
+      });
+    });
   }
 
   /* These are the object builders for the main scaffolding

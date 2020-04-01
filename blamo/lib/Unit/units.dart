@@ -197,7 +197,27 @@ Widget getScaffold(List<Unit> units){
   }
 
   void _onTileLongClicked(int i) async {
+    await currentState.storage.deleteUnit(currentState.currentDocument, currentState.unitList[i]);
+    currentState.unitList.removeAt(i);
 
+    String toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length}\n";
+    for(int i = 0; i < currentState.testList.length; i++){
+      toWrite = toWrite + currentState.testList[i] + ',';
+    }
+    for(int i = 0; i < currentState.unitList.length; i++){
+      toWrite = toWrite + currentState.unitList[i] + ',';
+    }
+    debugPrint(toWrite);
+
+    await currentState.storage.overWriteDocument(currentState.currentDocument, toWrite);
+    units = [];
+    await getUnitSet(currentState.unitList, currentState.currentDocument);
+    await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+      setState((){
+        currentState.dirty=0;
+        dirty = false;
+      });
+    });
   }
 
 void testBuiildingList() async {
