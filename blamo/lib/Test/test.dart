@@ -366,7 +366,7 @@ class _TestPageState extends State<TestPage> {
                     "/TestsPage",
                     arguments: currentState,
                   );*/
-                  Navigator.pop(context);
+                  Navigator.pop(context, "Success");
                 } else {
                   _showToast("Error in Fields", Colors.red);
                 }

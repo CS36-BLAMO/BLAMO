@@ -131,12 +131,19 @@ Widget getScaffold(List<Unit> units){
                         currentState.currentUnit = newUnitNoComma;
                         currentState.currentRoute = '/UnitPage';
                         Navigator.pop(context);
-                        Navigator.pushNamed(
+                        await Navigator.pushNamed(
                           context,
                           "/UnitPage",
                           arguments: currentState,
                         );
-
+                      units = [];
+                      await getUnitSet(currentState.unitList, currentState.currentDocument);
+                      await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+                        setState((){
+                          currentState.dirty=0;
+                          dirty = false;
+                        });
+                      });
                     }
                   },
                 )

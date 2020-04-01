@@ -130,11 +130,23 @@ class _TestsPageState extends State<TestsPage> {
                       currentState.currentTest = newTestNoComma;
                       currentState.currentRoute = '/TestPage';
                       Navigator.pop(context);
-                      Navigator.pushNamed(
+
+                      //Await for the test page to get popped
+                      await Navigator.pushNamed(
                         context,
                         "/TestPage",
                         arguments: currentState,
                       );
+
+                      //Update tests and reload page
+                      tests = [];
+                      await getTestSet(currentState.testList, currentState.currentDocument);
+                      await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+                        setState((){
+                          currentState.dirty=0;
+                          dirty = false;
+                        });
+                      });
                     }
                   },
                 )

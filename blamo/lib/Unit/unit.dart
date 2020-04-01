@@ -235,7 +235,7 @@ class _UnitPageState extends State<UnitPage> {
                       "/UnitsPage",
                       arguments: currentState,
                     );*/
-                    Navigator.pop(context);
+                    Navigator.pop(context, "Success");
                 } else {
                   _showToast("Error in Fields", Colors.red);
                 }
