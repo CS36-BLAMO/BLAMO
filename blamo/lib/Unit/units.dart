@@ -1,9 +1,11 @@
 import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:blamo/SideMenu.dart';
+import 'package:blamo/CustomActionBar.dart';
 
 //ToRemove
 /*
@@ -45,18 +47,12 @@ class _UnitsPageState extends State<UnitsPage> {
     else {
       debugPrint("Returning empty Scaffold");
       return new Scaffold(
-          backgroundColor: Colors.white,
+          appBar: CustomActionBar("Units Page").getAppBar(),
           drawer: new Drawer(
               child: SideMenu(currentState)
           ),
-          appBar: new AppBar(
-              title: new Text("Units Page"),
-              actions: <Widget>[
 
-              ],
-              backgroundColor: Colors.deepOrange
-          ));
-    }
+      );}
   }
   //@override
 Widget getScaffold(List<Unit> units){
@@ -66,13 +62,7 @@ Widget getScaffold(List<Unit> units){
         drawer: new Drawer(
         child: SideMenu(currentState),
       ),
-        appBar: new AppBar(
-            title: new Text("Units Page"),
-            actions: <Widget>[
-
-            ],
-            backgroundColor: Colors.deepOrange
-      ),
+      appBar: CustomActionBar("Units Page").getAppBar(),
       body: Padding(
         padding: EdgeInsets.fromLTRB(20,20,20,20),
         child: ListView.builder(
@@ -108,6 +98,7 @@ Widget getScaffold(List<Unit> units){
                 maxLength: 50,
                 controller: _textFieldController,
                 decoration: InputDecoration(labelText: 'Unit Name'),
+                inputFormatters: [new BlacklistingTextInputFormatter(new RegExp('[\\,]'))],
               ),
               actions: <Widget> [
                 new FlatButton(
@@ -139,12 +130,20 @@ Widget getScaffold(List<Unit> units){
                         currentState.unitList.add(newUnitNoComma);
                         currentState.currentUnit = newUnitNoComma;
                         currentState.currentRoute = '/UnitPage';
-                        Navigator.pushReplacementNamed(
+                        Navigator.pop(context);
+                        await Navigator.pushNamed(
                           context,
                           "/UnitPage",
                           arguments: currentState,
                         );
-
+                      units = [];
+                      await getUnitSet(currentState.unitList, currentState.currentDocument);
+                      await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+                        setState((){
+                          currentState.dirty=0;
+                          dirty = false;
+                        });
+                      });
                     }
                   },
                 )
@@ -159,33 +158,54 @@ Widget getScaffold(List<Unit> units){
     List<Widget> unitsToReturn = [];
     for (int i = 0; i < units.length; i++) {
         unitsToReturn.add(
-            new ListTile(
-              title: new Container(
-                height: 50,
+          new Container(
+            height: 50,
+            child: new Card(
+                elevation: 10,
                 color: Colors.brown[100],
-                child: Center(child: Text(units[i].depthUB.toString() + " - " + units[i].depthLB.toString())),
-              ),
-              onTap: () {
-                //testBuiildingList();
 
-                currentState.currentUnit=currentState.unitList[i];
-                debugPrint("(Units)Clicked on: " + currentState.unitList[i] + "\n");
-
-                if(currentState.currentRoute != '/UnitPage'){ // TODO - dynamically populate unit edit page
-                  currentState.currentRoute = '/UnitPage';
-                  Navigator.pushReplacementNamed(
-                    context,
-                    "/UnitPage",
-                    arguments: currentState,
-                  );
-                } else {
-                  Navigator.pop(context);
-                }
-              },
+                child: new Material(
+                  child: InkWell(
+                    onTap: () => _onTileClicked(i),
+                    onLongPress: () => _onTileLongClicked(i),
+                    splashColor: Colors.grey,
+                    child: new Center(child: Text(units[i].depthUB.toString() + " - " + units[i].depthLB.toString())),
+                  ),
+                  color: Colors.transparent,
+                )
             )
+          )
         );
       }
     return unitsToReturn;
+  }
+
+  void _onTileClicked(int i) async {
+    currentState.currentUnit=currentState.unitList[i];
+    debugPrint("(Units)Clicked on: " + currentState.unitList[i] + "\n");
+
+    if(currentState.currentRoute != '/UnitPage'){ // TODO - dynamically populate unit edit page
+      currentState.currentRoute = '/UnitPage';
+      await Navigator.pushNamed(
+        context,
+        "/UnitPage",
+        arguments: currentState,
+      );
+      units = [];
+      await getUnitSet(currentState.unitList, currentState.currentDocument);
+      await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+        setState((){
+          currentState.dirty=0;
+          dirty = false;
+        });
+      });
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
+  void _onTileLongClicked(int i) async {
+
   }
 
 void testBuiildingList() async {

@@ -2,6 +2,7 @@ import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/File_IO/FileHandler.dart';
 import 'package:blamo/SideMenu.dart';
+import 'package:blamo/CustomActionBar.dart';
 
 class DocumentPage extends StatefulWidget {
   final StateData pass;
@@ -39,20 +40,31 @@ class _DocumentPageState extends State<DocumentPage> {
         child: SideMenu(currentState),
       ),
 
-      appBar: new AppBar(
-          title: new Text(currentState.currentDocument),
-          actions: <Widget>[
-          ],
-          backgroundColor: Colors.deepOrange
-      ),
+      appBar: CustomActionBar("Overview: ${currentState.currentDocument}").getAppBar(),
 
-      body: ListView.builder(
+      body:ListView.builder(
         itemCount: 3,
         itemBuilder: (context, i){
           String title;
           switch(i){
             case 0:
               title = "LogInfo";
+              return  new Container(
+                        height: 50,
+                        child: new Card(
+                            elevation: 3,
+                            borderOnForeground: true,
+                            color: Colors.brown[100],
+                            child: new Material(
+                              child: InkWell(
+                                //onTap: () => _onTileClicked(i),
+                                splashColor: Colors.grey,
+                                child: new Center(child: Text("Log Info")),
+                              ),
+                              color: Colors.transparent,
+                            )
+                        )
+              );
               break;
             case 1:
               title = "Tests";
@@ -61,17 +73,23 @@ class _DocumentPageState extends State<DocumentPage> {
               title = "Units";
               break;
           }
-          return new ExpansionTile(
-            title: new Text(title),
-            children: <Widget>[
-              new Column(
-                children: _buildExpandedContent(title),
+          return
+            new Container(
+              child: new Card(
+              elevation: 5,
+              color: Colors.brown[100],
+              child:new ExpansionTile(
+                  title: new Text(title),
+                  children: <Widget>[
+                    new Column(
+                      children: _buildExpandedContent(title),
+                    )
+                  ],
+                )
               )
-            ],
           );
         },
       ),
-
     );
   }
 
@@ -157,16 +175,41 @@ class _DocumentPageState extends State<DocumentPage> {
     } else if (passedTitle == "Tests") {
       for (int i = currentState.testList.length - 1; i >= testBound; i--) {
         columnContent.add(
-            new ListTile(
-              title: new Text(currentState.testList[i]),
+            new Container(
+                height: 50,
+                child: new Card(
+                    elevation: 3,
+                    borderOnForeground: true,
+                    color: Colors.white,
+                    child: new Material(
+                      child: InkWell(
+                        //onTap: () => _onTileClicked(i),
+                        splashColor: Colors.grey,
+                        child: new Center(child: Text(currentState.testList[i])),
+                      ),
+                      color: Colors.transparent,
+                    )
+                )
             )
         );
       }
     } else {
       for (int i = currentState.unitList.length - 1; i >= unitBound; i--) {
         columnContent.add(
-            new ListTile(
-              title: new Text(currentState.unitList[i]),
+            new Container(
+                height: 50,
+                child: new Card(
+                    elevation: 3,
+                    color: Colors.white,
+                    child: new Material(
+                      child: InkWell(
+                        //onTap: () => _onTileClicked(i),
+                        splashColor: Colors.grey,
+                        child: new Center(child: Text(currentState.unitList[i])),
+                      ),
+                      color: Colors.transparent,
+                    )
+                )
             )
         );
       }

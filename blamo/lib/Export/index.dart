@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:blamo/PDF/pdf_builder.dart';
 import 'package:blamo/SideMenu.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:blamo/CustomActionBar.dart';
 import 'email.dart';
 import 'package:getflutter/getflutter.dart';
 
@@ -67,12 +68,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
       drawer: new Drawer(
         child: SideMenu(currentState),
       ),
-      appBar: new AppBar(
-          title: new Text("Export"),
-          actions: <Widget>[
-          ],
-          backgroundColor: Colors.deepOrangeAccent
-      ),
+      appBar: CustomActionBar("Export").getAppBar(),
 
       body: new Stack(
         children: <Widget> [

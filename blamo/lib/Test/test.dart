@@ -4,7 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:blamo/SideMenu.dart';
 import 'dart:convert';
-
+import 'package:blamo/CustomActionBar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 //TORemove
@@ -66,13 +66,7 @@ class _TestPageState extends State<TestPage> {
           drawer: new Drawer(
               child: SideMenu(currentState)
           ),
-          appBar: new AppBar(
-              title: new Text("Test Page: " + currentState.currentDocument + "/" + currentState.currentTest),
-              actions: <Widget>[
-
-              ],
-              backgroundColor: Colors.deepOrange
-          ));//getScaffold("","");
+        appBar: CustomActionBar("Test Page: ${currentState.currentTest}").getAppBar(),);//getScaffold("","");
     }
 
   }
@@ -88,16 +82,10 @@ class _TestPageState extends State<TestPage> {
   Widget getTestScaffold(Test testObjectToBuildFrom){
     return new Scaffold(
       backgroundColor: Colors.white,
-      drawer: new Drawer(
+      /*drawer: new Drawer(
         child: SideMenu(currentState),
-      ),
-      appBar: new AppBar(
-          title: new Text("Test Page: " + currentState.currentDocument + "/" + currentState.currentTest),
-          actions: <Widget>[
-
-          ],
-          backgroundColor: Colors.deepOrange
-      ),
+      ),*/
+      appBar: CustomActionBar("Test Page: ${currentState.currentTest}").getAppBar(),
       body: Padding(
           padding: EdgeInsets.fromLTRB(40,0,40,40),
           child: SingleChildScrollView(
@@ -128,7 +116,7 @@ class _TestPageState extends State<TestPage> {
                               focusNode: formNodes[1],
                               attribute: 'beginTestDepth',
                               validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Begin Test Depth (m)"),
+                              decoration: InputDecoration(labelText: "Begin Test Depth (-m)"),
                               initialValue: formatValue(testObjectToBuildFrom.beginTest.toString()),
                               onChanged: (void nbd){updateTestObject();},
                               onFieldSubmitted: (v){
@@ -140,7 +128,7 @@ class _TestPageState extends State<TestPage> {
                               focusNode: formNodes[2],
                               attribute: 'endTestDepth',
                               validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "End Test Depth (m)"),
+                              decoration: InputDecoration(labelText: "End Test Depth (-m)"),
                               initialValue: formatValue(testObjectToBuildFrom.endTest.toString()),
                               onChanged: (void nbd){updateTestObject();},
                               onFieldSubmitted: (v){
@@ -373,11 +361,12 @@ class _TestPageState extends State<TestPage> {
                   await saveTestObject();
                   currentState.currentRoute = '/TestsPage';
                   _showToast("Success", Colors.green);
-                  Navigator.pushReplacementNamed(
+                  /*Navigator.pushReplacementNamed(
                     context,
                     "/TestsPage",
                     arguments: currentState,
-                  );
+                  );*/
+                  Navigator.pop(context, "Success");
                 } else {
                   _showToast("Error in Fields", Colors.red);
                 }
@@ -414,14 +403,17 @@ class _TestPageState extends State<TestPage> {
     try{
       testObject.beginTest = double.parse(_fbKey.currentState.fields["beginTestDepth"].currentState.value);
     } catch(e) {
+      testObject.beginTest = null;
     }
     try{
       testObject.endTest = double.parse(_fbKey.currentState.fields["endTestDepth"].currentState.value);
     } catch(e) {
+      testObject.endTest = null;
     }
     try{
       testObject.percentRecovery = double.parse(_fbKey.currentState.fields["percentRecovery"].currentState.value);
     } catch(e) {
+      testObject.percentRecovery = null;
     }
     testObject.testType = _fbKey.currentState.fields["testType"].currentState.value.toString();
     testObject.soilDrivingResistance = _fbKey.currentState.fields["soilDrivingResistance"].currentState.value.toString();

@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:blamo/SideMenu.dart';
 import 'dart:convert';
+import 'package:blamo/CustomActionBar.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -70,17 +71,13 @@ class _UnitPageState extends State<UnitPage> {
     } else {
       debugPrint("Returning empty Scaffold");
       return new Scaffold(
+        appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
           backgroundColor: Colors.white,
           drawer: new Drawer(
               child: SideMenu(currentState)
           ),
-          appBar: new AppBar(
-              title: new Text("Unit Page: ${currentState.currentUnit}"),
-              actions: <Widget>[
 
-              ],
-              backgroundColor: Colors.deepOrange
-          ));
+          );
     }
 
   }
@@ -97,16 +94,10 @@ class _UnitPageState extends State<UnitPage> {
   Widget getScaffold(Unit unitToBuildFrom){
     return Scaffold(
       backgroundColor: Colors.white,
-      drawer: new Drawer(
+      /*drawer: new Drawer(
           child: SideMenu(currentState)
-      ),
-      appBar: new AppBar(
-          title: new Text("Unit Page: " + currentState.currentDocument + "/" + currentState.currentUnit),
-          actions: <Widget>[
-
-          ],
-          backgroundColor: Colors.deepOrange
-      ),
+      ),*/
+      appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
       body: Padding(
           padding: EdgeInsets.fromLTRB(40,0,40,40),
           child: SingleChildScrollView(
@@ -125,7 +116,7 @@ class _UnitPageState extends State<UnitPage> {
                               focusNode: formNodes[0],
                               attribute: 'depth-ub',
                               validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Depth Upper Bound (m)"),
+                              decoration: InputDecoration(labelText: "Depth Upper Bound (-m)"),
                               initialValue: formatValue(unitToBuildFrom.depthUB.toString()),
                               onChanged: (void nbd){updateUnitObject();},
                               onFieldSubmitted: (v){
@@ -141,7 +132,7 @@ class _UnitPageState extends State<UnitPage> {
                               focusNode: formNodes[1],
                               attribute: 'depth-lb',
                               validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Depth Lower Bound (m)"),
+                              decoration: InputDecoration(labelText: "Depth Lower Bound (-m)"),
                               initialValue: formatValue(unitToBuildFrom.depthLB.toString()),
                               onChanged: (void nbd){updateUnitObject();},
                               onFieldSubmitted: (v){
@@ -239,11 +230,12 @@ class _UnitPageState extends State<UnitPage> {
                   await saveObject();
                     currentState.currentRoute = '/UnitsPage';
                     _showToast("Success", Colors.green);
-                    Navigator.pushReplacementNamed(
+                    /*Navigator.pushReplacementNamed(
                       context,
                       "/UnitsPage",
                       arguments: currentState,
-                    );
+                    );*/
+                    Navigator.pop(context, "Success");
                 } else {
                   _showToast("Error in Fields", Colors.red);
                 }

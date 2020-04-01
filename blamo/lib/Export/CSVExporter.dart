@@ -118,17 +118,17 @@ class CSVExporter {
     PermissionStatus permission =
     await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
     if (permission.toString() != "PermissionStatus.granted") {
-      Map<PermissionGroup, PermissionStatus> permissions =
       await PermissionHandler().requestPermissions([PermissionGroup.storage]);
     }
     await new Future.delayed(new Duration(milliseconds: 50));
     permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
     if (permission.toString() != "PermissionStatus.granted"){
+      Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
       print("Permission denied. PDF write cancelled."); // TODO - Better handle permission denied case.
     } else {
       final output = await getExternalStorageDirectory();
       String filepathCSV = "${output.path}/$csvName.csv";
-      String filepathTXT = "${output.path}/$csvName.txt";
+      //String filepathTXT = "${output.path}/$csvName.txt";
       final file = File(filepathCSV);
       debugPrint("(CSV) printing csv to: $filepathCSV");
       await file.writeAsString(toWrite);

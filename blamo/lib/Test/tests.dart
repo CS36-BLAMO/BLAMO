@@ -1,9 +1,11 @@
 import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:blamo/SideMenu.dart';
+import 'package:blamo/CustomActionBar.dart';
 
 class TestsPage extends StatefulWidget {
   final StateData pass; 
@@ -39,19 +41,16 @@ class _TestsPageState extends State<TestsPage> {
       return getScaffold(tests);
     }
     else {
+      if(currentState.dirty == 1){
+        getTestSet(currentState.testList, currentState.currentDocument);
+      }
       debugPrint("Returning empty scaffold");
       return new Scaffold(
           backgroundColor: Colors.white,
           drawer: new Drawer(
               child: SideMenu(currentState)
           ),
-          appBar: new AppBar(
-              title: new Text("Tests Page"),
-              actions: <Widget>[
-
-              ],
-              backgroundColor: Colors.deepOrange
-          ));
+        appBar: CustomActionBar("Tests Page").getAppBar(),);
     }
   }
 
@@ -61,13 +60,7 @@ class _TestsPageState extends State<TestsPage> {
         drawer: new Drawer(
         child: SideMenu(currentState),
       ),
-        appBar: new AppBar(
-            title: new Text("Tests Page"),
-            actions: <Widget>[
-
-            ],
-            backgroundColor: Colors.deepOrange
-      ),
+      appBar: CustomActionBar("Tests Page").getAppBar(),
       body: Padding(
         padding: EdgeInsets.fromLTRB(20,20,20,20),
         child: ListView.builder(
@@ -103,6 +96,7 @@ class _TestsPageState extends State<TestsPage> {
                 maxLength: 50,
                 controller: _textFieldController,
                 decoration: InputDecoration(labelText: 'Test Name'),
+                inputFormatters: [new BlacklistingTextInputFormatter(new RegExp('[\\,]'))],
               ),
               actions: <Widget> [
                 new FlatButton(
@@ -135,11 +129,24 @@ class _TestsPageState extends State<TestsPage> {
                       currentState.testList.add(newTestNoComma);
                       currentState.currentTest = newTestNoComma;
                       currentState.currentRoute = '/TestPage';
-                      Navigator.pushReplacementNamed(
+                      Navigator.pop(context);
+
+                      //Await for the test page to get popped
+                      await Navigator.pushNamed(
                         context,
                         "/TestPage",
                         arguments: currentState,
                       );
+
+                      //Update tests and reload page
+                      tests = [];
+                      await getTestSet(currentState.testList, currentState.currentDocument);
+                      await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+                        setState((){
+                          currentState.dirty=0;
+                          dirty = false;
+                        });
+                      });
                     }
                   },
                 )
@@ -154,29 +161,52 @@ class _TestsPageState extends State<TestsPage> {
     List<Widget> testsToReturn = [];
     for (int i = 0; i < tests.length; i++) {
         testsToReturn.add(
-            new ListTile(
-              title: new Container(
-                height: 50,
-                color: Colors.orange[100],
-                child: Center(child: Text(tests[i].beginTest.toString() + " - " + tests[i].endTest.toString() + ", " + tests[i].tags)),
-              ),
-              onTap: () {
-                if(currentState.currentRoute != '/TestPage'){ // TODO - dynamically populate test edit page
-                  currentState.currentRoute = '/TestPage';
-                  currentState.currentTest=currentState.testList[i];
-                  Navigator.pushReplacementNamed(
-                    context,
-                    "/TestPage",
-                    arguments: currentState,
-                  );
-                } else {
-                  Navigator.pop(context);
-                }
-              },
-            )
+          new Container(
+              height: 50,
+              child: new Card(
+                  elevation: 10,
+                  color: Colors.brown[100],
+
+                  child: new Material(
+                    child: InkWell(
+                      onTap: () => _onTileClicked(i),
+                      onLongPress: () => _onTileLongClicked(i),
+                      splashColor: Colors.grey,
+                      child: Center(child: Text((i+1).toString() + "." + tests[i].beginTest.toString() + " - " + tests[i].endTest.toString())),
+                    ),
+                    color: Colors.transparent,
+                  )
+              )
+          )
         );
       }
     return testsToReturn;
+  }
+
+  void _onTileClicked(int i) async {
+    if(currentState.currentRoute != '/TestPage'){ // TODO - dynamically populate test edit page
+      currentState.currentRoute = '/TestPage';
+      currentState.currentTest=currentState.testList[i];
+      await Navigator.pushNamed(
+        context,
+        "/TestPage",
+        arguments: currentState,
+      );
+      tests = [];
+      await getTestSet(currentState.testList, currentState.currentDocument);
+      await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+        setState((){
+          currentState.dirty=0;
+          dirty = false;
+        });
+      });
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
+  void _onTileLongClicked(int i) async {
+
   }
 
   void getTestSet(List<String> testNames, String documentName) async{
@@ -193,6 +223,7 @@ class _TestsPageState extends State<TestsPage> {
     }
     await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
       setState((){
+        currentState.dirty=0;
         dirty = false;
       });
     });
