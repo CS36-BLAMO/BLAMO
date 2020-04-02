@@ -66,7 +66,7 @@ Future<String> docCreate(StateData currentState) async{
       widgetTests.add(
         Container( 
           child: Text( // TESTS
-            levels[i].tests[j].beginTest.toString() + "m to " + levels[i].tests[j].endTest.toString() + "m\t|\t" +
+            levels[i].tests[j].beginTest.toString() + "m to " + levels[i].tests[j].endTest.toString() + "m\t|\t" + 
             "Soil tags: " + testTags + "\t|\t" + // TODO - clean up tag display
             "% Recovery: " + levels[i].tests[j].percentRecovery.toString() + "\t|\t" +
             "SDR: " + levels[i].tests[j].soilDrivingResistance + "\t|\t" +
@@ -91,7 +91,7 @@ Future<String> docCreate(StateData currentState) async{
     widgetLevels.add(
       Container(
         decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-        margin: const EdgeInsets.only(bottom:10),
+        //margin: const EdgeInsets.only(bottom:10),
         child:Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -124,7 +124,7 @@ Future<String> docCreate(StateData currentState) async{
       widgetTests.add(
         Container( 
           child: Text( // TESTS
-            testsToDisplay[i].beginTest.toString() + "m to " + testsToDisplay[i].endTest.toString() + "m\t|\t" +
+            testsToDisplay[i].beginTest.toString() + "m to " + testsToDisplay[i].endTest.toString() + "m\t|\t" + 
             "Soil tags: " + testTags + "\t|\t" + // TODO - clean up tag display
             "% Recovery: " + testsToDisplay[i].percentRecovery.toString() + "\t|\t" +
             "SDR: " + testsToDisplay[i].soilDrivingResistance + "\t|\t" +
@@ -147,7 +147,7 @@ Future<String> docCreate(StateData currentState) async{
     widgetLevels.add(
       Container(
         decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-        margin: const EdgeInsets.only(bottom:10),
+        //margin: const EdgeInsets.only(bottom:10),
         child:Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -180,7 +180,7 @@ Future<String> docCreate(StateData currentState) async{
         child: Text('DRILL LOG | '+ loginfo.client.toUpperCase() + ' | Page ${context.pageNumber} of ${context.pagesCount}',
                 style: Theme.of(context)
                     .defaultTextStyle
-                    .copyWith(color: PdfColors.grey)));
+                    .copyWith(color: PdfColors.grey, fontSize: 10)));
     },
     build: (Context context) => <Widget>[
             Header(
@@ -188,24 +188,93 @@ Future<String> docCreate(StateData currentState) async{
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('DRILL LOG\n'+ loginfo.client.toUpperCase(), textScaleFactor: 1)
+                      Text('DRILL LOG | ' + loginfo.project +'\n'+ loginfo.client.toUpperCase(), textScaleFactor: 1)
                     ])),
-            Paragraph(
-                text:
-                    loginfo.project),
+            //Paragraph(
+            //    text:
+            //        loginfo.project),
             Table.fromTextArray(context: context, data: <List<String>>[
-              <String>['Number', 'Start Date', 'End Date', 'Latitude', 'Longitude', 'Location'], 
-              <String>[loginfo.number, loginfo.startDate, loginfo.endDate, loginfo.lat, loginfo.long, loginfo.location]
+              //<String>['Number', 'Start Date', 'End Date', 'Latitude', 'Longitude', 'Location'], 
+              <String>['Number: '+loginfo.number, 'Start Date: '+loginfo.startDate, 'End Date: '+loginfo.endDate, 'Latitude: '+loginfo.lat, 'Longitude: '+loginfo.long, 'Location: '+loginfo.location]
             ]),
             Table.fromTextArray(context: context, data: <List<String>>[
-              <String>['Highway', 'County', 'Elevation Datum', 'Surface Elevation', 'Tube Height'],
-              <String>[loginfo.highway, loginfo.county, loginfo.elevationDatum, loginfo.surfaceElevation, loginfo.tubeHeight]
+              //<String>['Highway', 'County', 'Elevation Datum', 'Surface Elevation', 'Tube Height'],
+              <String>['Highway: '+loginfo.highway, 'County: '+loginfo.county, 'Elevation Datum: '+loginfo.elevationDatum, 'Surface Elevation: '+loginfo.surfaceElevation, 'Tube Height: '+loginfo.tubeHeight]
             ]),
             Table.fromTextArray(context: context, data: <List<String>>[
-              <String>['Contractor', 'Equipment', 'Method', 'Logged By', 'Checked By'],
-              <String>[loginfo.contractor, loginfo.equipment, loginfo.method, loginfo.loggedBy, loginfo.checkedBy],
+              //<String>['Contractor', 'Equipment', 'Method', 'Logged By', 'Checked By'],
+              <String>['Contractor: '+loginfo.contractor, 'Equipment: '+loginfo.equipment, 'Method: '+loginfo.method, 'Logged by: '+loginfo.loggedBy, 'Checked by: '+loginfo.checkedBy],
             ]),
-            Paragraph(text:"\n"),
+            //Table.fromTextArray(context: context, data: <List<String>>[
+            //  <String>['Test Type','Rock Abbreviations','Typical Drilling Abbreviations'],
+            //  <String>['"A" - Auger Core\n"X" - Auger"\n"C" - Core, Barrel Type\n"N" - Standard Penetration\n"U" - Undisturbed Sample\n"T" - Test Pit',
+            //           'Discontinuity\t\tShape\t\tSurface Roughness\n'+
+            //            'J - Joint\t\tPl- Planar\t\tP - Polished\n'+
+            //            'F - Fault\t\tC - Curved\t\tSl - Slickensided\n'+
+            //            'B - Bedding\t\tU - Undulating\t\tSm - Smooth\n'+
+            //            'Fo - Foliation\t\tSt - Stepped\t\tR - Rough\n'+
+            //            'S - Shear\t\tIr - Irregular\t\tVR - Very Rough\n',
+            //            'Drilling Methods\t\tDrilling Remarks\n'+
+            //            'WL - Wire Line\t\tLW - Lost Water\n'+
+            //            'HS - Hollow Stern Auger\t\tWR - Water Return\n'+
+            //            'DP - Drill Fluid\t\tWC - Water Color'+
+            //            'SA - Solid Fligh Auger\t\tD - Down Pressure'+
+            //            'CA - Casing Advancer\t\tDR - Drill Rate'+
+            //            'HA - Hand Auger\t\tDA - Drill Action']]),
+            Container(
+              //margin: const EdgeInsets.all(5),
+              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    constraints: BoxConstraints(maxWidth: 194, maxHeight: 80),
+                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text("Test Type", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 10)),
+                        ),
+                        Container(
+                          child: Text('"A" - Auger Core\n"X" - Auger"\n"C" - Core, Barrel Type\n"N" - Standard Penetration\n"U" - Undisturbed Sample\n"T" - Test Pit', style: TextStyle(fontSize: 8)) 
+                        ),
+                      ]
+                    )
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    constraints: BoxConstraints(maxWidth: 194, maxHeight: 80),
+                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text("Rock Abbreviations", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 10)),
+                        ),
+                        Container(
+                          child: Text('"A" - Auger Core\n"X" - Auger"\n"C" - Core, Barrel Type\n"N" - Standard Penetration\n"U" - Undisturbed Sample\n"T" - Test Pit', style: TextStyle(fontSize: 8)) 
+                        ),
+                      ]
+                    )),
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    constraints: BoxConstraints(maxWidth: 194, maxHeight: 80),
+                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text("Typical Drilling Abbreviations", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 10))
+                        ),
+                        Container(
+                          child: Text('"A" - Auger Core\n"X" - Auger"\n"C" - Core, Barrel Type\n"N" - Standard Penetration\n"U" - Undisturbed Sample\n"T" - Test Pit', style: TextStyle(fontSize: 8)) 
+                        ),
+                      ]
+                    )),
+                ],
+              )
+            ),
+            //]),
             //Column(mainAxisAlignment: MainAxisAlignment.start,
             Wrap( 
               children: widgetLevels)
