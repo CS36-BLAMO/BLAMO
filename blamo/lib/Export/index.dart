@@ -29,7 +29,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
   final routeName = '/ExportPage';
   StateData currentState;
   //Creating structured list of output types
-  List<String> docTypes = ['csv','pdf'];
+  List<String> docTypes = ['csv','pdf','both'];
   //parameters to pass to emailer
   String pickedDoc = null;
   String pickedDocType = null;
@@ -46,7 +46,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
 
   @override
   void initState(){
-    //myImage = Image.asset('assets/images/plants.jpg');
+    //myImage = Image.asset('assets/images/');
     super.initState();
   }
 
@@ -94,13 +94,13 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                         fit: FlexFit.loose,
                         child: Container(
                             width: 500,
-                            height: 175,
+                            height: 160,
                             child: _saveFileGFTile(context)
                         ),
                       ),
                       Container(
                           width: 500,
-                          height: 175,
+                          height: 170,
                           child:_emailGFTile(context)
                       )
                     ]),
@@ -121,12 +121,15 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            new DropdownButtonHideUnderline(
-                child: DropdownButton(
+            Flexible (
+              flex: 3,
+              fit: FlexFit.loose,
+              child: new DropdownButtonHideUnderline(
+                  child: DropdownButton(
                     hint: Text(
-                      'Select Document',
+                      'Borehole',
                       style: TextStyle(
-                          fontSize: 21,
+                          fontSize: 15,
                           color: Color.fromRGBO(89,89,89,1)
                       )
                     ),
@@ -139,7 +142,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                         child: new Text(
                           value,
                           style: TextStyle(
-                              fontSize: 27,
+                              fontSize: 20,
                             fontWeight: FontWeight.bold,
                               color: Color.fromRGBO(89,89,89,1),
                           )
@@ -152,45 +155,49 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                         pickedDoc = value;
                       });
                     }
-                )
+                  )
+              ),
             ),
-            SizedBox(width:10),
-            new DropdownButtonHideUnderline(
-                child: DropdownButton(
-                    hint: Text(
-                        'Select Format',
-                        style: TextStyle(
-                            fontSize: 21,
-                            color: Color.fromRGBO(89,89,89,1)
-                        )
-                    ),
-                    value: pickedDocType,
-                    items:
-                    docTypes.map((String value) {
-                      //print("Value from List of strings " + value);
-                      return new DropdownMenuItem(
-                        value: value,
-                        child: new Text(
-                            value,
-                            style: TextStyle(
-                              fontSize: 27,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromRGBO(89,89,89,1),
-                            )
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (String value){
-                      setState(() {
-                        pickedDocType = value;
-                      });
-                    }
-                )
+            Flexible (
+              flex: 1,
+              fit: FlexFit.tight,
+              child: new DropdownButtonHideUnderline(
+                  child: DropdownButton(
+                      hint: Text(
+                          'Type',
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: Color.fromRGBO(89,89,89,1)
+                          )
+                      ),
+                      value: pickedDocType,
+                      items:
+                      docTypes.map((String value) {
+                        //print("Value from List of strings " + value);
+                        return new DropdownMenuItem(
+                          value: value,
+                          child: new Text(
+                              value,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromRGBO(89,89,89,1),
+                              )
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (String value){
+                        setState(() {
+                          pickedDocType = value;
+                        });
+                      }
+                  )
+              ),
             ),
 
           ]
         ),
-        SizedBox(height:15),
+        SizedBox(height:10),
         new Container(
           width: double.infinity,
           child: new MaterialButton(
@@ -203,37 +210,20 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                     animateEmail();
                   }
                 });
-                return sendEmail(pickedDoc, pickedDocType).then((
-                    onValue) {
-                  if (onValue == "No $pickedDocType type file found for $pickedDoc") {
-                    setState(() {
-                      _emailState = 0;
-                    });
-                    Fluttertoast.showToast(
-                        msg: "$pickedDoc does not have a saved .$pickedDocType file",
-                        toastLength: Toast.LENGTH_LONG,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIos: 3,
-                        backgroundColor: Color(0xFF3B3B3B),
-                        textColor: Colors.white,
-                        fontSize: 18
-                    );
-                  } else {
-                    setState(() {
-                      _emailState = 0;
-                    });
+                return sendEmail(pickedDoc, pickedDocType).then((onValue) {
+                  setState(() {
+                    _emailState = 0;
+                  });
+                  if (onValue == "$pickedDoc.csv not found"){
+                    toastEmailResponse("$pickedDoc.csv not found");
+                  } else if (onValue == "$pickedDoc.pdf not found"){
+                    toastEmailResponse("$pickedDoc.pdf not found");
+                  } else if (onValue == "failed to send email"){
+                    toastEmailResponse("failed to send email");
                   }
                 });
               } else {
-                Fluttertoast.showToast(
-                    msg: "Select a document and format type",
-                    toastLength: Toast.LENGTH_LONG,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIos: 3,
-                    backgroundColor: Color(0xFF3B3B3B),
-                    textColor: Colors.white,
-                    fontSize: 18
-                );
+                toastEmailResponse("Select a Borehole and format type");
               }
             },
             elevation: 4.0,
@@ -248,98 +238,114 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
     boxFit: BoxFit.contain,
     color: Color.fromRGBO(255,255,255,0.9),
     content: new Column(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        new Text(
-          "Save ${currentState.currentDocument}",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 35,
-            fontWeight: FontWeight.bold,
-            color: Color.fromRGBO(89,89,89,1)
+        Flexible (
+          flex: 3,
+          fit: FlexFit.loose,
+          child: Text(
+            "Save ${currentState.currentDocument}",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 25,
+              color: Color.fromRGBO(89,89,89,1)
+            ),
           ),
         ),
-        SizedBox(height:25),
-        new Row (
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              new Container(
-                  width: 150,
-                  child: new MaterialButton(
-                    child: setPDF(),
-                    onPressed: () async {
-                      setState(() {
-                        if(_pdfState == 0) {
-                          animatePDF();
-                        }
-                      });
-                      if(_pdfState == 1){
-                        String finish = await docCreate(currentState);
-                        if(finish == "done"){
+        SizedBox(height:20),
+        Flexible (
+          flex: 3,
+          fit: FlexFit.loose,
+          child: Row (
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Flexible (
+                  flex: 3,
+                  fit: FlexFit.loose,
+                  child: new Container(
+                      width: 150,
+                      child: new MaterialButton(
+                        child: setPDF(),
+                        onPressed: () async {
                           setState(() {
-                            _pdfState = 2;
+                            if(_pdfState == 0) {
+                              animatePDF();
+                            }
                           });
-                        } else if(finish == "failed") {
+                          if(_pdfState == 1){
+                            String finish = await docCreate(currentState);
+                            if(finish == "done"){
+                              setState(() {
+                                _pdfState = 2;
+                              });
+                            } else if(finish == "failed") {
+                              setState(() {
+                                _pdfState = 0;
+                              });
+                              Fluttertoast.showToast(
+                                  msg: "Failed to save ${currentState.currentDocument} as .pdf",
+                                  toastLength: Toast.LENGTH_LONG,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIos: 3,
+                                  backgroundColor: Color(0xFF3B3B3B),
+                                  textColor: Colors.white,
+                                  fontSize: 18
+                              );
+                            }
+                          }
+                        },
+                        elevation: 4.0,
+                        height: 48.0,
+                        color: Colors.blue,
+                      )
+                  ),
+                ),
+                Spacer(flex: 1),
+                Flexible (
+                  flex: 3,
+                  fit: FlexFit.loose,
+                  child: new Container(
+                      width: 150,
+                      child: new MaterialButton(
+                        child: setCSV(),
+                        onPressed: () async {
                           setState(() {
-                            _pdfState = 0;
+                            if(_csvState == 0) {
+                              animateCSV();
+                            }
                           });
-                          Fluttertoast.showToast(
-                              msg: "Failed to save ${currentState.currentDocument} as .pdf",
-                              toastLength: Toast.LENGTH_LONG,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIos: 3,
-                              backgroundColor: Color(0xFF3B3B3B),
-                              textColor: Colors.white,
-                              fontSize: 18
-                          );
-                        }
-                      }
-                    },
-                    elevation: 4.0,
-                    height: 48.0,
-                    color: Colors.blue,
-                  )
-              ),
-              SizedBox(width: 50),
-              new Container(
-                  width: 150,
-                  child: new MaterialButton(
-                    child: setCSV(),
-                    onPressed: () async {
-                      setState(() {
-                        if(_csvState == 0) {
-                          animateCSV();
-                        }
-                      });
-                      if(_csvState == 1){
-                        CSVExporter csvExporter = new CSVExporter(currentState);
-                        String finish = await csvExporter.exportToCSV();
-                        if(finish == "done"){
-                          setState(() {
-                            _csvState = 2;
-                          });
-                        } else if(finish == "failed") {
-                          setState(() {
-                            _csvState = 0;
-                          });
-                          Fluttertoast.showToast(
-                              msg: "Failed to save ${currentState.currentDocument} as .csv",
-                              toastLength: Toast.LENGTH_LONG,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIos: 3,
-                              backgroundColor: Color(0xFF3B3B3B),
-                              textColor: Colors.white,
-                              fontSize: 18
-                          );
-                        }
-                      }
-                    },
-                    elevation: 4.0,
-                    height: 48.0,
-                    color: Colors.blue,
-                  )
-              )
-            ]
+                          if(_csvState == 1){
+                            CSVExporter csvExporter = new CSVExporter(currentState);
+                            String finish = await csvExporter.exportToCSV();
+                            if(finish == "done"){
+                              setState(() {
+                                _csvState = 2;
+                              });
+                            } else if(finish == "failed") {
+                              setState(() {
+                                _csvState = 0;
+                              });
+                              Fluttertoast.showToast(
+                                  msg: "Failed to save ${currentState.currentDocument} as .csv",
+                                  toastLength: Toast.LENGTH_LONG,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIos: 3,
+                                  backgroundColor: Color(0xFF3B3B3B),
+                                  textColor: Colors.white,
+                                  fontSize: 18
+                              );
+                            }
+                          }
+                        },
+                        elevation: 4.0,
+                        height: 48.0,
+                        color: Colors.blue,
+                      )
+                  ),
+                )
+              ]
+          ),
         )
       ]
     ),
@@ -402,22 +408,30 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
   }
   Widget setPDF(){
     if(_pdfState == 0) {
-      return new Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            new Icon(
-              Icons.save_alt,
-              color: Colors.white
-            ),
-            new Text(
-              "  PDF",
-              style: TextStyle(
-                  fontSize: 24,
+      return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Flexible (
+                flex: 1,
+                fit: FlexFit.tight,
+                child: new Icon(
+                  Icons.save_alt,
                   color: Colors.white
+                ),
               ),
-            )
-          ]
+              Flexible (
+                flex: 3,
+                fit: FlexFit.tight,
+                child: new Text(
+                  "  PDF",
+                  style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.white
+                  ),
+                ),
+              )
+            ]
       );
     } else if (_pdfState == 1) {
       return CircularProgressIndicator(
@@ -428,12 +442,22 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Icon(Icons.check, color: Colors.white),
-            new Text(
-              "  PDF",
-              style: TextStyle(
-                  fontSize: 24,
-                  color: Colors.white
+            Flexible (
+                flex: 1,
+                fit: FlexFit.tight,
+                child: Icon(
+                    Icons.check,
+                    color: Colors.white)
+            ),
+            Flexible (
+              flex: 3,
+              fit: FlexFit.tight,
+              child: new Text(
+                "  PDF",
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.white
+                ),
               ),
             )
           ]
@@ -446,15 +470,23 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            new Icon(
-                Icons.save_alt,
-                color: Colors.white
-            ),
-            new Text(
-              "  CSV",
-              style: TextStyle(
-                  fontSize: 24,
+            Flexible (
+              flex: 1,
+              fit: FlexFit.tight,
+              child: new Icon(
+                  Icons.save_alt,
                   color: Colors.white
+              ),
+            ),
+            Flexible (
+              flex: 3,
+              fit: FlexFit.loose,
+              child: new Text(
+                "  CSV",
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.white
+                ),
               ),
             )
           ]
@@ -468,17 +500,42 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Icon(Icons.check, color: Colors.white),
-            new Text(
-              "  CSV",
-              style: TextStyle(
-                  fontSize: 24,
+            Flexible (
+              flex: 1,
+              fit: FlexFit.tight,
+              child: Icon(
+                  Icons.check,
                   color: Colors.white
+              ),
+            ),
+            Flexible (
+              flex: 3,
+              fit: FlexFit.tight,
+              child: new Text(
+                "  CSV",
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.white
+                ),
               ),
             )
           ]
       );
     }
+  }
+  //Shows toast with passed in message
+  void toastEmailResponse(String errorMessage){
+    //Cancels previous toasts
+    Fluttertoast.cancel();
+    Fluttertoast.showToast(
+        msg: errorMessage,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIos: 3,
+        backgroundColor: Color(0xFF3B3B3B),
+        textColor: Colors.white,
+        fontSize: 18
+    );
   }
 }
 
