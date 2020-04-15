@@ -15,10 +15,13 @@ class PersistentStorage {
   String devicePath;
   String fileName;
   String pathExtension; //Structure for a path is $path/pathExtension/filename
+  String projectPrepend;
   int nameIterator;
+
 
   PersistentStorage(){
     fileName = "Manifest.txt";
+    projectPrepend = "";
     pathExtension = "";
     nameIterator = 0;
   }
@@ -40,6 +43,10 @@ class PersistentStorage {
 
   void changeNameIterator(int newIterator){
     nameIterator = newIterator;
+  }
+
+  void changeProjectName(String newProjectName){
+    projectPrepend = newProjectName + "_";
   }
 
   void setFileToManifest(){
@@ -83,7 +90,7 @@ class PersistentStorage {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/' + pathExtension + fileName);
+    return File('$path/' + projectPrepend + pathExtension + fileName);
   }
 
   /*---End Path Getters---*/
@@ -297,34 +304,36 @@ class PersistentStorage {
   * */
   Future<bool> checkForManifest() async {
     setFileToManifest();
-    return File(await _localPath + "/Manifest.txt").exists();
+    return File(await _localPath + "/$projectPrepend" + "Manifest.txt").exists();
   }
 
   Future<bool> checkDocument(String documentName) async {
     setFileToManifest();
-    return File(await _localPath + "/$documentName" + '_Document-Meta.txt').exists();
+    return File(await _localPath + "/$projectPrepend" + documentName + '_Document-Meta.txt').exists();
   }
 
   Future<bool> checkTest(String documentName, String testName) async {
     setFileToManifest();
-    return File(await _localPath + "/$documentName" + '_$testName.txt').exists();
+    return File(await _localPath + "/$projectPrepend" + "$documentName" + '_$testName.txt').exists();
   }
 
   Future<bool> checkUnit(String documentName, String unitName) async {
     setFileToManifest();
-    return File(await _localPath + "/$documentName" + '_$unitName.txt').exists();
+    return File(await _localPath + "/$projectPrepend" + "$documentName" + '_$unitName.txt').exists();
   }
   /*---End Of file checking functions---*/
 
   //Updates the statedata object with the currentDocument
-  Future<StateData> setStateData(StateData toRead) async{
+  Future<StateData> setStateData(StateData toRead) async {
     String toParse;
     List<String> tempLoc = [];
     toRead.testList = [];
     toRead.unitList = [];
+    if(toRead.currentProject == ""){
 
-    if(toRead.currentRoute == "/") {
+    } else if(toRead.currentRoute == "/" && toRead.currentProject != "") {
       setFileToManifest();
+      changeProjectName(toRead.currentProject);
       toParse = await readManifest();
       debugPrint("(FH) readManifest in SD: $toParse");
 
@@ -337,6 +346,7 @@ class PersistentStorage {
     } else {
       if (toRead.currentDocument != "") {
         setFileToDocument(toRead.currentDocument);
+        changeProjectName(toRead.currentProject);
         toParse = await readDocument(toRead.currentDocument);
         tempLoc = toParse.split('\n');
 

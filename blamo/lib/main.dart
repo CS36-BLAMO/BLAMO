@@ -11,6 +11,7 @@ class StateData {
   String currentDocument;
   String currentUnit;
   String currentTest;
+  String currentProject;
 
   int documentIterator = 0;
   int unitCount = 0;
