@@ -28,6 +28,7 @@ class StateData {
 
   StateData(this.currentRoute, [this.dirty = 1]){
     this.currentDocument = "";
+    this.currentProject = "testing";
   }
 }
 
@@ -94,6 +95,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     if (currentState != null) {
       currentState.currentRoute = '/'; //Assigns currentState.currentRoute to the name of the current named route
+    } else {
+      currentState = new StateData("/");
     }
     currentState.currentDocument="";
     currentState.storage.checkForManifest().then((bool doesManifestExist) {

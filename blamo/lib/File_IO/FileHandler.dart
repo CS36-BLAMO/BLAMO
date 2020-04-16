@@ -46,7 +46,12 @@ class PersistentStorage {
   }
 
   void changeProjectName(String newProjectName){
-    projectPrepend = newProjectName + "_";
+    if(newProjectName == ""){
+      projectPrepend = "";
+    } else {
+      projectPrepend = newProjectName + "_";
+    }
+
   }
 
   void setFileToManifest(){
@@ -121,7 +126,7 @@ class PersistentStorage {
 
   Future<String> readDocument(String documentName) async {
     //--Debug
-    debugPrint("(FH)Reading from: /$documentName" + "_Document-Meta.txt\n");
+    debugPrint("(FH)Reading from: /" + projectPrepend + "$documentName"  + "_Document-Meta.txt\n");
 
     changePathExtension(documentName);
     changeFilename('_Document-Meta.txt');
@@ -140,7 +145,7 @@ class PersistentStorage {
 
   Future<String> readTest(String documentName, String testName) async {
     //--Debug
-    debugPrint("(FH)Reading from: /$documentName" + "_$testName.txt\n");
+    debugPrint("(FH)Reading from: /" + projectPrepend + "$documentName"  + "_$testName.txt\n");
 
     changePathExtension(documentName);
     changeFilename('_$testName.txt');
@@ -159,7 +164,7 @@ class PersistentStorage {
 
   Future<String> readUnit(String documentName, String unitName) async {
     //--Debug
-    debugPrint("(FH)Reading from: /$documentName" + "_$unitName.txt\n");
+    debugPrint("(FH)Reading from: /" + projectPrepend + "$documentName" + "_$unitName.txt\n");
 
     changePathExtension(documentName);
     changeFilename('_$unitName.txt');
@@ -425,9 +430,7 @@ class PersistentStorage {
     List<String> tempLoc = [];
     toRead.testList = [];
     toRead.unitList = [];
-    if(toRead.currentProject == ""){
-
-    } else if(toRead.currentRoute == "/" && toRead.currentProject != "") {
+    if(toRead.currentRoute == "/") {
       setFileToManifest();
       changeProjectName(toRead.currentProject);
       toParse = await readManifest();

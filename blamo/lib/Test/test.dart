@@ -428,7 +428,10 @@ class _TestPageState extends State<TestPage> {
 
   List<String> getTags(Test testObj) {
     List<String> toReturn = [];
-    List<dynamic> ba = jsonDecode(testObj.tags);
+    List<dynamic> ba;
+    if(testObj.tags != null){
+      ba = jsonDecode(testObj.tags);
+    }
     if(ba != null) {
       for (int i = 0; i < ba.length; i++) {
         toReturn.add(ba[i].toString());

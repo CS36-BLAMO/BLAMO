@@ -296,7 +296,10 @@ class _UnitPageState extends State<UnitPage> {
 
   List<String> getTags(Unit unitObj) {
     List<String> toReturn = [];
-    List<dynamic> ba = jsonDecode(unitObj.tags);
+    List<dynamic> ba;
+    if(unitObj.tags != null){
+      ba = jsonDecode(unitObj.tags);
+    }
     if(ba != null) {
       for(int i = 0; i < ba.length; i++){
         toReturn.add(ba[i].toString());
