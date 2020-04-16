@@ -273,7 +273,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               decoration: InputDecoration(labelText: "Start Date"),
 
                               //Todo
-                              initialValue: DateTime.tryParse(logInfoToBuildFrom.startDate),
+                              //initialValue: DateTime.tryParse(logInfoToBuildFrom.startDate),
 
                               onChanged: (void nbd){updateLogObject();},
                               onFieldSubmitted: (v){
@@ -290,7 +290,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               decoration: InputDecoration(labelText: "End Date"),
 
                               //Todo
-                              initialValue: DateTime.tryParse(logInfoToBuildFrom.endDate),
+                              //initialValue: DateTime.tryParse(logInfoToBuildFrom.startDate),
 
                               onChanged: (void nbd){updateLogObject();},
                               onFieldSubmitted: (v){
