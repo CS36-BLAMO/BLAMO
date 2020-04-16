@@ -58,15 +58,56 @@ class _LogInfoPageState extends State<LogInfoPage> {
       return getLogInfoScaffold(logInfoObject);
     } else {
       debugPrint("Returning empty Scaffold");
-      return new Scaffold(
-          backgroundColor: Colors.white,
-          drawer: new Drawer(
-              child: SideMenu(currentState)
-          ),
-        appBar: CustomActionBar("Log Info Page").getAppBar(),
+      return WillPopScope(
+        onWillPop: backPressed,
+        child: new Scaffold(
+            backgroundColor: Colors.white,
+            drawer: new Drawer(
+                child: SideMenu(currentState)
+            ),
+          appBar: CustomActionBar("Log Info Page").getAppBar(),
+        ),
       );
     }
 
+  }
+  //takes you back to Overview of borehole with dialog pop up to confirm loss of data
+  Future<bool> backPressed() async {
+    bool userInput = await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+            title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(
+                  "No",
+                  style: TextStyle(
+                      fontSize: 25,
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context,false),
+              ),
+              FlatButton(
+                child: Text(
+                  "Yes",
+                  style: TextStyle(
+                      fontSize: 25,
+                      color: Colors.red
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context,true),
+              )
+            ]
+        )
+    );
+    if(userInput) {   //If a user decides to leave the page it sets the page to navigate to
+      currentState.currentRoute = "/Document";
+      Navigator.pushReplacementNamed(
+        context,
+        "/Document",
+        arguments: currentState,
+      );
+    }
   }
 
   void updateLogInfoData(String documentName) async{
@@ -89,299 +130,302 @@ class _LogInfoPageState extends State<LogInfoPage> {
   }
 
   Widget getLogInfoScaffold(LogInfo logInfoToBuildFrom){
-    return new Scaffold(
-      backgroundColor: Colors.white,
-      drawer: new Drawer(
-        child: SideMenu(currentState),
-      ),
-      appBar: CustomActionBar("Log Info Page").getAppBar(),
-      body: Padding(
-          padding: EdgeInsets.fromLTRB(40,0,40,40),
-          child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  FormBuilder(key: _fbKey,
-                      initialValue: {
-                        'date': DateTime.now(),
-                        'accept_terms': false,
-                      },
-                      autovalidate: true,
-                      child: Column(
-                          children: <Widget>[
-                            /*
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[0],
-                              attribute: 'objectID',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "ObjectID"),
-                              initialValue: formatValue(logInfoToBuildFrom.objectID),
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[1]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[1],
-                              attribute: 'testType',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Test Type"),
-                              initialValue: formatValue(logInfoToBuildFrom.testType),
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[2]);
-                              },
-                            ),*/
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[0],
-                              attribute: 'project',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Project"),
-                              initialValue: formatValue(logInfoToBuildFrom.project),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[1]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[1],
-                              attribute: 'number',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Number"),
-                              initialValue: formatValue(logInfoToBuildFrom.number),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[2]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[2],
-                              attribute: 'client',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Client"),
-                              initialValue: formatValue(logInfoToBuildFrom.client),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[3]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[3],
-                              attribute: 'highway',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Highway"),
-                              initialValue: formatValue(logInfoToBuildFrom.highway),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[4]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[4],
-                              attribute: 'county',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "County"),
-                              initialValue: formatValue(logInfoToBuildFrom.county),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[5]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[5],
-                              attribute: 'lat',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Latitude"),
-                              initialValue: formatValue(logInfoToBuildFrom.lat),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[6]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[6],
-                              attribute: 'long',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Longitude"),
-                              initialValue: formatValue(logInfoToBuildFrom.long),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[7]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[7],
-                              attribute: 'location',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Location"),
-                              initialValue: formatValue(logInfoToBuildFrom.location),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[8]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[8],
-                              attribute: 'elevationDatum',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Elevation Datum"),
-                              initialValue: formatValue(logInfoToBuildFrom.elevationDatum),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[9]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[9],
-                              attribute: 'tubeHeight',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Tube Height"),
-                              initialValue: formatValue(logInfoToBuildFrom.tubeHeight),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[10]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[10],
-                              attribute: 'boreholeID',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Borehole ID"),
-                              initialValue: formatValue(logInfoToBuildFrom.boreholeID),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[11]);
-                              },
-                            ),
-                            FormBuilderDateTimePicker(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[11],
-                              attribute: "startDate",
-                              inputType: InputType.date,
-                              validators: [],
-                              format: DateFormat("dd-MM-yyyy"),
-                              decoration: InputDecoration(labelText: "Start Date"),
+    return WillPopScope(
+      onWillPop: backPressed,
+      child: new Scaffold(
+        backgroundColor: Colors.white,
+        drawer: new Drawer(
+          child: SideMenu(currentState),
+        ),
+        appBar: CustomActionBar("Log Info Page").getAppBar(),
+        body: Padding(
+            padding: EdgeInsets.fromLTRB(40,0,40,40),
+            child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    FormBuilder(key: _fbKey,
+                        initialValue: {
+                          'date': DateTime.now(),
+                          'accept_terms': false,
+                        },
+                        autovalidate: true,
+                        child: Column(
+                            children: <Widget>[
+                              /*
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[0],
+                                attribute: 'objectID',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "ObjectID"),
+                                initialValue: formatValue(logInfoToBuildFrom.objectID),
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[1]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[1],
+                                attribute: 'testType',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Test Type"),
+                                initialValue: formatValue(logInfoToBuildFrom.testType),
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[2]);
+                                },
+                              ),*/
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[0],
+                                attribute: 'project',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Project"),
+                                initialValue: formatValue(logInfoToBuildFrom.project),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[1]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[1],
+                                attribute: 'number',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Number"),
+                                initialValue: formatValue(logInfoToBuildFrom.number),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[2]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[2],
+                                attribute: 'client',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Client"),
+                                initialValue: formatValue(logInfoToBuildFrom.client),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[3]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[3],
+                                attribute: 'highway',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Highway"),
+                                initialValue: formatValue(logInfoToBuildFrom.highway),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[4]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[4],
+                                attribute: 'county',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "County"),
+                                initialValue: formatValue(logInfoToBuildFrom.county),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[5]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[5],
+                                attribute: 'lat',
+                                validators: [FormBuilderValidators.numeric()],
+                                decoration: InputDecoration(labelText: "Latitude"),
+                                initialValue: formatValue(logInfoToBuildFrom.lat),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[6]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[6],
+                                attribute: 'long',
+                                validators: [FormBuilderValidators.numeric()],
+                                decoration: InputDecoration(labelText: "Longitude"),
+                                initialValue: formatValue(logInfoToBuildFrom.long),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[7]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[7],
+                                attribute: 'location',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Location"),
+                                initialValue: formatValue(logInfoToBuildFrom.location),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[8]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[8],
+                                attribute: 'elevationDatum',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Elevation Datum"),
+                                initialValue: formatValue(logInfoToBuildFrom.elevationDatum),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[9]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[9],
+                                attribute: 'tubeHeight',
+                                validators: [FormBuilderValidators.numeric()],
+                                decoration: InputDecoration(labelText: "Tube Height"),
+                                initialValue: formatValue(logInfoToBuildFrom.tubeHeight),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[10]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[10],
+                                attribute: 'boreholeID',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Borehole ID"),
+                                initialValue: formatValue(logInfoToBuildFrom.boreholeID),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[11]);
+                                },
+                              ),
+                              FormBuilderDateTimePicker(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[11],
+                                attribute: "startDate",
+                                inputType: InputType.date,
+                                validators: [],
+                                format: DateFormat("dd-MM-yyyy"),
+                                decoration: InputDecoration(labelText: "Start Date"),
 
-                              //Todo
-                              initialValue: DateTime.tryParse(logInfoToBuildFrom.startDate),
+                                //Todo
+                                initialValue: DateTime.tryParse(logInfoToBuildFrom.startDate),
 
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[12]);
-                              },
-                            ),
-                            FormBuilderDateTimePicker(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[12],
-                              attribute: 'endDate',
-                              inputType: InputType.date,
-                              validators: [],
-                              format: DateFormat('dd-MM-yyyy'),
-                              decoration: InputDecoration(labelText: "End Date"),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[12]);
+                                },
+                              ),
+                              FormBuilderDateTimePicker(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[12],
+                                attribute: 'endDate',
+                                inputType: InputType.date,
+                                validators: [],
+                                format: DateFormat('dd-MM-yyyy'),
+                                decoration: InputDecoration(labelText: "End Date"),
 
-                              //Todo
-                              initialValue: DateTime.tryParse(logInfoToBuildFrom.endDate),
+                                //Todo
+                                initialValue: DateTime.tryParse(logInfoToBuildFrom.endDate),
 
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[13]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[13],
-                              attribute: 'surfaceElevation',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Surface Elevation (ft)"),
-                              initialValue: formatValue(logInfoToBuildFrom.surfaceElevation),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[14]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[14],
-                              attribute: 'contractor',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Contractor"),
-                              initialValue: formatValue(logInfoToBuildFrom.contractor),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[15]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[15],
-                              attribute: 'equipment',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Equipment"),
-                              initialValue: formatValue(logInfoToBuildFrom.equipment),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[16]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[16],
-                              attribute: 'method',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Method"),
-                              initialValue: formatValue(logInfoToBuildFrom.method),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[17]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[17],
-                              attribute: 'loggedBy',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Logged By"),
-                              initialValue: formatValue(logInfoToBuildFrom.loggedBy),
-                              onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[18]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              focusNode: formNodes[18],
-                              attribute: 'checkedBy',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Checked By"),
-                              onChanged: (void nbd){updateLogObject();},
-                              initialValue: formatValue(logInfoToBuildFrom.checkedBy),
-                            ),
-                          ]
-                      )
-                  )
-                ],
-              ))),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (_fbKey.currentState.saveAndValidate()) {
-            //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
-            updateLogObject();
-            saveLogObject();
-            _showToast("Success", Colors.green);
-          } else {
-            _showToast("Error in Fields", Colors.red);
-          }
-        },
-        child: Icon(Icons.save),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[13]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[13],
+                                attribute: 'surfaceElevation',
+                                validators: [FormBuilderValidators.numeric()],
+                                decoration: InputDecoration(labelText: "Surface Elevation (ft)"),
+                                initialValue: formatValue(logInfoToBuildFrom.surfaceElevation),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[14]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[14],
+                                attribute: 'contractor',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Contractor"),
+                                initialValue: formatValue(logInfoToBuildFrom.contractor),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[15]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[15],
+                                attribute: 'equipment',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Equipment"),
+                                initialValue: formatValue(logInfoToBuildFrom.equipment),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[16]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[16],
+                                attribute: 'method',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Method"),
+                                initialValue: formatValue(logInfoToBuildFrom.method),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[17]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[17],
+                                attribute: 'loggedBy',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Logged By"),
+                                initialValue: formatValue(logInfoToBuildFrom.loggedBy),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[18]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                focusNode: formNodes[18],
+                                attribute: 'checkedBy',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Checked By"),
+                                onChanged: (void nbd){updateLogObject();},
+                                initialValue: formatValue(logInfoToBuildFrom.checkedBy),
+                              ),
+                            ]
+                        )
+                    )
+                  ],
+                ))),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            if (_fbKey.currentState.saveAndValidate()) {
+              //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
+              updateLogObject();
+              saveLogObject();
+              _showToast("Success", Colors.green);
+            } else {
+              _showToast("Error in Fields", Colors.red);
+            }
+          },
+          child: Icon(Icons.save),
+        ),
       ),
     );
   }

@@ -35,62 +35,79 @@ class _DocumentPageState extends State<DocumentPage> {
       }
     });
 
-    return new Scaffold(
-      drawer: Drawer(
-        child: SideMenu(currentState),
-      ),
+    return WillPopScope(
+      onWillPop: backPressed,
+      child: new Scaffold(
+        drawer: Drawer(
+          child: SideMenu(currentState),
+        ),
 
-      appBar: CustomActionBar("Overview: ${currentState.currentDocument}").getAppBar(),
+        appBar: CustomActionBar("Overview: ${currentState.currentDocument}").getAppBar(),
 
-      body:ListView.builder(
-        itemCount: 3,
-        itemBuilder: (context, i){
-          String title;
-          switch(i){
-            case 0:
-              title = "LogInfo";
-              return  new Container(
-                        height: 50,
-                        child: new Card(
-                            elevation: 3,
-                            borderOnForeground: true,
-                            color: Colors.brown[100],
-                            child: new Material(
-                              child: InkWell(
-                                //onTap: () => _onTileClicked(i),
-                                splashColor: Colors.grey,
-                                child: new Center(child: Text("Log Info")),
-                              ),
-                              color: Colors.transparent,
-                            )
-                        )
-              );
-              break;
-            case 1:
-              title = "Tests";
-              break;
-            case 2:
-              title = "Units";
-              break;
-          }
-          return
-            new Container(
-              child: new Card(
-              elevation: 5,
-              color: Colors.brown[100],
-              child:new ExpansionTile(
-                  title: new Text(title),
-                  children: <Widget>[
-                    new Column(
-                      children: _buildExpandedContent(title),
-                    )
-                  ],
+        body:ListView.builder(
+          itemCount: 3,
+          itemBuilder: (context, i){
+            String title;
+            switch(i){
+              case 0:
+                title = "LogInfo";
+                return  new Container(
+                          height: 50,
+                          child: new Card(
+                              elevation: 3,
+                              borderOnForeground: true,
+                              color: Colors.brown[100],
+                              child: new Material(
+                                child: InkWell(
+                                  //onTap: () => _onTileClicked(i),
+                                  splashColor: Colors.grey,
+                                  child: new Center(child: Text("Log Info")),
+                                ),
+                                color: Colors.transparent,
+                              )
+                          )
+                );
+                break;
+              case 1:
+                title = "Tests";
+                break;
+              case 2:
+                title = "Units";
+                break;
+            }
+            return
+              new Container(
+                child: new Card(
+                elevation: 5,
+                color: Colors.brown[100],
+                child:new ExpansionTile(
+                    title: new Text(title),
+                    children: <Widget>[
+                      new Column(
+                        children: _buildExpandedContent(title),
+                      )
+                    ],
+                  )
                 )
-              )
-          );
-        },
+            );
+          },
+        ),
       ),
     );
+  }
+  //Takes you back to borehole landing page
+  //Removes currentDoc from currentState
+  Future<bool> backPressed() async {
+    if (currentState.currentRoute != '/') {
+      currentState.currentRoute = '/';
+      currentState.currentDocument = "";
+    }
+    Navigator.pushReplacementNamed(
+      context,
+      "/",
+      arguments: currentState,
+    );
+    return Future.value(false);
   }
 
   //--DEBUG

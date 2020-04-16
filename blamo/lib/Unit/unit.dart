@@ -70,16 +70,49 @@ class _UnitPageState extends State<UnitPage> {
       return getScaffold(unitObject);
     } else {
       debugPrint("Returning empty Scaffold");
-      return new Scaffold(
-        appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
-          backgroundColor: Colors.white,
-          drawer: new Drawer(
-              child: SideMenu(currentState)
-          ),
+      return WillPopScope(
+        onWillPop: backPressed,
+        child: new Scaffold(
+          appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
+            backgroundColor: Colors.white,
+            drawer: new Drawer(
+                child: SideMenu(currentState)
+            ),
 
-          );
+            ),
+      );
     }
 
+  }
+  //takes you back to units page with a pop up confirmation to not allow data loss
+  Future<bool> backPressed() async {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+            title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(
+                  "No",
+                  style: TextStyle(
+                    fontSize: 25,
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context,false),
+              ),
+              FlatButton(
+                child: Text(
+                    "Yes",
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: Colors.red
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context,true),
+              )
+            ]
+        )
+    );
   }
 
   String formatValue(String value){
@@ -92,157 +125,160 @@ class _UnitPageState extends State<UnitPage> {
 
 
   Widget getScaffold(Unit unitToBuildFrom){
-    return Scaffold(
-      backgroundColor: Colors.white,
-      /*drawer: new Drawer(
-          child: SideMenu(currentState)
-      ),*/
-      appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
-      body: Padding(
-          padding: EdgeInsets.fromLTRB(40,0,40,40),
-          child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  FormBuilder(key: _fbKey,
-                      initialValue: {
-                        'date': DateTime.now(),
-                        'accept_terms': false,
-                      },
-                      autovalidate: true,
-                      child: Column(
-                          children: <Widget>[
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[0],
-                              attribute: 'depth-ub',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Depth Upper Bound (-m)"),
-                              initialValue: formatValue(unitToBuildFrom.depthUB.toString()),
-                              onChanged: (void nbd){updateUnitObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[1]);
-                              },
-                              /*onEditingComplete: (){
-                                debugPrint("Updating object");
-                                unitObject.depthUB = double.parse(_fbKey.currentState.fields['depth-ub'].currentState.value);
-                              },*/
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[1],
-                              attribute: 'depth-lb',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Depth Lower Bound (-m)"),
-                              initialValue: formatValue(unitToBuildFrom.depthLB.toString()),
-                              onChanged: (void nbd){updateUnitObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[2]);
-                              },
-                              /*onEditingComplete: (){
-                                debugPrint("Updating object");
-                                unitObject.depthLB = double.parse(_fbKey.currentState.fields['depth-lb'].currentState.value);
-                              },*/
-                            ),
-                            FormBuilderTextField(
-                              focusNode: formNodes[2],
-                              attribute: 'methods',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Drilling Methods"),
-                              initialValue: formatValue(unitToBuildFrom.drillingMethods),
-                              onChanged: (void nbd){unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value;},
-                              /*onEditingComplete: (){
-                                debugPrint("Updating object");
-                                unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value;
-                              },*/
-                            ),
-                            FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: test.dart, 56)
-                              attribute: 'tags',
-                              validators: [],
-                              initialValue: getTags(unitToBuildFrom),
-                              options: [ // TODO need gint's set of tags, ability for user to make own tags.
-                                FormBuilderFieldOption(value: "Asphalt"),
-                                FormBuilderFieldOption(value: "Basalt"),
-                                FormBuilderFieldOption(value: "Bedrock"),
-                                FormBuilderFieldOption(value: "Boulders and Cobbles"),
-                                FormBuilderFieldOption(value: "Breccia"),
-                                FormBuilderFieldOption(value: "USCS High Plasticity Clay"),
-                                FormBuilderFieldOption(value: "Chalk"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Clay"),
-                                FormBuilderFieldOption(value: "USCS Low to High Plasticity Clay"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Gavelly Clay"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Silty Clay"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Sandy Clay"),
-                                FormBuilderFieldOption(value: "Coal"),
-                                FormBuilderFieldOption(value: "Concrete"),
-                                FormBuilderFieldOption(value: "Coral"),
-                                FormBuilderFieldOption(value: "Fill"),
-                                FormBuilderFieldOption(value: "USCS Clayey Gravel"),
-                                FormBuilderFieldOption(value: "USCS Silty Gravel"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Gravel"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Gravel with clay"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Gravel with silt"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Sandy Gravel"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Gravel"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Gravel with Clay"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Gravel with Silt"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Sandy Gravel"),
-                                FormBuilderFieldOption(value: "Gypsum, rocksalt, etc."),
-                                FormBuilderFieldOption(value: "Limestone"),
-                                FormBuilderFieldOption(value: "USCS Elastic Silt"),
-                                FormBuilderFieldOption(value: "USCS Silt"),
-                                FormBuilderFieldOption(value: "USCS Gravely Silt"),
-                                FormBuilderFieldOption(value: "USCS Sandy Silt"),
-                                FormBuilderFieldOption(value: "USCS High Plasticity Organic silt or clay"),
-                                FormBuilderFieldOption(value: "USCS High Plasticity Organic silt or clay with shells"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Organic silt or clay"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Organic silt or clay with shells"),
-                                FormBuilderFieldOption(value: "USCS Peat"),
-                                FormBuilderFieldOption(value: "Sandstone"),
-                                FormBuilderFieldOption(value: "USCS Clayey Sand"),
-                                FormBuilderFieldOption(value: "USCS Clayey Sand with silt"),
-                                FormBuilderFieldOption(value: "Shale"),
-                                FormBuilderFieldOption(value: "Siltstone"),
-                                FormBuilderFieldOption(value: "USCS Silty Sand"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Sand"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Gravelly Sand"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Sand with Clay"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Sand with Silt"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Sandy Gravel"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Gravelly Sand"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Sand with Clay"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Sand with Silt"),
-                                FormBuilderFieldOption(value: "Glacial Till"),
-                                FormBuilderFieldOption(value: "Topsoil")
-                              ],
-                            )
-                          ]
+    return WillPopScope(
+      onWillPop: backPressed,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        /*drawer: new Drawer(
+            child: SideMenu(currentState)
+        ),*/
+        appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
+        body: Padding(
+            padding: EdgeInsets.fromLTRB(40,0,40,40),
+            child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    FormBuilder(key: _fbKey,
+                        initialValue: {
+                          'date': DateTime.now(),
+                          'accept_terms': false,
+                        },
+                        autovalidate: true,
+                        child: Column(
+                            children: <Widget>[
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[0],
+                                attribute: 'depth-ub',
+                                validators: [FormBuilderValidators.numeric()],
+                                decoration: InputDecoration(labelText: "Depth Upper Bound (-m)"),
+                                initialValue: formatValue(unitToBuildFrom.depthUB.toString()),
+                                onChanged: (void nbd){updateUnitObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[1]);
+                                },
+                                /*onEditingComplete: (){
+                                  debugPrint("Updating object");
+                                  unitObject.depthUB = double.parse(_fbKey.currentState.fields['depth-ub'].currentState.value);
+                                },*/
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[1],
+                                attribute: 'depth-lb',
+                                validators: [FormBuilderValidators.numeric()],
+                                decoration: InputDecoration(labelText: "Depth Lower Bound (-m)"),
+                                initialValue: formatValue(unitToBuildFrom.depthLB.toString()),
+                                onChanged: (void nbd){updateUnitObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[2]);
+                                },
+                                /*onEditingComplete: (){
+                                  debugPrint("Updating object");
+                                  unitObject.depthLB = double.parse(_fbKey.currentState.fields['depth-lb'].currentState.value);
+                                },*/
+                              ),
+                              FormBuilderTextField(
+                                focusNode: formNodes[2],
+                                attribute: 'methods',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Drilling Methods"),
+                                initialValue: formatValue(unitToBuildFrom.drillingMethods),
+                                onChanged: (void nbd){unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value;},
+                                /*onEditingComplete: (){
+                                  debugPrint("Updating object");
+                                  unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value;
+                                },*/
+                              ),
+                              FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: test.dart, 56)
+                                attribute: 'tags',
+                                validators: [],
+                                initialValue: getTags(unitToBuildFrom),
+                                options: [ // TODO need gint's set of tags, ability for user to make own tags.
+                                  FormBuilderFieldOption(value: "Asphalt"),
+                                  FormBuilderFieldOption(value: "Basalt"),
+                                  FormBuilderFieldOption(value: "Bedrock"),
+                                  FormBuilderFieldOption(value: "Boulders and Cobbles"),
+                                  FormBuilderFieldOption(value: "Breccia"),
+                                  FormBuilderFieldOption(value: "USCS High Plasticity Clay"),
+                                  FormBuilderFieldOption(value: "Chalk"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Clay"),
+                                  FormBuilderFieldOption(value: "USCS Low to High Plasticity Clay"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Gavelly Clay"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Silty Clay"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Sandy Clay"),
+                                  FormBuilderFieldOption(value: "Coal"),
+                                  FormBuilderFieldOption(value: "Concrete"),
+                                  FormBuilderFieldOption(value: "Coral"),
+                                  FormBuilderFieldOption(value: "Fill"),
+                                  FormBuilderFieldOption(value: "USCS Clayey Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Silty Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Gravel with clay"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Gravel with silt"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Sandy Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Gravel with Clay"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Gravel with Silt"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Sandy Gravel"),
+                                  FormBuilderFieldOption(value: "Gypsum, rocksalt, etc."),
+                                  FormBuilderFieldOption(value: "Limestone"),
+                                  FormBuilderFieldOption(value: "USCS Elastic Silt"),
+                                  FormBuilderFieldOption(value: "USCS Silt"),
+                                  FormBuilderFieldOption(value: "USCS Gravely Silt"),
+                                  FormBuilderFieldOption(value: "USCS Sandy Silt"),
+                                  FormBuilderFieldOption(value: "USCS High Plasticity Organic silt or clay"),
+                                  FormBuilderFieldOption(value: "USCS High Plasticity Organic silt or clay with shells"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Organic silt or clay"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Organic silt or clay with shells"),
+                                  FormBuilderFieldOption(value: "USCS Peat"),
+                                  FormBuilderFieldOption(value: "Sandstone"),
+                                  FormBuilderFieldOption(value: "USCS Clayey Sand"),
+                                  FormBuilderFieldOption(value: "USCS Clayey Sand with silt"),
+                                  FormBuilderFieldOption(value: "Shale"),
+                                  FormBuilderFieldOption(value: "Siltstone"),
+                                  FormBuilderFieldOption(value: "USCS Silty Sand"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Sand"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Gravelly Sand"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Sand with Clay"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Sand with Silt"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Sandy Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Gravelly Sand"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Sand with Clay"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Sand with Silt"),
+                                  FormBuilderFieldOption(value: "Glacial Till"),
+                                  FormBuilderFieldOption(value: "Topsoil")
+                                ],
+                              )
+                            ]
+                          )
                         )
-                      )
-                    ]
+                      ]
+                    )
                   )
-                )
-              ),
-          floatingActionButton: FloatingActionButton(
-              onPressed: () async {
-                if (_fbKey.currentState.saveAndValidate()) {
-                  //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
-                  updateUnitObject();
-                  await saveObject();
-                    currentState.currentRoute = '/UnitsPage';
-                    _showToast("Success", Colors.green);
-                    /*Navigator.pushReplacementNamed(
-                      context,
-                      "/UnitsPage",
-                      arguments: currentState,
-                    );*/
-                    Navigator.pop(context, "Success");
-                } else {
-                  _showToast("Error in Fields", Colors.red);
-                }
+                ),
+            floatingActionButton: FloatingActionButton(
+                onPressed: () async {
+                  if (_fbKey.currentState.saveAndValidate()) {
+                    //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
+                    updateUnitObject();
+                    await saveObject();
+                      currentState.currentRoute = '/UnitsPage';
+                      _showToast("Success", Colors.green);
+                      /*Navigator.pushReplacementNamed(
+                        context,
+                        "/UnitsPage",
+                        arguments: currentState,
+                      );*/
+                      Navigator.pop(context, "Success");
+                  } else {
+                    _showToast("Error in Fields", Colors.red);
+                  }
 
-              },
-              child: Icon(Icons.save),
-          ),
+                },
+                child: Icon(Icons.save),
+            ),
+      ),
     );
   }
 
