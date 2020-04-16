@@ -271,7 +271,7 @@ class _UnitPageState extends State<UnitPage> {
                   if (_fbKey.currentState.saveAndValidate()) {
                     //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
                     updateUnitObject();
-                    await saveObject();
+                    await saveUnitObject();
                       currentState.currentRoute = '/UnitsPage';
                       _showToast("Success", Colors.green);
                       /*Navigator.pushReplacementNamed(
