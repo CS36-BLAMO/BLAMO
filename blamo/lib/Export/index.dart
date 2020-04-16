@@ -64,52 +64,64 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
       '/ExportPage'; //Assigns currentState.currentRoute to the name of the current named route
     }
 
-    return new Scaffold(
-      drawer: new Drawer(
-        child: SideMenu(currentState),
-      ),
-      appBar: CustomActionBar("Export").getAppBar(),
+    return WillPopScope(
+      onWillPop: backPressed,
+      child: new Scaffold(
+        drawer: new Drawer(
+          child: SideMenu(currentState),
+        ),
+        appBar: CustomActionBar("Export").getAppBar(),
 
-      body: new Stack(
-        children: <Widget> [
-          new Container(
-            //decoration: new BoxDecoration(
-            //  image: new DecorationImage(
-            //      image: myImage.image,
-            //      fit: BoxFit.cover,
-            //  )
-            //)
-          ),
-          new Container(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: new SingleChildScrollView(
-                child: new Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      SizedBox(height: 25),
-                      Flexible(
-                        flex: 1,
-                        fit: FlexFit.loose,
-                        child: Container(
-                            width: 500,
-                            height: 160,
-                            child: _saveFileGFTile(context)
+        body: new Stack(
+          children: <Widget> [
+            new Container(
+              //decoration: new BoxDecoration(
+              //  image: new DecorationImage(
+              //      image: myImage.image,
+              //      fit: BoxFit.cover,
+              //  )
+              //)
+            ),
+            new Container(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: new SingleChildScrollView(
+                  child: new Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        SizedBox(height: 25),
+                        Flexible(
+                          flex: 1,
+                          fit: FlexFit.loose,
+                          child: Container(
+                              width: 500,
+                              height: 160,
+                              child: _saveFileGFTile(context)
+                          ),
                         ),
-                      ),
-                      Container(
-                          width: 500,
-                          height: 170,
-                          child:_emailGFTile(context)
-                      )
-                    ]),
+                        Container(
+                            width: 500,
+                            height: 170,
+                            child:_emailGFTile(context)
+                        )
+                      ]),
+                )
               )
             )
-          )
-        ],
-      )
+          ],
+        )
+      ),
     );
+  }
+  //Takes you back to the Overview page for the selected borehole
+  Future<bool> backPressed() async {
+    Navigator.pushReplacementNamed(
+      context,
+      "/Document",
+      arguments: currentState,
+    );
+    return Future.value(false);
   }
 
   GFCard _emailGFTile(BuildContext context) => GFCard(

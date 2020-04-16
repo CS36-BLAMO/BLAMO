@@ -2,6 +2,7 @@ import 'package:blamo/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/SideMenu.dart';
+import 'package:blamo/routeGenerator.dart';
 import 'package:blamo/CustomActionBar.dart';
 
 
@@ -28,20 +29,32 @@ class _SettingsPageState extends State<SettingsPage> {
     if(currentState.currentRoute != null) {
       currentState.currentRoute = '/SettingsPage'; //Assigns currentState.currentRoute to the name of the current named route
     }
-    return new Scaffold(
-      backgroundColor: Colors.grey[300],
-      drawer: new Drawer(
-        child: SideMenu(currentState),
-      ),
-      appBar: new AppBar(
-          title: new Text("Settings"),
-          actions: <Widget>[
-          ],
-          backgroundColor: Colors.grey[800],
-      ),
-      body:
-       _settingsList(),
-       );
+    return WillPopScope(
+      onWillPop: backPressed,
+      child: new Scaffold(
+        backgroundColor: Colors.grey[300],
+        drawer: new Drawer(
+          child: SideMenu(currentState),
+        ),
+        appBar: new AppBar(
+            title: new Text("Settings"),
+            actions: <Widget>[
+            ],
+            backgroundColor: Colors.grey[800],
+        ),
+        body:
+         _settingsList(),
+         ),
+    );
+  }
+  //Takes you back to the Home Page
+  Future<bool> backPressed() async {
+    Navigator.pushReplacementNamed(
+      context,
+      "/",
+      arguments: currentState,
+    );
+    return Future.value(false);
   }
 }
 // List of Boxes that are customizeable, we can parameterize the values and change the colors and indicate the allotment of changing these.

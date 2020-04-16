@@ -49,11 +49,10 @@ class _UnitsPageState extends State<UnitsPage> {
       return WillPopScope(
         onWillPop: backPressed,
         child: new Scaffold(
-          appBar: CustomActionBar("Units Page").getAppBar(),
-          drawer: new Drawer(
-              child: SideMenu(currentState)
-          ),
-
+            appBar: CustomActionBar("Units Page").getAppBar(),
+            drawer: new Drawer(
+                child: SideMenu(currentState)
+            ),
         ),
       );}
   }
@@ -63,21 +62,21 @@ class _UnitsPageState extends State<UnitsPage> {
     return WillPopScope(
       onWillPop: backPressed,
       child: new Scaffold(
-        backgroundColor: Colors.white,
-        drawer: new Drawer(
+          backgroundColor: Colors.white,
+          drawer: new Drawer(
           child: SideMenu(currentState),
         ),
         appBar: CustomActionBar("Units Page").getAppBar(),
         body: Padding(
-            padding: EdgeInsets.fromLTRB(20,20,20,20),
-            child: ListView.builder(
-                itemCount: 1,
-                itemBuilder: (context,i){
-                  return new Column(
-                      children: _populateUnitList()
-                  );
-                }
-            )
+          padding: EdgeInsets.fromLTRB(20,20,20,20),
+          child: ListView.builder(
+            itemCount: 1,
+            itemBuilder: (context,i){
+              return new Column(
+                children: _populateUnitList()
+              );
+            }
+          )
         ),
         floatingActionButton: floatingActionButtonBuilder(),
       ),

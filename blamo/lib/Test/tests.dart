@@ -45,34 +45,50 @@ class _TestsPageState extends State<TestsPage> {
         getTestSet(currentState.testList, currentState.currentDocument);
       }
       debugPrint("Returning empty scaffold");
-      return new Scaffold(
-        backgroundColor: Colors.white,
-        drawer: new Drawer(
-            child: SideMenu(currentState)
-        ),
-        appBar: CustomActionBar("Tests Page").getAppBar(),);
+      return WillPopScope(
+        onWillPop: backPressed,
+        child: new Scaffold(
+            backgroundColor: Colors.white,
+            drawer: new Drawer(
+                child: SideMenu(currentState)
+            ),
+          appBar: CustomActionBar("Tests Page").getAppBar(),),
+      );
     }
   }
 
+  //takes you back to overview of current borehole
+  Future<bool> backPressed() async {
+    Navigator.pushReplacementNamed(
+      context,
+      "/Document",
+      arguments: currentState,
+    );
+    return Future.value(false);
+  }
+
   Widget getScaffold(List<Test> tests){
-    return new Scaffold(
-      backgroundColor: Colors.white,
-      drawer: new Drawer(
-        child: SideMenu(currentState),
-      ),
-      appBar: CustomActionBar("Tests Page").getAppBar(),
-      body: Padding(
+    return WillPopScope(
+      onWillPop: backPressed,
+      child: new Scaffold(
+          backgroundColor: Colors.white,
+          drawer: new Drawer(
+          child: SideMenu(currentState),
+        ),
+        appBar: CustomActionBar("Tests Page").getAppBar(),
+        body: Padding(
           padding: EdgeInsets.fromLTRB(20,20,20,20),
           child: ListView.builder(
-              itemCount: 1,
-              itemBuilder: (context,i){
-                return new Column(
-                    children: _populateTestList()
-                );
-              }
+            itemCount: 1,
+            itemBuilder: (context,i){
+              return new Column(
+                children: _populateTestList()
+              );
+            }
           )
-      ),
+        ),
       floatingActionButton: floatingActionButtonBuilder(),
+      ),
     );
   }
 

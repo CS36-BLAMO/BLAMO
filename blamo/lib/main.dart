@@ -115,17 +115,50 @@ class _HomePageState extends State<HomePage> {
     * double drawerEdgeDragWidth )
     *
     * */
-    return new Scaffold(
-      drawer: Drawer(
-        child: SideMenu(currentState),
+    return WillPopScope (  // WillPopScope handles native android back button
+      onWillPop: backPressed,          //Requires a future
+      child: new Scaffold(
+        drawer: Drawer(
+          child: SideMenu(currentState),
+        ),
+
+        appBar: CustomActionBar("Home").getAppBar(),
+
+        body: gridViewBuilder(currentState.list),
+
+        floatingActionButton: floatingActionButtonBuilder(),
+
       ),
+    );
+  }
 
-      appBar: CustomActionBar("Home").getAppBar(),
-
-      body: gridViewBuilder(currentState.list),
-
-      floatingActionButton: floatingActionButtonBuilder(),
-
+  Future<bool> backPressed() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Do you want to exit the BLAMO application?"),
+        actions: <Widget>[
+          FlatButton(
+            child: Text(
+              "No",
+              style: TextStyle(
+                  fontSize: 25,
+              ),
+            ),
+            onPressed: () => Navigator.pop(context,false),
+          ),
+          FlatButton(
+            child: Text(
+              "Yes",
+              style: TextStyle(
+                fontSize: 25,
+                color: Colors.red
+              ),
+            ),
+            onPressed: () => Navigator.pop(context,true),
+          )
+        ]
+      )
     );
   }
 

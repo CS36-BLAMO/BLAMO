@@ -72,16 +72,49 @@ class _UnitPageState extends State<UnitPage> {
       return getScaffold(unitObject);
     } else {
       debugPrint("Returning empty Scaffold");
-      return new Scaffold(
-        appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
-        backgroundColor: Colors.white,
-        drawer: new Drawer(
-            child: SideMenu(currentState)
-        ),
+      return WillPopScope(
+        onWillPop: backPressed,
+        child: new Scaffold(
+          appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
+            backgroundColor: Colors.white,
+            drawer: new Drawer(
+                child: SideMenu(currentState)
+            ),
 
+            ),
       );
     }
 
+  }
+  //takes you back to units page with a pop up confirmation to not allow data loss
+  Future<bool> backPressed() async {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+            title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(
+                  "No",
+                  style: TextStyle(
+                    fontSize: 25,
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context,false),
+              ),
+              FlatButton(
+                child: Text(
+                    "Yes",
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: Colors.red
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context,true),
+              )
+            ]
+        )
+    );
   }
 
   String formatValue(String value){
@@ -94,16 +127,18 @@ class _UnitPageState extends State<UnitPage> {
 
 
   Widget getScaffold(Unit unitToBuildFrom){
-    return Scaffold(
-      backgroundColor: Colors.white,
-      /*drawer: new Drawer(
-          child: SideMenu(currentState)
-      ),*/
-      appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
-      body: Padding(
-          padding: EdgeInsets.fromLTRB(40,0,40,40),
-          child: SingleChildScrollView(
-              child: Column(
+    return WillPopScope(
+      onWillPop: backPressed,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        /*drawer: new Drawer(
+            child: SideMenu(currentState)
+        ),*/
+        appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
+        body: Padding(
+            padding: EdgeInsets.fromLTRB(40,0,40,40),
+            child: SingleChildScrollView(
+                child: Column(
                   children: <Widget>[
                     FormBuilder(key: _fbKey,
                         initialValue: {
@@ -225,32 +260,33 @@ class _UnitPageState extends State<UnitPage> {
                                 ],
                               )
                             ]
+                          )
                         )
+                      ]
                     )
-                  ]
-              )
-          )
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          if (_fbKey.currentState.saveAndValidate()) {
-            //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
-            updateUnitObject();
-            await saveUnitObject();
-            currentState.currentRoute = '/UnitsPage';
-            _showToast("Success", Colors.green);
-            /*Navigator.pushReplacementNamed(
-                      context,
-                      "/UnitsPage",
-                      arguments: currentState,
-                    );*/
-            Navigator.pop(context, "Success");
-          } else {
-            _showToast("Error in Fields", Colors.red);
-          }
+                  )
+                ),
+            floatingActionButton: FloatingActionButton(
+                onPressed: () async {
+                  if (_fbKey.currentState.saveAndValidate()) {
+                    //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
+                    updateUnitObject();
+                    await saveObject();
+                      currentState.currentRoute = '/UnitsPage';
+                      _showToast("Success", Colors.green);
+                      /*Navigator.pushReplacementNamed(
+                        context,
+                        "/UnitsPage",
+                        arguments: currentState,
+                      );*/
+                      Navigator.pop(context, "Success");
+                  } else {
+                    _showToast("Error in Fields", Colors.red);
+                  }
 
-        },
-        child: Icon(Icons.save),
+                },
+                child: Icon(Icons.save),
+            ),
       ),
     );
   }
