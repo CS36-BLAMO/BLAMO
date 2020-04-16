@@ -1,14 +1,14 @@
 import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+//import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:blamo/SideMenu.dart';
 import 'package:blamo/CustomActionBar.dart';
 
 class TestsPage extends StatefulWidget {
-  final StateData pass; 
+  final StateData pass;
 
   TestsPage(this.pass);
   @override
@@ -30,10 +30,10 @@ class _TestsPageState extends State<TestsPage> {
     getTestSet(currentState.testList, currentState.currentDocument);
   }
 
-  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  //final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   Widget build(BuildContext context) {
     if(currentState.currentRoute != null) {
-      currentState.currentRoute = '/TestsPage'; 
+      currentState.currentRoute = '/TestsPage';
     }
 
     if(!dirty){
@@ -46,33 +46,33 @@ class _TestsPageState extends State<TestsPage> {
       }
       debugPrint("Returning empty scaffold");
       return new Scaffold(
-          backgroundColor: Colors.white,
-          drawer: new Drawer(
-              child: SideMenu(currentState)
-          ),
+        backgroundColor: Colors.white,
+        drawer: new Drawer(
+            child: SideMenu(currentState)
+        ),
         appBar: CustomActionBar("Tests Page").getAppBar(),);
     }
   }
 
   Widget getScaffold(List<Test> tests){
     return new Scaffold(
-        backgroundColor: Colors.white,
-        drawer: new Drawer(
+      backgroundColor: Colors.white,
+      drawer: new Drawer(
         child: SideMenu(currentState),
       ),
       appBar: CustomActionBar("Tests Page").getAppBar(),
       body: Padding(
-        padding: EdgeInsets.fromLTRB(20,20,20,20),
-        child: ListView.builder(
-          itemCount: 1,
-          itemBuilder: (context,i){
-            return new Column(
-              children: _populateTestList()
-            );
-          }
-        )
+          padding: EdgeInsets.fromLTRB(20,20,20,20),
+          child: ListView.builder(
+              itemCount: 1,
+              itemBuilder: (context,i){
+                return new Column(
+                    children: _populateTestList()
+                );
+              }
+          )
       ),
-    floatingActionButton: floatingActionButtonBuilder(),
+      floatingActionButton: floatingActionButtonBuilder(),
     );
   }
 
@@ -160,7 +160,7 @@ class _TestsPageState extends State<TestsPage> {
   List _populateTestList() {
     List<Widget> testsToReturn = [];
     for (int i = 0; i < tests.length; i++) {
-        testsToReturn.add(
+      testsToReturn.add(
           new Container(
               height: 50,
               child: new Card(
@@ -178,8 +178,8 @@ class _TestsPageState extends State<TestsPage> {
                   )
               )
           )
-        );
-      }
+      );
+    }
     return testsToReturn;
   }
 
@@ -206,56 +206,10 @@ class _TestsPageState extends State<TestsPage> {
   }
 
   void _onTileLongClicked(int i) async {
-    String result;
-    result = await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Are you sure you want to delete this test?"),
-          actions: <Widget>[
-            new FlatButton(
-                child: Text("DELETE"),
-                textColor: Colors.red,
-                onPressed: () {
-                  Navigator.pop(context, "DELETE");
-                }),
-            new FlatButton(
-              child: Text("CANCEL"),
-              onPressed: (){
-                Navigator.pop(context, "CANCEL");
-              },
-            )
-          ],
-        )
-    );
-    if(result == "DELETE") {
-      await currentState.storage.deleteTest(
-          currentState.currentDocument, currentState.testList[i]);
-      currentState.testList.removeAt(i);
 
-      String toWrite = "${currentState.currentDocument}\n${currentState.testList
-          .length}\n${currentState.unitList.length}\n";
-      for (int i = 0; i < currentState.testList.length; i++) {
-        toWrite = toWrite + currentState.testList[i] + ',';
-      }
-      for (int i = 0; i < currentState.unitList.length; i++) {
-        toWrite = toWrite + currentState.unitList[i] + ',';
-      }
-      debugPrint(toWrite);
-
-      await currentState.storage.overWriteDocument(
-          currentState.currentDocument, toWrite);
-      tests = [];
-      await getTestSet(currentState.testList, currentState.currentDocument);
-      await new Future.delayed(new Duration(microseconds: 3)).then((onValue) {
-        setState(() {
-          currentState.dirty = 0;
-          dirty = false;
-        });
-      });
-    }
   }
 
-  void getTestSet(List<String> testNames, String documentName) async{
+  Future<void> getTestSet(List<String> testNames, String documentName) async{
     debugPrint("In getTestSet");
     ObjectHandler objectHandler = new ObjectHandler();
     for(int i = 0; i < currentState.testList.length; i++){

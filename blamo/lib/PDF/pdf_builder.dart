@@ -194,8 +194,8 @@ Future<String> docCreate(StateData currentState) async{
                 text:
                     loginfo.project),
             Table.fromTextArray(context: context, data: <List<String>>[
-              <String>['Number', 'Start Date', 'End Date', 'Latitude', 'Longitude', 'Location'], 
-              <String>[loginfo.number, loginfo.startDate, loginfo.endDate, loginfo.lat, loginfo.long, loginfo.location]
+              <String>['Number', 'Start Date', 'End Date', 'Northing', 'Easting', 'Location'],
+              <String>[loginfo.number, loginfo.startDate, loginfo.endDate, loginfo.north, loginfo.east, loginfo.location]
             ]),
             Table.fromTextArray(context: context, data: <List<String>>[
               <String>['Highway', 'County', 'Elevation Datum', 'Surface Elevation', 'Tube Height'],

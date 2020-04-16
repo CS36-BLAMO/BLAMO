@@ -21,7 +21,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
   final routeName = '/TestPage';
   StateData currentState;
   _LogInfoPageState(this.currentState);
-  var formNodes = new List<FocusNode>(19);
+  var formNodes = new List<FocusNode>(19); //Handle passing focus from one field to the next
 
   bool dirty = true;
   LogInfo logInfoObject;
@@ -45,8 +45,8 @@ class _LogInfoPageState extends State<LogInfoPage> {
     super.dispose();
   }
 
-  @override
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  @override
   Widget build(BuildContext context) {
     if(currentState.currentRoute != null) {
       currentState.currentRoute = '/LogInfoPage'; //Assigns currentState.currentRoute to the name of the current named route
@@ -59,10 +59,10 @@ class _LogInfoPageState extends State<LogInfoPage> {
     } else {
       debugPrint("Returning empty Scaffold");
       return new Scaffold(
-          backgroundColor: Colors.white,
-          drawer: new Drawer(
-              child: SideMenu(currentState)
-          ),
+        backgroundColor: Colors.white,
+        drawer: new Drawer(
+            child: SideMenu(currentState)
+        ),
         appBar: CustomActionBar("Log Info Page").getAppBar(),
       );
     }
@@ -102,35 +102,12 @@ class _LogInfoPageState extends State<LogInfoPage> {
                 children: <Widget>[
                   FormBuilder(key: _fbKey,
                       initialValue: {
-                        'date': DateTime.now(),
+                        'date': DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
                         'accept_terms': false,
                       },
                       autovalidate: true,
                       child: Column(
                           children: <Widget>[
-                            /*
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[0],
-                              attribute: 'objectID',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "ObjectID"),
-                              initialValue: formatValue(logInfoToBuildFrom.objectID),
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[1]);
-                              },
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[1],
-                              attribute: 'testType',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Test Type"),
-                              initialValue: formatValue(logInfoToBuildFrom.testType),
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[2]);
-                              },
-                            ),*/
                             FormBuilderTextField(
                               textInputAction: TextInputAction.next,
                               focusNode: formNodes[0],
@@ -138,16 +115,17 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               validators: [],
                               decoration: InputDecoration(labelText: "Project"),
                               initialValue: formatValue(logInfoToBuildFrom.project),
-                              onChanged: (void nbd){updateLogObject();},
+                              onChanged: (void nbd){updateLogObject();}, //Update field when it is changed
                               onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[1]);
+                                FocusScope.of(context).requestFocus(formNodes[1]); //The next field gets focus when this field is submitted
                               },
                             ),
                             FormBuilderTextField(
                               textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.number,
                               focusNode: formNodes[1],
                               attribute: 'number',
-                              validators: [],
+                              validators: [FormBuilderValidators.numeric(), FormBuilderValidators.min(0)],
                               decoration: InputDecoration(labelText: "Number"),
                               initialValue: formatValue(logInfoToBuildFrom.number),
                               onChanged: (void nbd){updateLogObject();},
@@ -193,11 +171,12 @@ class _LogInfoPageState extends State<LogInfoPage> {
                             ),
                             FormBuilderTextField(
                               textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.number,
                               focusNode: formNodes[5],
-                              attribute: 'lat',
+                              attribute: 'north',
                               validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Latitude"),
-                              initialValue: formatValue(logInfoToBuildFrom.lat),
+                              decoration: InputDecoration(labelText: "Northing"),
+                              initialValue: formatValue(logInfoToBuildFrom.north),
                               onChanged: (void nbd){updateLogObject();},
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[6]);
@@ -205,11 +184,12 @@ class _LogInfoPageState extends State<LogInfoPage> {
                             ),
                             FormBuilderTextField(
                               textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.number,
                               focusNode: formNodes[6],
-                              attribute: 'long',
+                              attribute: 'east',
                               validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Longitude"),
-                              initialValue: formatValue(logInfoToBuildFrom.long),
+                              decoration: InputDecoration(labelText: "Easting"),
+                              initialValue: formatValue(logInfoToBuildFrom.east),
                               onChanged: (void nbd){updateLogObject();},
                               onFieldSubmitted: (v){
                                 FocusScope.of(context).requestFocus(formNodes[7]);
@@ -241,9 +221,10 @@ class _LogInfoPageState extends State<LogInfoPage> {
                             ),
                             FormBuilderTextField(
                               textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.number,
                               focusNode: formNodes[9],
                               attribute: 'tubeHeight',
-                              validators: [FormBuilderValidators.numeric()],
+                              validators: [FormBuilderValidators.numeric(), FormBuilderValidators.min(0)],
                               decoration: InputDecoration(labelText: "Tube Height"),
                               initialValue: formatValue(logInfoToBuildFrom.tubeHeight),
                               onChanged: (void nbd){updateLogObject();},
@@ -252,19 +233,15 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               },
                             ),
                             FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
+                              textInputAction: TextInputAction.done,
                               focusNode: formNodes[10],
                               attribute: 'boreholeID',
                               validators: [],
                               decoration: InputDecoration(labelText: "Borehole ID"),
                               initialValue: formatValue(logInfoToBuildFrom.boreholeID),
                               onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[11]);
-                              },
                             ),
                             FormBuilderDateTimePicker(
-                              textInputAction: TextInputAction.next,
                               focusNode: formNodes[11],
                               attribute: "startDate",
                               inputType: InputType.date,
@@ -276,16 +253,16 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               initialValue: DateTime.tryParse(logInfoToBuildFrom.startDate),
 
                               onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[12]);
-                              },
                             ),
                             FormBuilderDateTimePicker(
-                              textInputAction: TextInputAction.next,
                               focusNode: formNodes[12],
                               attribute: 'endDate',
                               inputType: InputType.date,
-                              validators: [],
+                              validators: [(endDate){
+                                if(_fbKey.currentState != null && endDate != null && _fbKey.currentState.fields["startDate"].currentState.value != null && endDate.isBefore(_fbKey.currentState.fields["startDate"].currentState.value))
+                                  return "End Date must be after Start Date";
+                                return null;
+                              }], //Custom validator that checks that the end date is after the start date
                               format: DateFormat('dd-MM-yyyy'),
                               decoration: InputDecoration(labelText: "End Date"),
 
@@ -293,12 +270,10 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               initialValue: DateTime.tryParse(logInfoToBuildFrom.endDate),
 
                               onChanged: (void nbd){updateLogObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[13]);
-                              },
                             ),
                             FormBuilderTextField(
                               textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.number,
                               focusNode: formNodes[13],
                               attribute: 'surfaceElevation',
                               validators: [FormBuilderValidators.numeric()],
@@ -358,6 +333,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               },
                             ),
                             FormBuilderTextField(
+                              textInputAction: TextInputAction.done,
                               focusNode: formNodes[18],
                               attribute: 'checkedBy',
                               validators: [],
@@ -399,21 +375,30 @@ class _LogInfoPageState extends State<LogInfoPage> {
   }
 
   void updateLogObject(){
-    logInfoObject.boreholeID = _fbKey.currentState.fields["boreholeID"].currentState.value;
-    //logInfoObject.objectID = _fbKey.currentState.fields["objectID"].currentState.value;
-    //logInfoObject.testType = _fbKey.currentState.fields["testType"].currentState.value;
     logInfoObject.project = _fbKey.currentState.fields["project"].currentState.value;
     logInfoObject.number = _fbKey.currentState.fields["number"].currentState.value;
     logInfoObject.client = _fbKey.currentState.fields["client"].currentState.value;
     logInfoObject.highway = _fbKey.currentState.fields["highway"].currentState.value;
     logInfoObject.county = _fbKey.currentState.fields["county"].currentState.value;
-    logInfoObject.lat = _fbKey.currentState.fields["lat"].currentState.value;
-    logInfoObject.long = _fbKey.currentState.fields["long"].currentState.value;
+    logInfoObject.north = _fbKey.currentState.fields["north"].currentState.value;
+    logInfoObject.east = _fbKey.currentState.fields["east"].currentState.value;
     logInfoObject.location = _fbKey.currentState.fields["location"].currentState.value;
     logInfoObject.elevationDatum = _fbKey.currentState.fields["elevationDatum"].currentState.value;
     logInfoObject.tubeHeight = _fbKey.currentState.fields["tubeHeight"].currentState.value;
-    logInfoObject.startDate = "" +_fbKey.currentState.fields["startDate"].currentState.value.toString();
-    logInfoObject.endDate = "" +_fbKey.currentState.fields["endDate"].currentState.value.toString();
+    logInfoObject.boreholeID = _fbKey.currentState.fields["boreholeID"].currentState.value;
+    if(_fbKey.currentState.fields["startDate"].currentState.value != null) {
+      //Updates date and removes time values
+      logInfoObject.startDate = "" + DateTime(_fbKey.currentState.fields["startDate"].currentState.value.year, _fbKey.currentState.fields["startDate"].currentState.value.month, _fbKey.currentState.fields["startDate"].currentState.value.day).toString();
+    }
+    else {
+      logInfoObject.startDate = ""+_fbKey.currentState.fields["startDate"].currentState.value.toString();
+    }
+    if(_fbKey.currentState.fields["endDate"].currentState.value != null) {
+      logInfoObject.endDate = "" + DateTime(_fbKey.currentState.fields["endDate"].currentState.value.year, _fbKey.currentState.fields["endDate"].currentState.value.month, _fbKey.currentState.fields["endDate"].currentState.value.day).toString();
+    }
+    else {
+      logInfoObject.endDate = ""+_fbKey.currentState.fields["endDate"].currentState.value.toString();
+    }
     logInfoObject.surfaceElevation = _fbKey.currentState.fields["surfaceElevation"].currentState.value;
     logInfoObject.contractor = _fbKey.currentState.fields["contractor"].currentState.value;
     logInfoObject.equipment = _fbKey.currentState.fields["equipment"].currentState.value;

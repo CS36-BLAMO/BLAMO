@@ -112,33 +112,31 @@ class ObjectHandler {
   }
 
 
-/*Saves data for the varios pages/objects users will fill out
+/*Saves data for the various pages/objects users will fill out
 * saveUnitData -> Saves the state of a unit page to Local storage. Takes in unitFileName, the document name to save under, and a unit object to save
 * saveTestData -> aves the state of a Test page to Local storage Takes in testFileName, the document name to save under, and a test object to save
-* saveLogInfoDataa -> aves the state of a logInfo page to Local storage. Takes in the Document to save under and the LogInfo object to save.
+* saveLogInfoData -> aves the state of a logInfo page to Local storage. Takes in the Document to save under and the LogInfo object to save.
 */
   Future<void> saveUnitData(String unitName, String documentName, Unit unitObj) async{
-     String unitJSON = gson.encode({
-      "depthUB": unitObj.depthUB,
-      "depthLB": unitObj.depthLB,
-      "beginUnitDepth": unitObj.beginUnitDepth,
-      "unitMethods": unitObj.unitMethods,
+    String unitJSON = gson.encode({
+      "depthUB": new Double(unitObj.depthUB),
+      "depthLB": new Double(unitObj.depthLB),
       "drillingMethods": unitObj.drillingMethods,
       "tags": unitObj.tags
-     });
+    });
 
-     //---Debug
-     //debugPrint("------UnitJSON Encoded------\n" + unitJSON + "\n");
-     parseUnitJSON(unitJSON);
+    //---Debug
+    //debugPrint("------UnitJSON Encoded------\n" + unitJSON + "\n");
+    parseUnitJSON(unitJSON);
 
-     await storage.overWriteUnit(documentName, unitName, unitJSON);
+    await storage.overWriteUnit(documentName, unitName, unitJSON);
   }
   Future<void> saveTestData(String testName, String document, Test testObj) async{
     //TODO SAVE TEST PAGE INTO STORAGE
     String testJSON = gson.encode({
       "testType": testObj.testType,
-      "beginTest": testObj.beginTest,
-      "endTest": testObj.endTest,
+      "beginTest": new Double(testObj.beginTest),
+      "endTest": new Double(testObj.endTest),
       "percentRecovery": testObj.percentRecovery,
       "soilDrivingResistance": testObj.soilDrivingResistance,
       "rockDiscontinuityData": testObj.rockDiscontinuityData,
@@ -162,39 +160,25 @@ class ObjectHandler {
 
   Future<void> saveLogInfoData(String document, LogInfo logInfoObj) async{
     String logInfoJSON = gson.encode({
-      //"projectName": logInfoObj.projectName,
-      "startDate": logInfoObj.startDate,
-      "endDate": logInfoObj.endDate,
-      //"driller": logInfoObj.driller,
-      //"projectGeologist": logInfoObj.projectGeologist,
-      //"recorder": logInfoObj.recorder,
-      //"northing": logInfoObj.northing,
-      //"easting": logInfoObj.easting,
-      "highway": logInfoObj.highway,
-      "county": logInfoObj.county,
-      //"purpose": logInfoObj.purpose,
-      "equipment": logInfoObj.equipment,
-      //"objectID": logInfoObj.objectID,
-      //"testType": logInfoObj.testType,
       "project": logInfoObj.project,
       "number": logInfoObj.number,
       "client": logInfoObj.client,
-      "lat": logInfoObj.lat,
-      "long": logInfoObj.long,
+      "highway": logInfoObj.highway,
+      "county": logInfoObj.county,
+      "north": logInfoObj.north,
+      "east": logInfoObj.east,
       "location": logInfoObj.location,
       "elevationDatum": logInfoObj.elevationDatum,
+      "tubeHeight": logInfoObj.tubeHeight,
       "boreholeID": logInfoObj.boreholeID,
+      "startDate": logInfoObj.startDate,
+      "endDate": logInfoObj.endDate,
       "surfaceElevation": logInfoObj.surfaceElevation,
       "contractor": logInfoObj.contractor,
+      "equipment": logInfoObj.equipment,
       "method": logInfoObj.method,
       "loggedBy": logInfoObj.loggedBy,
-      "checkedBy": logInfoObj.checkedBy,
-      //"holeNo": logInfoObj.holeNo,
-      //"eANo": logInfoObj.eANo,
-      //"keyNo": logInfoObj.keyNo,
-      //"startCardNo": logInfoObj.startCardNo,
-      //"groundElevation": logInfoObj.groundElevation,
-      "tubeHeight": logInfoObj.tubeHeight
+      "checkedBy": logInfoObj.checkedBy
     });
     //debugPrint("------LogInfoJSON Encoded------\n" + logInfoJSON + "\n");
     parseLogInfoJSON(logInfoJSON);
@@ -213,7 +197,7 @@ class ObjectHandler {
     return localUnitData;
   }
   Future<String> retrieveLocalTest(String testName, String documentName) async{
-    //Take docname and testName and get local storage String 
+    //Take docname and testName and get local storage String
     String localTestData;
     localTestData = await storage.readTest(documentName, testName);
     //return string
@@ -320,133 +304,71 @@ class Document {
   Units units;
 }
 class LogInfo {
-  //String projectName;
-  String startDate;
-  String endDate;
-  ///String driller;
-  //String projectGeologist;
-  //String recorder;
-  //String northing;
-  //String easting;
-  String highway;
-  String county;
-  //String purpose;
-  String equipment;
-  //String objectID;
-  //String testType;
   String project;
   String number;
   String client;
-  String lat;
-  String long;
+  String highway;
+  String county;
+  String north;
+  String east;
   String location;
   String elevationDatum;
+  String tubeHeight;
   String boreholeID;
+  String startDate;
+  String endDate;
   String surfaceElevation;
   String contractor;
+  String equipment;
   String method;
   String loggedBy;
   String checkedBy;
-  //double holeNo;
-  //double eANo;
-  //double keyNo;
-  //double startCardNo;
-  //double groundElevation;
-  String tubeHeight;
 
   LogInfo({
-    //this.projectName,
-    this.startDate,
-    this.endDate,
-    //this.driller,
-    //this.projectGeologist,
-    //this.recorder,
-    //this.northing,
-    //this.easting,
-    this.highway,
-    this.county,
-    //this.purpose,
-    this.equipment,
-    //this.objectID,
-    //this.testType,
     this.project,
     this.number,
     this.client,
-    this.lat,
-    this.long,
+    this.highway,
+    this.county,
+    this.north,
+    this.east,
     this.location,
     this.elevationDatum,
+    this.tubeHeight,
     this.boreholeID,
+    this.startDate,
+    this.endDate,
     this.surfaceElevation,
     this.contractor,
+    this.equipment,
     this.method,
     this.loggedBy,
-    this.checkedBy,
-    //this.holeNo,
-    //this.eANo,
-    //this.keyNo,
-    //this.startCardNo,
-    //this.groundElevation,
-    this.tubeHeight,
+    this.checkedBy
+
   });
   //Returns LogInfo object with mapped values from an already parsed JSON object
   factory LogInfo.fromJSON (Map<String, dynamic> parsedJSON) {
-    //double holeNoConverted;//= null;
-    //double eANoConverted;//= null;
-    //double keyNoConverted;//= null;
-    //double startCardNoConverted;// = null;
-    //double groundElevationConverted;//= null;
-    //double tubeHeightConverted;//= null;
-/*
-    if(parsedJSON["holeNo"] != "null"){
-      holeNoConverted = parsedJSON["holeNo"].value;
-    }if(parsedJSON["eANo"] != "null"){
-      eANoConverted = parsedJSON["eANo"].value;
-    }if(parsedJSON["keyNo"] != "null"){
-      keyNoConverted = parsedJSON["keyNo"].value;
-    }if(parsedJSON["startCardNo"] != "null"){
-      startCardNoConverted = parsedJSON["startCardNo"].value;
-    }if(parsedJSON["groundElevation"] != "null"){
-      groundElevationConverted = parsedJSON["groundElevation"].value;
-    }
-    if(parsedJSON["tubeHeight"] != "null"){
-      tubeHeightConverted = parsedJSON["tubeHeight"].value;
-    }*/
 
     return LogInfo(
-      //holeNo: holeNoConverted,
-      //eANo: eANoConverted,
-      //keyNo: keyNoConverted,
-      //startCardNo: startCardNoConverted,
-      //groundElevation: groundElevationConverted,
-      tubeHeight: parsedJSON["tubeHeight"],
-      //projectName: parsedJSON["projectName"],
-      startDate: parsedJSON["startDate"],
-      endDate: parsedJSON["endDate"],
-      //driller: parsedJSON["driller"],
-      //projectGeologist: parsedJSON["projectGeologist"],
-      //recorder: parsedJSON["recorder"],
-      //northing: parsedJSON["northing"],
-      //easting: parsedJSON["easting"],
-      highway: parsedJSON["highway"],
-      county: parsedJSON["county"],
-      //purpose: parsedJSON["purpose"],
-      equipment: parsedJSON["equipment"],
-      //objectID: parsedJSON["objectID"],
-      //testType: parsedJSON["testType"],
-      project: parsedJSON["project"],
-      number: parsedJSON["number"],
-      client: parsedJSON["client"],
-      lat: parsedJSON["lat"],
-      long: parsedJSON["long"],
-      location: parsedJSON["location"],
-      elevationDatum: parsedJSON["elevationDatum"],
-      boreholeID: parsedJSON["boreholeID"],
-      surfaceElevation: parsedJSON["surfaceElevation"],
-      contractor: parsedJSON["contractor"],
-      method: parsedJSON["method"],
-      loggedBy: parsedJSON["loggedBy"],
-      checkedBy: parsedJSON["checkedBy"],
+        project: parsedJSON["project"],
+        number: parsedJSON["number"],
+        client: parsedJSON["client"],
+        highway: parsedJSON["highway"],
+        county: parsedJSON["county"],
+        north: parsedJSON["north"],
+        east: parsedJSON["east"],
+        location: parsedJSON["location"],
+        elevationDatum: parsedJSON["elevationDatum"],
+        tubeHeight: parsedJSON["tubeHeight"],
+        boreholeID: parsedJSON["boreholeID"],
+        startDate: parsedJSON["startDate"],
+        endDate: parsedJSON["endDate"],
+        surfaceElevation: parsedJSON["surfaceElevation"],
+        contractor: parsedJSON["contractor"],
+        equipment: parsedJSON["equipment"],
+        method: parsedJSON["method"],
+        loggedBy: parsedJSON["loggedBy"],
+        checkedBy: parsedJSON["checkedBy"]
     );
   }
 }
@@ -458,8 +380,6 @@ class Units {
 class Unit {
   double depthUB;
   double depthLB;
-  double beginUnitDepth;
-  String unitMethods;
   String drillingMethods;
   String tags;
 
@@ -467,8 +387,6 @@ class Unit {
   Unit({
     this.depthUB,
     this.depthLB,
-    this.beginUnitDepth,
-    this.unitMethods,
     this.drillingMethods,
     this.tags
   });
@@ -477,28 +395,28 @@ class Unit {
   factory Unit.fromJSON (Map<String, dynamic> parsedJSON) {
     double depthUBConverted;
     double depthLBConverted;
-    double beginUnitDepthConverted;
-    if(parsedJSON["depthUB"] != "null"){
+    //Negative values are Strings for some reason, so check type
+    if(parsedJSON["depthUB"] != "null" && parsedJSON["depthUB"].runtimeType.toString() == "Double"){
       depthUBConverted = parsedJSON["depthUB"].value;
+    } else if(parsedJSON["depthUB"] != "null" && parsedJSON["depthUB"].runtimeType.toString() == "String"){
+      depthUBConverted = double.parse(parsedJSON["depthUB"].replaceAll(new RegExp('d'), ''));
     }
-    if(parsedJSON["depthLB"] != "null"){
+
+    if(parsedJSON["depthLB"] != "null" && parsedJSON["depthLB"].runtimeType.toString() == "Double"){
       depthLBConverted = parsedJSON["depthLB"].value;
-    }
-    if(parsedJSON["beginUnitDepth"] != "null"){
-      beginUnitDepthConverted = parsedJSON["beginUnitDepth"].value;
+    } else if(parsedJSON["depthLB"] != "null" && parsedJSON["depthLB"].runtimeType.toString() == "String"){
+      depthLBConverted = double.parse(parsedJSON["depthLB"].replaceAll(new RegExp('d'), ''));
     }
     /*debugPrint("beginDepthFromJSON: $beginDepthFromJSON, of type ${parsedJSON["beginUnitDepth"].runtimeType}\n"
         + "endDepthFromJSON: $endDepthFromJSON of type ${endDepthFromJSON.runtimeType}\n"
     );*/
     //debugPrint("Tags: ${parsedJSON["tags"]}\nIs of type${parsedJSON["tags"].runtimeType}");
-    
+
     return Unit(
-      depthUB: depthUBConverted,
-      depthLB: depthLBConverted,
-      beginUnitDepth: beginUnitDepthConverted,
-      unitMethods: parsedJSON["unitMethods"],
-      drillingMethods: parsedJSON["drillingMethods"],
-      tags: parsedJSON["tags"]
+        depthUB: depthUBConverted,
+        depthLB: depthLBConverted,
+        drillingMethods: parsedJSON["drillingMethods"],
+        tags: parsedJSON["tags"]
     );
   }
 }
@@ -510,7 +428,7 @@ class Test {
   String testType;
   double beginTest;
   double endTest;
-  double percentRecovery;
+  String percentRecovery;
   String soilDrivingResistance;
   String rockDiscontinuityData;
   String rockQualityDesignation;
@@ -549,36 +467,36 @@ class Test {
   factory Test.fromJSON(Map<String, dynamic> parsedJSON){
     double beginTestConverted;
     double endTestConverted;
-    double percentRecoveryConverted;
-
-    if(parsedJSON["beginTest"] != "null"){
+    //Negative values are Strings for some reason, so check type
+    if(parsedJSON["beginTest"] != "null" && parsedJSON["beginTest"].runtimeType.toString() == "Double"){
       beginTestConverted = parsedJSON["beginTest"].value;
-    } 
-    if(parsedJSON["endTest"]  != "null") {
-      endTestConverted = parsedJSON["endTest"].value;
+    } else if(parsedJSON["beginTest"] != "null" && parsedJSON["beginTest"].runtimeType.toString() == "String"){
+      beginTestConverted = double.parse(parsedJSON["beginTest"].replaceAll(new RegExp('d'), ''));
     }
-    if(parsedJSON["percentRecovery"] != "null") {
-      percentRecoveryConverted = parsedJSON["percentRecovery"].value;
+    if(parsedJSON["endTest"] != "null" && parsedJSON["endTest"].runtimeType.toString() == "Double"){
+      endTestConverted = parsedJSON["endTest"].value;
+    } else if(parsedJSON["endTest"] != "null" && parsedJSON["endTest"].runtimeType.toString() == "String"){
+      endTestConverted = double.parse(parsedJSON["endTest"].replaceAll(new RegExp('d'), ''));
     }
 
     return Test(
-      testType: parsedJSON["testType"],
-      beginTest: beginTestConverted,
-      endTest: endTestConverted,
-      percentRecovery: percentRecoveryConverted,
-      soilDrivingResistance: parsedJSON["soilDrivingResistance"],
-      rockDiscontinuityData: parsedJSON["rockDiscontinuityData"],
-      rockQualityDesignation: parsedJSON["rockQualityDesignation"],
-      moistureContent: parsedJSON["moistureContent"],
-      dryDensity: parsedJSON["dryDensity"],
-      liquidLimit: parsedJSON["liquidLimit"],
-      plasticLimit: parsedJSON["plasticLimit"],
-      fines: parsedJSON["fines"],
-      blows1: parsedJSON["blows1"],
-      blows2: parsedJSON["blows2"],
-      blows3: parsedJSON["blows3"],
-      blowCount: parsedJSON["blowCount"],
-      tags: parsedJSON["tags"]
+        testType: parsedJSON["testType"],
+        beginTest: beginTestConverted,
+        endTest: endTestConverted,
+        percentRecovery: parsedJSON["percentRecovery"],
+        soilDrivingResistance: parsedJSON["soilDrivingResistance"],
+        rockDiscontinuityData: parsedJSON["rockDiscontinuityData"],
+        rockQualityDesignation: parsedJSON["rockQualityDesignation"],
+        moistureContent: parsedJSON["moistureContent"],
+        dryDensity: parsedJSON["dryDensity"],
+        liquidLimit: parsedJSON["liquidLimit"],
+        plasticLimit: parsedJSON["plasticLimit"],
+        fines: parsedJSON["fines"],
+        blows1: parsedJSON["blows1"],
+        blows2: parsedJSON["blows2"],
+        blows3: parsedJSON["blows3"],
+        blowCount: parsedJSON["blowCount"],
+        tags: parsedJSON["tags"]
     );
 
   }

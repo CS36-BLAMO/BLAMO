@@ -4,7 +4,6 @@ import 'package:blamo/File_IO/FileHandler.dart';
 import 'package:blamo/SideMenu.dart';
 import 'package:blamo/CustomActionBar.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 //This class will be used to house all the data between each route
 class StateData {
@@ -30,7 +29,7 @@ class StateData {
   }
 }
 
- /* the idea behind the home page is a series of existing logs will appear in the white space, While the button in
+/* the idea behind the home page is a series of existing logs will appear in the white space, While the button in
   * the bottom right will allow users to create a new log
   * (the "second page" in this code is mostly a demonstration and can/should be removed in later implimentation) additionally,
   * the drawer will provide easy familiar navigation between setting, export, etc. Activities/pages of the project
@@ -131,12 +130,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   //Creates a new document manifest
-  void createNewDocument(String docName) async{
+  Future<void> createNewDocument(String docName) async{
     await currentState.storage.overWriteDocument(docName, "$docName\n0\n0");
   }
 
   //Updates the currentState object to reflect the manifest document
-  void updateStateData() async{
+  Future<void> updateStateData() async{
     await currentState.storage.setStateData(currentState).then((StateData recieved) {
       currentState.list = recieved.list;
       currentState.dirty = 0;
@@ -162,76 +161,26 @@ class _HomePageState extends State<HomePage> {
     //currentState.currentDocument = "";
   }
 
-  void _showToast(String toShow, MaterialColor color){
-    Fluttertoast.showToast(
-        msg: toShow,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIos: 1,
-        backgroundColor: color,
-        textColor: Colors.black,
-        fontSize: 16.0
-    );
-  }
-
   void _onTileLongPressed(int index) async {
-    currentState.documentIterator = index;
-    currentState.currentDocument = currentState.list[index];
-    String result;
-    result = await showDialog(
-        context: context,
-        builder: (context) =>
-            AlertDialog(
-              title: Text("Are you sure you want to delete ${currentState
-                  .currentDocument}?"),
-              actions: <Widget>[
-                new FlatButton(
-                    child: Text("DELETE"),
-                    textColor: Colors.red,
-                    onPressed: () {
-                      Navigator.pop(context, "DELETE");
-                    }),
-                new FlatButton(
-                  child: Text("CANCEL"),
-                  onPressed: () {
-                    Navigator.pop(context, "CANCEL");
-                  },
-                )
-              ],
-            )
-    );
-    if (result == "DELETE") {
-      debugPrint("(main)LongPressed on: ${currentState.currentDocument}");
-      await currentState.storage.deleteDocument(currentState.currentDocument);
-      _showToast("${currentState.currentDocument} Deleted!", Colors.red);
-      await new Future.delayed(new Duration(microseconds: 3)).then((onValue) {
-        setState(() {
-          currentState.dirty = 1;
-          currentState.list.remove(currentState.currentDocument);
-          currentState.currentDocument = "";
-        });
-      });
-    }
+
   }
-
-
 
   /* These are the object builders for the main scaffolding
    *  FloatingActionButtonBuilder -> Builds the functionalty and style of the FAB in the bottom right of the screen, creates new documents onPressed
    *  gridViewBuilder             -> Builds the main gridview dynamically on document creation
    */
-    FloatingActionButton floatingActionButtonBuilder(){
-      return new FloatingActionButton.extended(
-        label: Text("New Document"),
-        tooltip: 'New Borehole Document',
-        icon: new Icon(Icons.add),
-        foregroundColor: Colors.black,
-        backgroundColor: Colors.grey,
-        elevation: 50.0,
-        onPressed:(){
-          showDialog(
-            context: context,
-            builder:(context) => AlertDialog(
+  FloatingActionButton floatingActionButtonBuilder(){
+    return new FloatingActionButton.extended(
+      label: Text("New Document"),
+      tooltip: 'New Borehole Document',
+      icon: new Icon(Icons.add),
+      foregroundColor: Colors.black,
+      backgroundColor: Colors.grey,
+      elevation: 50.0,
+      onPressed:(){
+        showDialog(
+          context: context,
+          builder:(context) => AlertDialog(
               title: Text('Enter Document Name'),
               content: TextField(
                 maxLength: 20,
@@ -241,11 +190,11 @@ class _HomePageState extends State<HomePage> {
               ),
               actions: <Widget> [
                 new FlatButton(
-                     child: new Text('CANCEL'),
-                     textColor: Colors.red,
-                     onPressed: () {
-                       Navigator.of(context).pop();
-                     },
+                  child: new Text('CANCEL'),
+                  textColor: Colors.red,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                 ),
                 new FlatButton(
                   child: new Text('ACCEPT'),
@@ -256,82 +205,82 @@ class _HomePageState extends State<HomePage> {
                     String newNameWithComma = _textFieldController.text + ","; //TODO REGEX TO PARSE INPUT FOR SPECIAL CHARS AND DUP NAMES
                     print("INPUT FIELD RECIEVED:" + newNameWithComma);
                     if(_textFieldController.text.isNotEmpty) {
-                        if (currentState.list.length == 1) {
-                          toWrite = newNameWithComma;
-                          newestDoc = _textFieldController.text;
-                        } else {
-                          for (i = 0; i < currentState.list.length - 1; i++) {
-                            toWrite = toWrite + currentState.list[i] + ',';
-                          }
-                          toWrite = toWrite + newNameWithComma;
-                          //toWrite = "Document$i,";
-                          newestDoc = _textFieldController.text;
+                      if (currentState.list.length == 1) {
+                        toWrite = newNameWithComma;
+                        newestDoc = _textFieldController.text;
+                      } else {
+                        for (i = 0; i < currentState.list.length - 1; i++) {
+                          toWrite = toWrite + currentState.list[i] + ',';
                         }
-                        //In order for this to create doc and update homepage there needs to be a comma at the end of the filename
-                        //Or else it will fail to create
-                        await currentState.storage.overWriteManifest(toWrite);
-                        await currentState.storage.overWriteLogInfo(_textFieldController.text, "{projectName:null,startDate:null,endDate:null,driller:null,projectGeologist:null,recorder:null,northing:null,easting:null,highway:null,county:null,purpose:null,equipment:null,objectID:null,testType:null,project:null,number:null,client:null,lat:null,long:null,location:null,elevationDatum:null,boreholeID:null,surfaceElevation:null,contractor:null,method:null,loggedBy:null,checkedBy:null,holeNo:null,eANo:null,keyNo:null,startCardNo:null,groundElevation:null,tubeHeight:null}");
+                        toWrite = toWrite + newNameWithComma;
+                        //toWrite = "Document$i,";
+                        newestDoc = _textFieldController.text;
+                      }
+                      //In order for this to create doc and update homepage there needs to be a comma at the end of the filename
+                      //Or else it will fail to create
+                      await currentState.storage.overWriteManifest(toWrite);
+                      await currentState.storage.overWriteLogInfo(_textFieldController.text, "{project:null,number:null,client:null,highway:null,county:null,north:null,east:null,location:null,elevationDatum:null,tubeHeight:null,boreholeID:null,startDate:null,endDate:null,surfaceElevation:null,contractor:null,equipment:null,method:null,loggedBy:null,checkedBy:null}");
 
-                        await updateStateDataCreateDoc(newestDoc);
-                        setState(() {});
-                        //Remove AlertDialog and allow for another doc to be created
-                        Navigator.of(context).pop();
-                        _textFieldController.text = "";
+                      await updateStateDataCreateDoc(newestDoc);
+                      setState(() {});
+                      //Remove AlertDialog and allow for another doc to be created
+                      Navigator.of(context).pop();
+                      _textFieldController.text = "";
                     }
                   },
                 )
               ]
-            ),
-          );
-        },
-      );
-    }
+          ),
+        );
+      },
+    );
+  }
 
-    GridView gridViewBuilder(List<String> listToBuildFrom){
-      return new GridView.count(
-        padding: const EdgeInsets.all(20),
-        crossAxisSpacing: 2,
-        mainAxisSpacing: 10,
-        crossAxisCount: 2,
-        children: List.generate(listToBuildFrom.length - 1, (indexReg) {
+  GridView gridViewBuilder(List<String> listToBuildFrom){
+    return new GridView.count(
+      padding: const EdgeInsets.all(20),
+      crossAxisSpacing: 2,
+      mainAxisSpacing: 10,
+      crossAxisCount: 2,
+      children: List.generate(listToBuildFrom.length - 1, (indexReg) {
 
-          int index = listToBuildFrom.length - 2 - (indexReg);
+        int index = listToBuildFrom.length - 2 - (indexReg);
 
-          if(indexReg==0){
-            index = listToBuildFrom.length - 2;
-          }
-          debugPrint("UpperBound: ${listToBuildFrom.length}");
-          debugPrint("indexReg: $index" + " With Docname: " + listToBuildFrom[index]);
-          String toReturn;
-          int colorVal = (index+1) * 100;
-          if (index >= 9) {
-            colorVal = 800;
-          }
-          toReturn = listToBuildFrom[index];
-          return new Container(
-            child: new Card(
-              child: new Material(
-                child: InkWell(
-                    onTap: () => _onTileClicked(index),
-                    onLongPress: () => _onTileLongPressed(index),
-                    splashColor: Colors.grey,
-                    child: new Container(
-                      child: Center(
-                          child: Text(toReturn,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                          )
-                      ),
-                    )
-                ),
-                color: Colors.transparent,
+        if(indexReg==0){
+          index = listToBuildFrom.length - 2;
+        }
+        debugPrint("UpperBound: ${listToBuildFrom.length}");
+        debugPrint("indexReg: $index" + " With Docname: " + listToBuildFrom[index]);
+        String toReturn;
+        int colorVal = (index+1) * 100;
+        if (index >= 9) {
+          colorVal = 800;
+        }
+        toReturn = listToBuildFrom[index];
+        return new Container(
+          child: new Card(
+            child: new Material(
+              child: InkWell(
+                  onTap: () => _onTileClicked(index),
+                  onLongPress: () => _onTileLongPressed(index),
+                  splashColor: Colors.grey,
+                  child: new Container(
+                    child: Center(
+                        child: Text(toReturn,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )
+                    ),
+                  )
               ),
-              color: Colors.orange[colorVal],
-              elevation: 10,
+              color: Colors.transparent,
             ),
-          );
-        }),
-      );
-    }
-    //---End Builders---
+            color: Colors.orange[colorVal],
+            elevation: 10,
+          ),
+        );
+      }),
+    );
+  }
+//---End Builders---
 }
