@@ -171,7 +171,7 @@ class _UnitPageState extends State<UnitPage> {
                                 focusNode: formNodes[1],
                                 attribute: 'depth-lb',
                                 validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0), (lower){
-                                  if(_fbKey.currentState != null && lower != null && _fbKey.currentState.fields['depth-ub'].currentState.value != null && double.tryParse(_fbKey.currentState.fields['depth-ub'].currentState.value) != null && double.tryParse(lower) != null && double.tryParse(lower) > double.tryParse(_fbKey.currentState.fields['depth-ub'].currentState.value))
+                                  if(_fbKey.currentState != null && lower != null && _fbKey.currentState.fields['depth-ub'].currentState.value != null && double.tryParse(_fbKey.currentState.fields['depth-ub'].currentState.value) != null && double.tryParse(lower) != null && double.tryParse(lower) >= double.tryParse(_fbKey.currentState.fields['depth-ub'].currentState.value))
                                     return "Depth Lower Bound must be lower than Depth Upper Bound";
                                   return null;
                                 }],//Custom validator that checks if lower bound is lower than upper bound

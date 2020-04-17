@@ -167,7 +167,7 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[2],
                                 attribute: 'endTestDepth',
                                 validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0), (endDepth){
-                                  if(_fbKey.currentState != null && endDepth != null && _fbKey.currentState.fields["beginTestDepth"].currentState.value != null && double.tryParse(_fbKey.currentState.fields["beginTestDepth"].currentState.value) != null && double.tryParse(endDepth) != null && double.tryParse(endDepth) > double.tryParse(_fbKey.currentState.fields["beginTestDepth"].currentState.value))
+                                  if(_fbKey.currentState != null && endDepth != null && _fbKey.currentState.fields["beginTestDepth"].currentState.value != null && double.tryParse(_fbKey.currentState.fields["beginTestDepth"].currentState.value) != null && double.tryParse(endDepth) != null && double.tryParse(endDepth) >= double.tryParse(_fbKey.currentState.fields["beginTestDepth"].currentState.value))
                                     return "End Test Depth must be lower than Begin Test Depth";
                                   return null;
                                 }],//Custom validator that checks that end depth is lower than begin depth
