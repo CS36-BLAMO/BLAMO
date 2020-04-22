@@ -7,7 +7,6 @@ import 'package:blamo/SideMenu.dart';
 import 'package:blamo/CustomActionBar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:blamo/ObjectHandler.dart';
-import 'package:location/location.dart';
 
 class LogInfoPage extends StatefulWidget {
   final StateData pass; //Passes the StateData object to the stateful constructor
@@ -27,14 +26,6 @@ class _LogInfoPageState extends State<LogInfoPage> {
   bool dirty = true;
   LogInfo logInfoObject;
 
-  Location location = new Location();
-  bool serviceEnabled;
-  PermissionStatus permissionGranted;
-  LocationData locationData;
-
-  //final TextEditingController latController = TextEditingController();
-  //final TextEditingController longController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -51,9 +42,6 @@ class _LogInfoPageState extends State<LogInfoPage> {
     for(var i = 0; i < 21; i++) {
       formNodes[i].dispose();
     }
-    //Errors here
-    //latController.dispose();
-    //longController.dispose();
     super.dispose();
   }
 
@@ -67,8 +55,6 @@ class _LogInfoPageState extends State<LogInfoPage> {
     if(!dirty){
       debugPrint("After setState: (${logInfoObject.county})");
       //debugPrint("Returning scaffold $toTest1, $toTest2");
-      //latController.text = formatValue(logInfoObject.lat);
-      //longController.text = formatValue(logInfoObject.long);
       return getLogInfoScaffold(logInfoObject);
     } else {
       debugPrint("Returning empty Scaffold");
@@ -252,40 +238,10 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                   FocusScope.of(context).requestFocus(formNodes[7]);
                                 },
                               ),
-                              /*MaterialButton(
-                                child: Text("Get Lat, Long"),
-                                onPressed: () async {
-                                  serviceEnabled = await location.serviceEnabled();
-                                  if(!serviceEnabled) {
-                                    serviceEnabled = await location.requestService();
-                                    if(!serviceEnabled) {
-                                      return null;
-                                    }
-                                  }
-
-                                  permissionGranted = await location.hasPermission();
-                                  if(permissionGranted == PermissionStatus.denied) {
-                                    permissionGranted = await location.requestPermission();
-                                    if(permissionGranted != PermissionStatus.granted) {
-                                      return null;
-                                    }
-                                  }
-
-                                  locationData = await location.getLocation();
-
-                                  latController.text = locationData.latitude.toString();
-                                  longController.text = locationData.longitude.toString();
-
-                                  logInfoObject.lat = locationData.latitude.toString();
-                                  logInfoObject.long = locationData.longitude.toString();
-                                  updateLogObject();
-                                }
-                              ),*/
                               FormBuilderTextField(
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[7],
-                                //controller: latController,
                                 attribute: 'lat',
                                 validators: [FormBuilderValidators.numeric()],
                                 decoration: InputDecoration(labelText: "Latitude"),
@@ -298,7 +254,6 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               FormBuilderTextField(
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
-                                //controller: longController,
                                 focusNode: formNodes[8],
                                 attribute: 'long',
                                 validators: [FormBuilderValidators.numeric()],
