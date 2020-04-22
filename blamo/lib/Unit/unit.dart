@@ -154,7 +154,7 @@ class _UnitPageState extends State<UnitPage> {
                                 focusNode: formNodes[0],
                                 attribute: 'depth-ub',
                                 validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0)],
-                                decoration: InputDecoration(labelText: "Depth Upper Bound (-m)"),
+                                decoration: InputDecoration(labelText: "Depth Upper Bound (m)"),
                                 initialValue: formatValue(unitToBuildFrom.depthUB.toString()),
                                 onChanged: (void nbd){updateUnitObject();},
                                 onFieldSubmitted: (v){
@@ -175,7 +175,7 @@ class _UnitPageState extends State<UnitPage> {
                                     return "Depth Lower Bound must be lower than Depth Upper Bound";
                                   return null;
                                 }],//Custom validator that checks if lower bound is lower than upper bound
-                                decoration: InputDecoration(labelText: "Depth Lower Bound (-m)"),
+                                decoration: InputDecoration(labelText: "Depth Lower Bound (m)"),
                                 initialValue: formatValue(unitToBuildFrom.depthLB.toString()),
                                 onChanged: (void nbd){updateUnitObject();},
                                 onFieldSubmitted: (v){

@@ -154,7 +154,7 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[1],
                                 attribute: 'beginTestDepth',
                                 validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0)],
-                                decoration: InputDecoration(labelText: "Begin Test Depth (-m)"),
+                                decoration: InputDecoration(labelText: "Begin Test Depth (m)"),
                                 initialValue: formatValue(testObjectToBuildFrom.beginTest.toString()),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -171,7 +171,7 @@ class _TestPageState extends State<TestPage> {
                                     return "End Test Depth must be lower than Begin Test Depth";
                                   return null;
                                 }],//Custom validator that checks that end depth is lower than begin depth
-                                decoration: InputDecoration(labelText: "End Test Depth (-m)"),
+                                decoration: InputDecoration(labelText: "End Test Depth (m)"),
                                 initialValue: formatValue(testObjectToBuildFrom.endTest.toString()),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){

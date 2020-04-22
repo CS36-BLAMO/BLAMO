@@ -303,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                         //In order for this to create doc and update homepage there needs to be a comma at the end of the filename
                         //Or else it will fail to create
                         await currentState.storage.overWriteManifest(toWrite);
-                        await currentState.storage.overWriteLogInfo(_textFieldController.text, "{project:null,number:null,client:null,highway:null,county:null,north:null,east:null,location:null,elevationDatum:null,tubeHeight:null,boreholeID:null,startDate:null,endDate:null,surfaceElevation:null,contractor:null,equipment:null,method:null,loggedBy:null,checkedBy:null}");
+                        await currentState.storage.overWriteLogInfo(_textFieldController.text, "{project:null,number:null,client:null,highway:null,county:null,north:null,east:null,lat:null,long:null,location:null,elevationDatum:null,tubeHeight:null,boreholeID:null,startDate:null,endDate:null,surfaceElevation:null,contractor:null,equipment:null,method:null,loggedBy:null,checkedBy:null}");
 
                         await updateStateDataCreateDoc(newestDoc);
                         setState(() {});

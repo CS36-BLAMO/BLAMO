@@ -167,6 +167,8 @@ class ObjectHandler {
       "county": logInfoObj.county,
       "north": logInfoObj.north,
       "east": logInfoObj.east,
+      "lat": logInfoObj.lat,
+      "long": logInfoObj.long,
       "location": logInfoObj.location,
       "elevationDatum": logInfoObj.elevationDatum,
       "tubeHeight": logInfoObj.tubeHeight,
@@ -311,6 +313,8 @@ class LogInfo {
   String county;
   String north;
   String east;
+  String lat;
+  String long;
   String location;
   String elevationDatum;
   String tubeHeight;
@@ -332,6 +336,8 @@ class LogInfo {
     this.county,
     this.north,
     this.east,
+    this.lat,
+    this.long,
     this.location,
     this.elevationDatum,
     this.tubeHeight,
@@ -357,6 +363,8 @@ class LogInfo {
         county: parsedJSON["county"],
         north: parsedJSON["north"],
         east: parsedJSON["east"],
+        lat: parsedJSON["lat"],
+        long: parsedJSON["long"],
         location: parsedJSON["location"],
         elevationDatum: parsedJSON["elevationDatum"],
         tubeHeight: parsedJSON["tubeHeight"],

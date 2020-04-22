@@ -7,6 +7,7 @@ import 'package:blamo/SideMenu.dart';
 import 'package:blamo/CustomActionBar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:blamo/ObjectHandler.dart';
+import 'package:location/location.dart';
 
 class LogInfoPage extends StatefulWidget {
   final StateData pass; //Passes the StateData object to the stateful constructor
@@ -21,27 +22,38 @@ class _LogInfoPageState extends State<LogInfoPage> {
   final routeName = '/TestPage';
   StateData currentState;
   _LogInfoPageState(this.currentState);
-  var formNodes = new List<FocusNode>(19); //Handle passing focus from one field to the next
+  var formNodes = new List<FocusNode>(21); //Handle passing focus from one field to the next
 
   bool dirty = true;
   LogInfo logInfoObject;
 
+  Location location = new Location();
+  bool serviceEnabled;
+  PermissionStatus permissionGranted;
+  LocationData locationData;
+
+  //final TextEditingController latController = TextEditingController();
+  //final TextEditingController longController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-
-    for( var i = 0; i < 19; i++) {
+    for( var i = 0; i < 21; i++) {
       formNodes[i] = FocusNode();
     }
+
     dirty = true;
     updateLogInfoData(currentState.currentDocument);
   }
 
   @override
   void dispose () {
-    for(var i = 0; i < 19; i++) {
+    for(var i = 0; i < 21; i++) {
       formNodes[i].dispose();
     }
+    //Errors here
+    //latController.dispose();
+    //longController.dispose();
     super.dispose();
   }
 
@@ -55,6 +67,8 @@ class _LogInfoPageState extends State<LogInfoPage> {
     if(!dirty){
       debugPrint("After setState: (${logInfoObject.county})");
       //debugPrint("Returning scaffold $toTest1, $toTest2");
+      //latController.text = formatValue(logInfoObject.lat);
+      //longController.text = formatValue(logInfoObject.long);
       return getLogInfoScaffold(logInfoObject);
     } else {
       debugPrint("Returning empty Scaffold");
@@ -238,13 +252,44 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                   FocusScope.of(context).requestFocus(formNodes[7]);
                                 },
                               ),
+                              /*MaterialButton(
+                                child: Text("Get Lat, Long"),
+                                onPressed: () async {
+                                  serviceEnabled = await location.serviceEnabled();
+                                  if(!serviceEnabled) {
+                                    serviceEnabled = await location.requestService();
+                                    if(!serviceEnabled) {
+                                      return null;
+                                    }
+                                  }
+
+                                  permissionGranted = await location.hasPermission();
+                                  if(permissionGranted == PermissionStatus.denied) {
+                                    permissionGranted = await location.requestPermission();
+                                    if(permissionGranted != PermissionStatus.granted) {
+                                      return null;
+                                    }
+                                  }
+
+                                  locationData = await location.getLocation();
+
+                                  latController.text = locationData.latitude.toString();
+                                  longController.text = locationData.longitude.toString();
+
+                                  logInfoObject.lat = locationData.latitude.toString();
+                                  logInfoObject.long = locationData.longitude.toString();
+                                  updateLogObject();
+                                }
+                              ),*/
                               FormBuilderTextField(
                                 textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
                                 focusNode: formNodes[7],
-                                attribute: 'location',
-                                validators: [],
-                                decoration: InputDecoration(labelText: "Location"),
-                                initialValue: formatValue(logInfoToBuildFrom.location),
+                                //controller: latController,
+                                attribute: 'lat',
+                                validators: [FormBuilderValidators.numeric()],
+                                decoration: InputDecoration(labelText: "Latitude"),
+                                initialValue: formatValue(logInfoToBuildFrom.lat),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
                                   FocusScope.of(context).requestFocus(formNodes[8]);
@@ -252,11 +297,13 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               ),
                               FormBuilderTextField(
                                 textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
+                                //controller: longController,
                                 focusNode: formNodes[8],
-                                attribute: 'elevationDatum',
-                                validators: [],
-                                decoration: InputDecoration(labelText: "Elevation Datum"),
-                                initialValue: formatValue(logInfoToBuildFrom.elevationDatum),
+                                attribute: 'long',
+                                validators: [FormBuilderValidators.numeric()],
+                                decoration: InputDecoration(labelText: "Longitude"),
+                                initialValue: formatValue(logInfoToBuildFrom.long),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
                                   FocusScope.of(context).requestFocus(formNodes[9]);
@@ -264,20 +311,44 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               ),
                               FormBuilderTextField(
                                 textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.number,
                                 focusNode: formNodes[9],
-                                attribute: 'tubeHeight',
-                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.min(0)],
-                                decoration: InputDecoration(labelText: "Tube Height"),
-                                initialValue: formatValue(logInfoToBuildFrom.tubeHeight),
+                                attribute: 'location',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Location"),
+                                initialValue: formatValue(logInfoToBuildFrom.location),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
                                   FocusScope.of(context).requestFocus(formNodes[10]);
                                 },
                               ),
                               FormBuilderTextField(
-                                textInputAction: TextInputAction.done,
+                                textInputAction: TextInputAction.next,
                                 focusNode: formNodes[10],
+                                attribute: 'elevationDatum',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Elevation Datum"),
+                                initialValue: formatValue(logInfoToBuildFrom.elevationDatum),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[11]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
+                                focusNode: formNodes[11],
+                                attribute: 'tubeHeight',
+                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.min(0)],
+                                decoration: InputDecoration(labelText: "Tube Height"),
+                                initialValue: formatValue(logInfoToBuildFrom.tubeHeight),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[12]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.done,
+                                focusNode: formNodes[12],
                                 attribute: 'boreholeID',
                                 validators: [],
                                 decoration: InputDecoration(labelText: "Borehole ID"),
@@ -285,7 +356,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 onChanged: (void nbd){updateLogObject();},
                               ),
                               FormBuilderDateTimePicker(
-                                focusNode: formNodes[11],
+                                focusNode: formNodes[13],
                                 attribute: "startDate",
                                 inputType: InputType.date,
                                 validators: [],
@@ -296,7 +367,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 onChanged: (void nbd){updateLogObject();},
                               ),
                               FormBuilderDateTimePicker(
-                                focusNode: formNodes[12],
+                                focusNode: formNodes[14],
                                 attribute: 'endDate',
                                 inputType: InputType.date,
                                 validators: [(endDate){
@@ -313,35 +384,11 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               FormBuilderTextField(
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
-                                focusNode: formNodes[13],
+                                focusNode: formNodes[15],
                                 attribute: 'surfaceElevation',
                                 validators: [FormBuilderValidators.numeric()],
                                 decoration: InputDecoration(labelText: "Surface Elevation (ft)"),
                                 initialValue: formatValue(logInfoToBuildFrom.surfaceElevation),
-                                onChanged: (void nbd){updateLogObject();},
-                                onFieldSubmitted: (v){
-                                  FocusScope.of(context).requestFocus(formNodes[14]);
-                                },
-                              ),
-                              FormBuilderTextField(
-                                textInputAction: TextInputAction.next,
-                                focusNode: formNodes[14],
-                                attribute: 'contractor',
-                                validators: [],
-                                decoration: InputDecoration(labelText: "Contractor"),
-                                initialValue: formatValue(logInfoToBuildFrom.contractor),
-                                onChanged: (void nbd){updateLogObject();},
-                                onFieldSubmitted: (v){
-                                  FocusScope.of(context).requestFocus(formNodes[15]);
-                                },
-                              ),
-                              FormBuilderTextField(
-                                textInputAction: TextInputAction.next,
-                                focusNode: formNodes[15],
-                                attribute: 'equipment',
-                                validators: [],
-                                decoration: InputDecoration(labelText: "Equipment"),
-                                initialValue: formatValue(logInfoToBuildFrom.equipment),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
                                   FocusScope.of(context).requestFocus(formNodes[16]);
@@ -350,10 +397,10 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               FormBuilderTextField(
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[16],
-                                attribute: 'method',
+                                attribute: 'contractor',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Method"),
-                                initialValue: formatValue(logInfoToBuildFrom.method),
+                                decoration: InputDecoration(labelText: "Contractor"),
+                                initialValue: formatValue(logInfoToBuildFrom.contractor),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
                                   FocusScope.of(context).requestFocus(formNodes[17]);
@@ -362,18 +409,42 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               FormBuilderTextField(
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[17],
-                                attribute: 'loggedBy',
+                                attribute: 'equipment',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Logged By"),
-                                initialValue: formatValue(logInfoToBuildFrom.loggedBy),
+                                decoration: InputDecoration(labelText: "Equipment"),
+                                initialValue: formatValue(logInfoToBuildFrom.equipment),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
                                   FocusScope.of(context).requestFocus(formNodes[18]);
                                 },
                               ),
                               FormBuilderTextField(
-                                textInputAction: TextInputAction.done,
+                                textInputAction: TextInputAction.next,
                                 focusNode: formNodes[18],
+                                attribute: 'method',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Method"),
+                                initialValue: formatValue(logInfoToBuildFrom.method),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[19]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[19],
+                                attribute: 'loggedBy',
+                                validators: [],
+                                decoration: InputDecoration(labelText: "Logged By"),
+                                initialValue: formatValue(logInfoToBuildFrom.loggedBy),
+                                onChanged: (void nbd){updateLogObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[20]);
+                                },
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.done,
+                                focusNode: formNodes[20],
                                 attribute: 'checkedBy',
                                 validators: [],
                                 decoration: InputDecoration(labelText: "Checked By"),
@@ -422,6 +493,8 @@ class _LogInfoPageState extends State<LogInfoPage> {
     logInfoObject.county = _fbKey.currentState.fields["county"].currentState.value;
     logInfoObject.north = _fbKey.currentState.fields["north"].currentState.value;
     logInfoObject.east = _fbKey.currentState.fields["east"].currentState.value;
+    logInfoObject.lat = _fbKey.currentState.fields["lat"].currentState.value;
+    logInfoObject.long = _fbKey.currentState.fields["long"].currentState.value;
     logInfoObject.location = _fbKey.currentState.fields["location"].currentState.value;
     logInfoObject.elevationDatum = _fbKey.currentState.fields["elevationDatum"].currentState.value;
     logInfoObject.tubeHeight = _fbKey.currentState.fields["tubeHeight"].currentState.value;
