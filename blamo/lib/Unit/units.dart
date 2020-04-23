@@ -268,23 +268,6 @@ class _UnitsPageState extends State<UnitsPage> {
     }
   }
 
-  void testBuiildingList() async {
-    List<Unit> units = [];
-    ObjectHandler objectHandler = new ObjectHandler();
-
-    for(int i = 0; i < currentState.unitList.length; i++){
-      debugPrint("Would have tried searching: ${currentState.currentDocument}_${currentState.unitList[i]}.txt");
-      Unit unit = await objectHandler.getUnitData(currentState.unitList[i], currentState.currentDocument);
-      units.add(unit);
-    }
-
-    for(int i = 0; i < currentState.unitList.length; i++){
-      debugPrint("${units[i].runtimeType}");
-      debugPrint("${units[i].drillingMethods}");
-    }
-
-  }
-
   Future<void> getUnitSet(List<String> unitNames, String documentName) async{
     ObjectHandler objectHandler = new ObjectHandler();
     for(int i = 0; i < currentState.unitList.length; i++){
@@ -310,5 +293,4 @@ class _UnitsPageState extends State<UnitsPage> {
     //    });
     //});
   }
-
 }
