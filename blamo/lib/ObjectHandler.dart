@@ -122,6 +122,7 @@ class ObjectHandler {
       "depthUB": new Double(unitObj.depthUB),
       "depthLB": new Double(unitObj.depthLB),
       "drillingMethods": unitObj.drillingMethods,
+      "notes": unitObj.notes,
       "tags": unitObj.tags
     });
 
@@ -165,6 +166,7 @@ class ObjectHandler {
       "client": logInfoObj.client,
       "highway": logInfoObj.highway,
       "county": logInfoObj.county,
+      "projection": logInfoObj.projection,
       "north": logInfoObj.north,
       "east": logInfoObj.east,
       "lat": logInfoObj.lat,
@@ -311,6 +313,7 @@ class LogInfo {
   String client;
   String highway;
   String county;
+  String projection;
   String north;
   String east;
   String lat;
@@ -334,6 +337,7 @@ class LogInfo {
     this.client,
     this.highway,
     this.county,
+    this.projection,
     this.north,
     this.east,
     this.lat,
@@ -361,6 +365,7 @@ class LogInfo {
         client: parsedJSON["client"],
         highway: parsedJSON["highway"],
         county: parsedJSON["county"],
+        projection: parsedJSON["projection"],
         north: parsedJSON["north"],
         east: parsedJSON["east"],
         lat: parsedJSON["lat"],
@@ -389,6 +394,7 @@ class Unit {
   double depthUB;
   double depthLB;
   String drillingMethods;
+  String notes;
   String tags;
 
   //Unit constructor
@@ -396,6 +402,7 @@ class Unit {
     this.depthUB,
     this.depthLB,
     this.drillingMethods,
+    this.notes,
     this.tags
   });
 
@@ -424,6 +431,7 @@ class Unit {
         depthUB: depthUBConverted,
         depthLB: depthLBConverted,
         drillingMethods: parsedJSON["drillingMethods"],
+        notes: parsedJSON["notes"],
         tags: parsedJSON["tags"]
     );
   }

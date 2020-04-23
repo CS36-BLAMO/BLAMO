@@ -32,12 +32,12 @@ class _UnitPageState extends State<UnitPage> {
   bool dirty;
   String tags;
   final myController = TextEditingController();
-  var formNodes = new List<FocusNode>(3);
+  var formNodes = new List<FocusNode>(4);
 
   @override
   void initState() {
     super.initState();
-    for( var i = 0; i < 3; i++) {
+    for( var i = 0; i < 4; i++) {
       formNodes[i] = FocusNode();
     }
     dirty = true;
@@ -46,7 +46,7 @@ class _UnitPageState extends State<UnitPage> {
 
   @override
   void dispose () {
-    for(var i = 0; i < 3; i++) {
+    for(var i = 0; i < 4; i++) {
       formNodes[i].dispose();
     }
     super.dispose();
@@ -153,8 +153,10 @@ class _UnitPageState extends State<UnitPage> {
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[0],
                                 attribute: 'depth-ub',
-                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0)],
-                                decoration: InputDecoration(labelText: "Depth Upper Bound (m)"),
+                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0), FormBuilderValidators.required()],
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Depth Upper Bound (m)", counterText:""),
                                 initialValue: formatValue(unitToBuildFrom.depthUB.toString()),
                                 onChanged: (void nbd){updateUnitObject();},
                                 onFieldSubmitted: (v){
@@ -170,12 +172,14 @@ class _UnitPageState extends State<UnitPage> {
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[1],
                                 attribute: 'depth-lb',
-                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0), (lower){
+                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0), FormBuilderValidators.required(), (lower){
                                   if(_fbKey.currentState != null && lower != null && _fbKey.currentState.fields['depth-ub'].currentState.value != null && double.tryParse(_fbKey.currentState.fields['depth-ub'].currentState.value) != null && double.tryParse(lower) != null && double.tryParse(lower) >= double.tryParse(_fbKey.currentState.fields['depth-ub'].currentState.value))
                                     return "Depth Lower Bound must be lower than Depth Upper Bound";
                                   return null;
                                 }],//Custom validator that checks if lower bound is lower than upper bound
-                                decoration: InputDecoration(labelText: "Depth Lower Bound (m)"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Depth Lower Bound (m)", counterText:""),
                                 initialValue: formatValue(unitToBuildFrom.depthLB.toString()),
                                 onChanged: (void nbd){updateUnitObject();},
                                 onFieldSubmitted: (v){
@@ -187,17 +191,33 @@ class _UnitPageState extends State<UnitPage> {
                               },*/
                               ),
                               FormBuilderTextField(
-                                textInputAction: TextInputAction.done,
+                                textInputAction: TextInputAction.next,
                                 focusNode: formNodes[2],
                                 attribute: 'methods',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Drilling Methods"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Drilling Methods", counterText:""),
                                 initialValue: formatValue(unitToBuildFrom.drillingMethods),
                                 onChanged: (void nbd){updateUnitObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[3]);
+                                },
                                 /*onEditingComplete: (){
                                 debugPrint("Updating object");
                                 unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value;
                               },*/
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.newline,
+                                focusNode: formNodes[3],
+                                attribute: 'notes',
+                                validators: [],
+                                maxLength: 256,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Notes"),
+                                initialValue: formatValue(unitToBuildFrom.notes),
+                                onChanged: (void nbd){updateUnitObject();},
                               ),
                               FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: test.dart, 56)
                                 attribute: 'tags',
@@ -271,15 +291,21 @@ class _UnitPageState extends State<UnitPage> {
                   if (_fbKey.currentState.saveAndValidate()) {
                     //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
                     updateUnitObject();
-                    await saveUnitObject();
+                    bool noOverlap = await checkUnitDepthOverlap();
+                    if(noOverlap){
+                      await saveUnitObject();
                       currentState.currentRoute = '/UnitsPage';
                       _showToast("Success", Colors.green);
-                      /*Navigator.pushReplacementNamed(
-                        context,
-                        "/UnitsPage",
-                        arguments: currentState,
-                      );*/
                       Navigator.pop(context, "Success");
+                    } else {
+                      _showToast("Unit overlaps another Unit", Colors.red);
+                    }
+
+                    /*Navigator.pushReplacementNamed(
+                      context,
+                      "/UnitsPage",
+                      arguments: currentState,
+                    );*/
                   } else {
                     _showToast("Error in Fields", Colors.red);
                   }
@@ -289,6 +315,27 @@ class _UnitPageState extends State<UnitPage> {
             ),
       ),
     );
+  }
+
+  Future<bool> checkUnitDepthOverlap() async {
+    ObjectHandler objectHandler = new ObjectHandler();
+    for(int i = 0; i < currentState.unitList.length; i++){
+      Unit currentCheck = await objectHandler.getUnitData(currentState.unitList[i], currentState.currentDocument);
+      if(currentCheck.depthUB != null) {
+        if (unitObject.depthUB < currentCheck.depthUB && unitObject.depthUB > currentCheck.depthLB) {
+          return false;
+        } else if (unitObject.depthLB < currentCheck.depthUB && unitObject.depthLB > currentCheck.depthLB) {
+          return false;
+        } else if (unitObject.depthUB == currentCheck.depthUB || unitObject.depthLB == currentCheck.depthLB) {
+          return false;
+        } else if (currentCheck.depthUB < unitObject.depthUB && currentCheck.depthUB > unitObject.depthLB) {
+          return false;
+        } else if (currentCheck.depthLB < unitObject.depthUB && currentCheck.depthLB > unitObject.depthLB) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   void _showToast(String toShow, MaterialColor color){
@@ -326,6 +373,7 @@ class _UnitPageState extends State<UnitPage> {
       unitObject.depthLB = null;
     }
     unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value.toString();
+    unitObject.notes = _fbKey.currentState.fields['notes'].currentState.value.toString();
     unitObject.tags = jsonEncode(_fbKey.currentState.fields['tags'].currentState.value);
   }
 
@@ -344,6 +392,16 @@ class _UnitPageState extends State<UnitPage> {
     debugPrint("saving the unitObject: \nLB = ${unitObject.depthLB}\nUB = ${unitObject.depthUB}\nMethods = ${unitObject.drillingMethods}");
   }
 
+  void updateUnitData(String unitName, String documentName) async{
+    ObjectHandler objectHandler = new ObjectHandler();
+    await objectHandler.getUnitData(unitName, documentName).then((onValue){
+      setState(() {
+        unitObject = onValue;
+        debugPrint("In set state: (${unitObject.drillingMethods})");
+        dirty = false;
+      });
+    });
+  }
 //new
   /*void testSave() async {
     ObjectHandler toTest = new ObjectHandler();
@@ -494,17 +552,5 @@ class _UnitPageState extends State<UnitPage> {
     );
     
   }*/
-
-  void updateUnitData(String unitName, String documentName) async{
-    ObjectHandler objectHandler = new ObjectHandler();
-    await objectHandler.getUnitData(unitName, documentName).then((onValue){
-      setState(() {
-        unitObject = onValue;
-        debugPrint("In set state: (${unitObject.drillingMethods})");
-        dirty = false;
-      });
-    });
-  }
-
 }
 

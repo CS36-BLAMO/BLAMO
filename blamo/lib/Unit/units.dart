@@ -127,7 +127,7 @@ class _UnitsPageState extends State<UnitsPage> {
                   onPressed: () async {
                     String newUnit = _textFieldController.text + ',';
                     String newUnitNoComma = _textFieldController.text;
-                    String unit = "{depthUB:null,depthLB:null,drillingMethods:null,tags:null}";
+                    String unit = "{depthUB:null,depthLB:null,drillingMethods:null,notes:null,tags:null}";
                     String toWrite = '';
                     if(_textFieldController.text.isNotEmpty){
                       toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length + 1}\n";

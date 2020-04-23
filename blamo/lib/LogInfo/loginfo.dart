@@ -156,7 +156,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[0],
                                 attribute: 'project',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Project"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Project", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.project),
                                 onChanged: (void nbd){updateLogObject();}, //Update field when it is changed
                                 onFieldSubmitted: (v){
@@ -169,7 +171,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[1],
                                 attribute: 'number',
                                 validators: [FormBuilderValidators.numeric(), FormBuilderValidators.min(0)],
-                                decoration: InputDecoration(labelText: "Number"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Number", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.number),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -181,7 +185,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[2],
                                 attribute: 'client',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Client"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Client", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.client),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -193,7 +199,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[3],
                                 attribute: 'highway',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Highway"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Highway", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.highway),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -201,16 +209,27 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
-                                textInputAction: TextInputAction.next,
+                                textInputAction: TextInputAction.done,
                                 focusNode: formNodes[4],
                                 attribute: 'county',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "County"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "County", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.county),
                                 onChanged: (void nbd){updateLogObject();},
-                                onFieldSubmitted: (v){
-                                  FocusScope.of(context).requestFocus(formNodes[5]);
-                                },
+                              ),
+                              FormBuilderDropdown(
+                                attribute: 'projection',
+                                decoration: InputDecoration(labelText: "Projection"),
+                                validators: [],
+                                items: ["Lambert Conformal Conic", "Transverse Mercator", "Oblique Mercator"].map(
+                                    (projection) => DropdownMenuItem(
+                                      value: projection,
+                                      child: Text("$projection")
+                                    )).toList(),
+                                initialValue: formatValue(logInfoToBuildFrom.projection),
+                                onChanged: (void nbd){updateLogObject();},
                               ),
                               FormBuilderTextField(
                                 textInputAction: TextInputAction.next,
@@ -218,7 +237,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[5],
                                 attribute: 'north',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Northing"),
+                                maxLength: 25,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Northing", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.north),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -231,7 +252,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[6],
                                 attribute: 'east',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Easting"),
+                                maxLength: 25,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Easting", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.east),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -244,7 +267,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[7],
                                 attribute: 'lat',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Latitude"),
+                                maxLength: 25,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Latitude", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.lat),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -257,7 +282,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[8],
                                 attribute: 'long',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Longitude"),
+                                maxLength: 25,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Longitude", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.long),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -269,7 +296,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[9],
                                 attribute: 'location',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Location"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Location", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.location),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -281,7 +310,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[10],
                                 attribute: 'elevationDatum',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Elevation Datum"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Elevation Datum", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.elevationDatum),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -294,7 +325,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[11],
                                 attribute: 'tubeHeight',
                                 validators: [FormBuilderValidators.numeric(), FormBuilderValidators.min(0)],
-                                decoration: InputDecoration(labelText: "Tube Height"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Tube Height", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.tubeHeight),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -306,7 +339,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[12],
                                 attribute: 'boreholeID',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Borehole ID"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Borehole ID", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.boreholeID),
                                 onChanged: (void nbd){updateLogObject();},
                               ),
@@ -342,7 +377,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[15],
                                 attribute: 'surfaceElevation',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Surface Elevation (ft)"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Surface Elevation (ft)", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.surfaceElevation),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -354,7 +391,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[16],
                                 attribute: 'contractor',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Contractor"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Contractor", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.contractor),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -366,7 +405,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[17],
                                 attribute: 'equipment',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Equipment"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Equipment", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.equipment),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -378,7 +419,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[18],
                                 attribute: 'method',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Method"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Method", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.method),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -390,7 +433,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[19],
                                 attribute: 'loggedBy',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Logged By"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Logged By", counterText:""),
                                 initialValue: formatValue(logInfoToBuildFrom.loggedBy),
                                 onChanged: (void nbd){updateLogObject();},
                                 onFieldSubmitted: (v){
@@ -402,7 +447,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 focusNode: formNodes[20],
                                 attribute: 'checkedBy',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Checked By"),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Checked By", counterText:""),
                                 onChanged: (void nbd){updateLogObject();},
                                 initialValue: formatValue(logInfoToBuildFrom.checkedBy),
                               ),
@@ -446,6 +493,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
     logInfoObject.client = _fbKey.currentState.fields["client"].currentState.value;
     logInfoObject.highway = _fbKey.currentState.fields["highway"].currentState.value;
     logInfoObject.county = _fbKey.currentState.fields["county"].currentState.value;
+    logInfoObject.projection = _fbKey.currentState.fields["projection"].currentState.value;
     logInfoObject.north = _fbKey.currentState.fields["north"].currentState.value;
     logInfoObject.east = _fbKey.currentState.fields["east"].currentState.value;
     logInfoObject.lat = _fbKey.currentState.fields["lat"].currentState.value;

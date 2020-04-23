@@ -141,7 +141,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[0],
                                 attribute: 'testType',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Test Type, No."),
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Test Type, No.", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.testType),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -153,8 +155,10 @@ class _TestPageState extends State<TestPage> {
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[1],
                                 attribute: 'beginTestDepth',
-                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0)],
-                                decoration: InputDecoration(labelText: "Begin Test Depth (m)"),
+                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0), FormBuilderValidators.required()],
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Begin Test Depth (m)", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.beginTest.toString()),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -166,12 +170,14 @@ class _TestPageState extends State<TestPage> {
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[2],
                                 attribute: 'endTestDepth',
-                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0), (endDepth){
+                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0), FormBuilderValidators.required(), (endDepth){
                                   if(_fbKey.currentState != null && endDepth != null && _fbKey.currentState.fields["beginTestDepth"].currentState.value != null && double.tryParse(_fbKey.currentState.fields["beginTestDepth"].currentState.value) != null && double.tryParse(endDepth) != null && double.tryParse(endDepth) >= double.tryParse(_fbKey.currentState.fields["beginTestDepth"].currentState.value))
                                     return "End Test Depth must be lower than Begin Test Depth";
                                   return null;
                                 }],//Custom validator that checks that end depth is lower than begin depth
-                                decoration: InputDecoration(labelText: "End Test Depth (m)"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "End Test Depth (m)", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.endTest.toString()),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -184,7 +190,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[3],
                                 attribute: 'percentRecovery',
                                 validators: [FormBuilderValidators.numeric(), FormBuilderValidators.min(0), FormBuilderValidators.max(100)],
-                                decoration: InputDecoration(labelText: "Percent Recovery"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Percent Recovery", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.percentRecovery.toString()),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -197,7 +205,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[4],
                                 attribute: 'soilDrivingResistance',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Soil Driving Resistance"), //ASK - preferred title?
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Soil Driving Resistance", counterText:""), //ASK - preferred title?
                                 initialValue: formatValue(testObjectToBuildFrom.soilDrivingResistance),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -210,7 +220,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[5],
                                 attribute: 'rockDiscontinuityData',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Rock Discontinuity Data"), //ASK - preferred title?
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Rock Discontinuity Data", counterText:""), //ASK - preferred title?
                                 initialValue: formatValue(testObjectToBuildFrom.rockDiscontinuityData),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -223,7 +235,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[6],
                                 attribute: 'rockQualityDesignation',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Rock Quality Designation"), //ASK - preferred title?
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Rock Quality Designation", counterText:""), //ASK - preferred title?
                                 initialValue: formatValue(testObjectToBuildFrom.rockQualityDesignation),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -236,7 +250,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[7],
                                 attribute: 'moistureContent',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Moisture Content (%)"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Moisture Content (%)", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.moistureContent),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -249,7 +265,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[8],
                                 attribute: 'dryDensity',
                                 validators: [],
-                                decoration: InputDecoration(labelText: "Dry Density (pcf)"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Dry Density (pcf)", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.dryDensity),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -262,7 +280,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[9],
                                 attribute: 'liquidLimit',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Liquid Limit (%)"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Liquid Limit (%)", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.liquidLimit),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -275,7 +295,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[10],
                                 attribute: 'plasticLimit',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Plastic Limit (%)"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Plastic Limit (%)", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.plasticLimit),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -288,7 +310,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[11],
                                 attribute: 'fines',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Fines (%)"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Fines (%)", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.fines),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -301,7 +325,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[12],
                                 attribute: 'blows1',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Blows 1st"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Blows 1st", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.blows1),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -314,7 +340,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[13],
                                 attribute: 'blows2',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Blows 2nd"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Blows 2nd", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.blows2),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -327,7 +355,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[14],
                                 attribute: 'blows3',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Blows 3rd"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Blows 3rd", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.blows3),
                                 onChanged: (void nbd){updateTestObject();},
                                 onFieldSubmitted: (v){
@@ -340,7 +370,9 @@ class _TestPageState extends State<TestPage> {
                                 focusNode: formNodes[15],
                                 attribute: 'blowCount',
                                 validators: [FormBuilderValidators.numeric()],
-                                decoration: InputDecoration(labelText: "Blow Count"),
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Blow Count", counterText:""),
                                 initialValue: formatValue(testObjectToBuildFrom.blowCount),
                                 onChanged: (void nbd){updateTestObject();},
                               ),
@@ -415,15 +447,22 @@ class _TestPageState extends State<TestPage> {
           onPressed: () async {
             if (_fbKey.currentState.saveAndValidate()) {
               updateTestObject();
-              await saveTestObject();
-              currentState.currentRoute = '/TestsPage';
-              _showToast("Success", Colors.green);
+              bool noOverlap = await checkTestDepthOverlap();
+              if(noOverlap) {
+                await saveTestObject();
+                currentState.currentRoute = '/TestsPage';
+                _showToast("Success", Colors.green);
+                Navigator.pop(context, "Success");
+              } else {
+                _showToast("Test overlaps another Test", Colors.red);
+              }
+
               /*Navigator.pushReplacementNamed(
                       context,
                       "/TestsPage",
                       arguments: currentState,
                     );*/
-              Navigator.pop(context, "Success");
+
             } else {
               _showToast("Error in Fields", Colors.red);
             }
@@ -432,6 +471,27 @@ class _TestPageState extends State<TestPage> {
         ),
       ),
     );
+  }
+
+  Future<bool> checkTestDepthOverlap() async {
+    ObjectHandler objectHandler = new ObjectHandler();
+    for(int i = 0; i < currentState.testList.length; i++){
+      Test currentCheck = await objectHandler.getTestData(currentState.testList[i], currentState.currentDocument);
+      if (currentCheck.beginTest != null) {
+        if(testObject.beginTest < currentCheck.beginTest && testObject.beginTest > currentCheck.endTest) {
+          return false;
+        } else if(testObject.endTest < currentCheck.beginTest && testObject.endTest > currentCheck.endTest) {
+          return false;
+        } else if (testObject.beginTest == currentCheck.beginTest || testObject.endTest == currentCheck.endTest) {
+          return false;
+        } else if (currentCheck.beginTest < testObject.beginTest && currentCheck.beginTest > testObject.endTest) {
+          return false;
+        } else if (currentCheck.endTest < testObject.beginTest && currentCheck.endTest > testObject.endTest) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   void _showToast(String toShow, MaterialColor color){
