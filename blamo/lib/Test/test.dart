@@ -477,7 +477,7 @@ class _TestPageState extends State<TestPage> {
     ObjectHandler objectHandler = new ObjectHandler();
     for(int i = 0; i < currentState.testList.length; i++){
       Test currentCheck = await objectHandler.getTestData(currentState.testList[i], currentState.currentDocument);
-      if (currentCheck.beginTest != null) {
+      if (currentState.currentTest != currentState.testList[i]) {
         if(testObject.beginTest < currentCheck.beginTest && testObject.beginTest > currentCheck.endTest) {
           return false;
         } else if(testObject.endTest < currentCheck.beginTest && testObject.endTest > currentCheck.endTest) {

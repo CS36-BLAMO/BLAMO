@@ -45,7 +45,7 @@ class CSVExporter {
   }
 
   void buildCSVLines(){
-    String header = "OBJECTID,Test Type,PROJECT,Number,Client,LATITUDE,LONGITUDE,North,East,Location,Elevation Datum,Borehole ID,Date Started,Date Completed,Surface Elevation (ft),Contractor/Driller,Method,Logged By,Checked By,Begin Depth (ft),End Depth (ft),Soil Type,Description,Moisture Content,Dry Density (pcf),Liquid Limit (%),Plastic Limit (%),Fines (%),Blows 1st,Blows 2nd,Blows 3rd,N Value";
+    String header = "OBJECTID,Test Type,PROJECT,Number,Client,LATITUDE,LONGITUDE,Projection,North,East,Location,Elevation Datum,Borehole ID,Date Started,Date Completed,Surface Elevation (ft),Contractor/Driller,Method,Logged By,Checked By,Begin Depth (ft),End Depth (ft),Soil Type,Description,Moisture Content,Dry Density (pcf),Liquid Limit (%),Plastic Limit (%),Fines (%),Blows 1st,Blows 2nd,Blows 3rd,N Value";
     lines.add(header);
 
     //TODO SizeofTest
@@ -57,6 +57,7 @@ class CSVExporter {
           "${logInfo.client.replaceAll(",", " ").replaceAll('\n', '')},"
           "${logInfo.lat.replaceAll(",", " ").replaceAll('\n', '')},"
           "${logInfo.long.replaceAll(",", " ").replaceAll('\n', '')},"
+          "${logInfo.projection.replaceAll(",", " ").replaceAll('\n', '')},"
           "${logInfo.north.replaceAll(",", " ").replaceAll('\n', '')},"
           "${logInfo.east.replaceAll(",", " ").replaceAll('\n', '')},"
           "${logInfo.location.replaceAll(",", " ").replaceAll('\n', '')},"

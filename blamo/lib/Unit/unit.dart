@@ -321,7 +321,7 @@ class _UnitPageState extends State<UnitPage> {
     ObjectHandler objectHandler = new ObjectHandler();
     for(int i = 0; i < currentState.unitList.length; i++){
       Unit currentCheck = await objectHandler.getUnitData(currentState.unitList[i], currentState.currentDocument);
-      if(currentCheck.depthUB != null) {
+      if(currentState.currentUnit != currentState.unitList[i]) {
         if (unitObject.depthUB < currentCheck.depthUB && unitObject.depthUB > currentCheck.depthLB) {
           return false;
         } else if (unitObject.depthLB < currentCheck.depthUB && unitObject.depthLB > currentCheck.depthLB) {
