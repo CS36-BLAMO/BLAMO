@@ -221,12 +221,17 @@ class _LogInfoPageState extends State<LogInfoPage> {
                               ),
                               FormBuilderDropdown(
                                 attribute: 'projection',
-                                decoration: InputDecoration(labelText: "Projection"),
+                                decoration: InputDecoration(labelText: "Projection",
+                                  border: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,),
                                 validators: [],
-                                items: ["Lambert Conformal Conic", "Transverse Mercator", "Oblique Mercator"].map(
+                                items: ["NAD 1983 2011 Oregon Statewide Lambert Ft Intl", "GCS WGS 1984 "].map(
                                     (projection) => DropdownMenuItem(
                                       value: projection,
-                                      child: Text("$projection")
+                                      child: Text("$projection", overflow: TextOverflow.visible)
                                     )).toList(),
                                 initialValue: formatValue(logInfoToBuildFrom.projection),
                                 onChanged: (void nbd){updateLogObject();},
