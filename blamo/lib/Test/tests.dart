@@ -1,7 +1,7 @@
 import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+//import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:blamo/SideMenu.dart';
@@ -30,7 +30,7 @@ class _TestsPageState extends State<TestsPage> {
     getTestSet(currentState.testList, currentState.currentDocument);
   }
 
-  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  //final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   Widget build(BuildContext context) {
     if(currentState.currentRoute != null) {
       currentState.currentRoute = '/TestsPage'; 
@@ -271,7 +271,7 @@ class _TestsPageState extends State<TestsPage> {
     }
   }
 
-  void getTestSet(List<String> testNames, String documentName) async{
+  Future<void> getTestSet(List<String> testNames, String documentName) async{
     debugPrint("In getTestSet");
     ObjectHandler objectHandler = new ObjectHandler();
     for(int i = 0; i < currentState.testList.length; i++){

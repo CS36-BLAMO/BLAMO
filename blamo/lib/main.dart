@@ -164,12 +164,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   //Creates a new document manifest
-  void createNewDocument(String docName) async{
+  Future<void> createNewDocument(String docName) async{
     await currentState.storage.overWriteDocument(docName, "$docName\n0\n0");
   }
 
   //Updates the currentState object to reflect the manifest document
-  void updateStateData() async{
+  Future<void> updateStateData() async{
     await currentState.storage.setStateData(currentState).then((StateData recieved) {
       currentState.list = recieved.list;
       currentState.dirty = 0;
@@ -303,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                         //In order for this to create doc and update homepage there needs to be a comma at the end of the filename
                         //Or else it will fail to create
                         await currentState.storage.overWriteManifest(toWrite);
-                        await currentState.storage.overWriteLogInfo(_textFieldController.text, "{projectName:null,startDate:null,endDate:null,driller:null,projectGeologist:null,recorder:null,northing:null,easting:null,highway:null,county:null,purpose:null,equipment:null,objectID:null,testType:null,project:null,number:null,client:null,lat:null,long:null,location:null,elevationDatum:null,boreholeID:null,surfaceElevation:null,contractor:null,method:null,loggedBy:null,checkedBy:null,holeNo:null,eANo:null,keyNo:null,startCardNo:null,groundElevation:null,tubeHeight:null}");
+                        await currentState.storage.overWriteLogInfo(_textFieldController.text, "{project:null,number:null,client:null,highway:null,county:null,projection:NAD 1983 2011 Oregon Statewide Lambert Ft Intl,north:null,east:null,lat:null,long:null,location:null,elevationDatum:null,tubeHeight:null,boreholeID:null,startDate:null,endDate:null,surfaceElevation:null,contractor:null,equipment:null,method:null,loggedBy:null,checkedBy:null}");
 
                         await updateStateDataCreateDoc(newestDoc);
                         setState(() {});

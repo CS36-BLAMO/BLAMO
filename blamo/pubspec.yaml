@@ -34,8 +34,12 @@ dependencies:
 
   gradient_app_bar: ^0.0.1
 
+  location: ^3.0.0
+
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  flutter_driver:
     sdk: flutter
 
 
