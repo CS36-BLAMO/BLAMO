@@ -53,10 +53,12 @@ class Level { //class for holding units and associated tests.
     List<Test> tests = [];
     double beginDepth; // GOES BY ELEVATION. begindepth is higher elevation, or technically a "lower" bound. i.e. 0.
     double endDepth; //                      enddepth is lower elevation, or technically a "higher" bound. i.e. -2.5.
+    String tags;
     void setDepth(){
       this.beginDepth = this.beginDepth ?? this.unit.depthUB;
       this.endDepth = this.endDepth ?? this.unit.depthLB;
     }
+    double scaledRenderHeight;
 }
 
 class LogInfoPDF {
