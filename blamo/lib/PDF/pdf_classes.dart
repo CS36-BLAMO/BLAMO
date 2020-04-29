@@ -103,31 +103,30 @@ class LogInfoPDF {
     //String fakedata;
     //String testType;
 
-  void init(String project, number, client, highway, county, projection, north, east, lat, long, location, elevationDatum, tubeHeight, boreholeID, 
-  startDate, endDate, surfaceElevation, contractor, equipment, method, loggedBy, checkedBy){
-  //void init(String objectID, testType, project, number, client, lat, long, location, elevationDatum, boreholeID, startDate, endDate, surfaceElevation, contractor, method, loggedBy, checkedBy){
-   
-    this.project = project;
-    this.number = number;
-    this.client = client;
-    this.highway = highway;
-    this.county = county;
-    this.projection = projection;
-    this.north = north;
-    this.east = east;
-    this.lat = lat;
-    this.long = long;
-    this.location = location;
-    this.elevationDatum = elevationDatum;
-    this.tubeHeight = tubeHeight;
-    this.boreholeID = boreholeID;
-    this.startDate = startDate;
-    this.endDate = endDate;
-    this.surfaceElevation = surfaceElevation;
-    this.contractor = contractor;
-    this.equipment = equipment;
-    this.method = method;
-    this.loggedBy = loggedBy;
-    this.checkedBy = checkedBy;
+  //void init(String project, number, client, highway, county, projection, north, east, lat, long, location, elevationDatum, tubeHeight, boreholeID, 
+  //startDate, endDate, surfaceElevation, contractor, equipment, method, loggedBy, checkedBy){
+  void init(LogInfo i){
+    this.project = i.project ?? "";
+    this.number = i.number ?? "";
+    this.client = i.client ?? "";
+    this.highway = i.highway ?? "";
+    this.county = i.county ?? "";
+    this.projection = i.projection ?? "";
+    this.north = i.north ?? "";
+    this.east = i.east ?? "";
+    this.lat = i.lat ?? "";
+    this.long = i.long ?? "";
+    this.location = i.location ?? "";
+    this.elevationDatum = i.elevationDatum ?? "";
+    this.tubeHeight = i.tubeHeight ?? "";
+    this.boreholeID = i.boreholeID ?? "";
+    this.startDate = i.startDate ?? "";
+    this.endDate = i.endDate ?? "";
+    this.surfaceElevation = i.surfaceElevation ?? "";
+    this.contractor = i.contractor ?? "";
+    this.equipment = i.equipment ?? "";
+    this.method = i.method ?? "";
+    this.loggedBy = i.loggedBy ?? "";
+    this.checkedBy = i.checkedBy ?? "";
   }
 }

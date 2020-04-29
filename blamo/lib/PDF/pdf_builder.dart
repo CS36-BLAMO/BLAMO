@@ -11,18 +11,20 @@ import 'package:blamo/ObjectHandler.dart' as handler;
 
 Document pdf = Document();
 
-// Victoria fields:
-// Log info: ID, test type, project, number, client, lat, long, location, elevation datum, borehold id, start date, end date,
-//          surface elevation, contractor, method, logged by, checked by
-// Test/hole: Begin depth, end depth, soil type, description, moisture content, dry density, liquid limit, plastic limit,
-//            fines, Blows 1, Blows 2, Blows 3, Blows count
+// Log Info fields:
+// project, number, client, highway, county, startDate, endDate
+// projection, north, east, lat, long, location
+// elevationDatum, tubeHeight, boreholeID, surfaceElevation
+// equipment, method, loggedBy, checkedBy, contractor
 
 Future<String> docCreate(StateData currentState) async{
 
   // Create levels from provided lists of tests and units 
   var tests = await getTests(currentState);
   var units = await getUnits(currentState);
-  var loginfo = await getLogInfo(currentState.currentDocument);
+  var loginfoInit = await getLogInfo(currentState.currentDocument);
+  var loginfo = new LogInfoPDF();
+  loginfo.init(loginfoInit);
   List<Level> levels = [];
   List<int> testIndexesStored = [];
   var testsToDisplay = [];
@@ -261,12 +263,10 @@ Future<String> docCreate(StateData currentState) async{
                     children: <Widget>[
                       Text('DRILL LOG | ' + loginfo.project +'\n'+ loginfo.client.toUpperCase(), textScaleFactor: 1)
                     ])),
-            //Paragraph(
-            //    text:
-            //        loginfo.project),
+                    
             Table.fromTextArray(context: context, data: <List<String>>[
-              //<String>['Number', 'Start Date', 'End Date', 'Latitude', 'Longitude', 'Location'], 
-              <String>['Number: '+loginfo.number, 'Start Date: '+loginfo.startDate, 'End Date: '+loginfo.endDate, 'Latitude: '+loginfo.lat, 'Longitude: '+loginfo.long, 'Location: '+loginfo.location]
+              // TODO - LatLong in pdf or North East?
+              <String>['Start Date: '+loginfo.startDate, 'End Date: '+loginfo.endDate, 'ID: '+loginfo.boreholeID, 'Number: '+loginfo.number,  'Latitude: '+loginfo.lat, 'Longitude: '+loginfo.long, 'Location: '+loginfo.location]
             ]),
             Table.fromTextArray(context: context, data: <List<String>>[
               //<String>['Highway', 'County', 'Elevation Datum', 'Surface Elevation', 'Tube Height'],
@@ -274,7 +274,10 @@ Future<String> docCreate(StateData currentState) async{
             ]),
             Table.fromTextArray(context: context, data: <List<String>>[
               //<String>['Contractor', 'Equipment', 'Method', 'Logged By', 'Checked By'],
-              <String>['Contractor: '+loginfo.contractor, 'Equipment: '+loginfo.equipment, 'Method: '+loginfo.method, 'Logged by: '+loginfo.loggedBy, 'Checked by: '+loginfo.checkedBy],
+              <String>['Projection: '+loginfo.projection, 'Equipment: '+loginfo.equipment, 'Method: '+loginfo.method],
+            ]),
+            Table.fromTextArray(context: context, data: <List<String>>[
+              <String>['Contractor: '+loginfo.contractor, 'Logged by: '+loginfo.loggedBy, 'Checked by: '+loginfo.checkedBy]
             ]),
             Container(
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.start,
