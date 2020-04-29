@@ -5,20 +5,27 @@ class UnitPDF { // TODO - touch up inits? Maybe?
     double endUnitDepth;
     String unitDescription;
     String unitMethods;
+    String notes;
 
-    void init(String beginUnitDepth, endUnitDepth, unitDescription, unitMethods){
+    void init(String beginUnitDepth, endUnitDepth, unitDescription, unitMethods, notes){
       this.beginUnitDepth = double.parse(beginUnitDepth);
       this.endUnitDepth = double.parse(endUnitDepth);
       this.unitDescription = unitDescription;
       this.unitMethods = unitMethods;
+      this.notes = notes;
     }
 }
 
 class TestPDF {
+    String testType; //
     double beginTestDepth;
     double endTestDepth;
-    String soilType;
-    String description;
+    double percentRecovery; //
+    String soilDrivingResistance; //
+    String rockDiscontinuityData; //
+    String rockQualityDesignation; //
+    // String soilType;
+    // String description;
     String moistureContent;
     String dryDensity;
     String liquidLimit;
@@ -28,12 +35,18 @@ class TestPDF {
     String blows2;
     String blows3;
     String blowCount;
+    String tags;
 
-    void init(String beginTestDepth, endTestDepth, soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount){
+    void init(String testType, beginTestDepth, endTestDepth, percentRecovery, soilDrivingResistance, rockDicontinuityData, rockQualityDesignation, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount){
+    //void init(String beginTestDepth, endTestDepth, soilType, description, moistureContent, dryDensity, liquidLimit, plasticLimit, fines, blows1, blows2, blows3, blowCount){
+      this.testType = testType;
       this.beginTestDepth = double.parse(beginTestDepth);
       this.endTestDepth = double.parse(endTestDepth);
-      this.soilType = soilType;
-      this.description = description;
+      this.soilDrivingResistance = soilDrivingResistance; //
+      this.rockDiscontinuityData = rockDiscontinuityData; //
+      this.rockQualityDesignation = rockQualityDesignation; //
+      //this.soilType = soilType;
+      //this.description = description;
       this.moistureContent = moistureContent;
       this.dryDensity = dryDensity;
       this.liquidLimit = liquidLimit;
@@ -43,6 +56,7 @@ class TestPDF {
       this.blows2 = blows2;
       this.blows3 = blows3;
       this.blowCount = blowCount;
+      this.tags = tags; //
     }
 }
 
