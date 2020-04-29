@@ -76,40 +76,56 @@ class Level { //class for holding units and associated tests.
 }
 
 class LogInfoPDF {
-    String objectID;
-    String testType;
+    //String objectID;
+    
     String project;
     String number;
     String client;
+    String highway;
+    String county;
+    String projection;
+    String north;
+    String east;
     String lat;
     String long;
     String location;
     String elevationDatum;
+    String tubeHeight;
     String boreholeID;
     String startDate;
     String endDate;
     String surfaceElevation;
     String contractor;
+    String equipment;
     String method;
     String loggedBy;
     String checkedBy;
-    String fakedata;
+    //String fakedata;
+    //String testType;
 
-  void init(String objectID, testType, project, number, client, lat, long, location, elevationDatum, boreholeID, startDate, endDate, surfaceElevation, contractor, method, loggedBy, checkedBy){
-    this.objectID = objectID;
-    this.testType = testType;
+  void init(String project, number, client, highway, county, projection, north, east, lat, long, location, elevationDatum, tubeHeight, boreholeID, 
+  startDate, endDate, surfaceElevation, contractor, equipment, method, loggedBy, checkedBy){
+  //void init(String objectID, testType, project, number, client, lat, long, location, elevationDatum, boreholeID, startDate, endDate, surfaceElevation, contractor, method, loggedBy, checkedBy){
+   
     this.project = project;
     this.number = number;
     this.client = client;
+    this.highway = highway;
+    this.county = county;
+    this.projection = projection;
+    this.north = north;
+    this.east = east;
     this.lat = lat;
     this.long = long;
     this.location = location;
     this.elevationDatum = elevationDatum;
+    this.tubeHeight = tubeHeight;
     this.boreholeID = boreholeID;
     this.startDate = startDate;
     this.endDate = endDate;
     this.surfaceElevation = surfaceElevation;
     this.contractor = contractor;
+    this.equipment = equipment;
     this.method = method;
     this.loggedBy = loggedBy;
     this.checkedBy = checkedBy;
