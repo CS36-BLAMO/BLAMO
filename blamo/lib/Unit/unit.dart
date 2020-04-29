@@ -1,9 +1,11 @@
 import 'package:blamo/main.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:blamo/SideMenu.dart';
 import 'dart:convert';
+import 'package:blamo/CustomActionBar.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -30,12 +32,12 @@ class _UnitPageState extends State<UnitPage> {
   bool dirty;
   String tags;
   final myController = TextEditingController();
-  var formNodes = new List<FocusNode>(3);
+  var formNodes = new List<FocusNode>(4);
 
   @override
   void initState() {
     super.initState();
-    for( var i = 0; i < 3; i++) {
+    for( var i = 0; i < 4; i++) {
       formNodes[i] = FocusNode();
     }
     dirty = true;
@@ -44,14 +46,15 @@ class _UnitPageState extends State<UnitPage> {
 
   @override
   void dispose () {
-    for(var i = 0; i < 3; i++) {
+    for(var i = 0; i < 4; i++) {
       formNodes[i].dispose();
     }
     super.dispose();
   }
 
-@override
+
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  @override
   Widget build(BuildContext context) {
 
     String toTest1;
@@ -69,20 +72,49 @@ class _UnitPageState extends State<UnitPage> {
       return getScaffold(unitObject);
     } else {
       debugPrint("Returning empty Scaffold");
-      return new Scaffold(
-          backgroundColor: Colors.white,
-          drawer: new Drawer(
-              child: SideMenu(currentState)
-          ),
-          appBar: new AppBar(
-              title: new Text("Unit Page: ${currentState.currentUnit}"),
-              actions: <Widget>[
+      return WillPopScope(
+        onWillPop: backPressed,
+        child: new Scaffold(
+          appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
+            backgroundColor: Colors.white,
+            drawer: new Drawer(
+                child: SideMenu(currentState)
+            ),
 
-              ],
-              backgroundColor: Colors.deepOrange
-          ));
+            ),
+      );
     }
 
+  }
+  //takes you back to units page with a pop up confirmation to not allow data loss
+  Future<bool> backPressed() async {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+            title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(
+                  "No",
+                  style: TextStyle(
+                    fontSize: 25,
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context,false),
+              ),
+              FlatButton(
+                child: Text(
+                    "Yes",
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: Colors.red
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context,true),
+              )
+            ]
+        )
+    );
   }
 
   String formatValue(String value){
@@ -95,163 +127,215 @@ class _UnitPageState extends State<UnitPage> {
 
 
   Widget getScaffold(Unit unitToBuildFrom){
-    return Scaffold(
-      backgroundColor: Colors.white,
-      drawer: new Drawer(
-          child: SideMenu(currentState)
-      ),
-      appBar: new AppBar(
-          title: new Text("Unit Page: " + currentState.currentDocument + "/" + currentState.currentUnit),
-          actions: <Widget>[
-
-          ],
-          backgroundColor: Colors.deepOrange
-      ),
-      body: Padding(
-          padding: EdgeInsets.fromLTRB(40,0,40,40),
-          child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  FormBuilder(key: _fbKey,
-                      initialValue: {
-                        'date': DateTime.now(),
-                        'accept_terms': false,
-                      },
-                      autovalidate: true,
-                      child: Column(
-                          children: <Widget>[
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[0],
-                              attribute: 'depth-ub',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Depth Upper Bound (m)"),
-                              initialValue: formatValue(unitToBuildFrom.depthUB.toString()),
-                              onChanged: (void nbd){updateUnitObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[1]);
-                              },
-                              /*onEditingComplete: (){
+    return WillPopScope(
+      onWillPop: backPressed,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        /*drawer: new Drawer(
+            child: SideMenu(currentState)
+        ),*/
+        appBar: CustomActionBar("Unit Page: ${currentState.currentUnit}").getAppBar(),
+        body: Padding(
+            padding: EdgeInsets.fromLTRB(40,0,40,40),
+            child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    FormBuilder(key: _fbKey,
+                        initialValue: {
+                          'date': DateTime.now(),
+                          'accept_terms': false,
+                        },
+                        autovalidate: true,
+                        child: Column(
+                            children: <Widget>[
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
+                                focusNode: formNodes[0],
+                                attribute: 'depth-ub',
+                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0), FormBuilderValidators.required()],
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Depth Upper Bound (m)", counterText:""),
+                                initialValue: formatValue(unitToBuildFrom.depthUB.toString()),
+                                onChanged: (void nbd){updateUnitObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[1]);
+                                },
+                                /*onEditingComplete: (){
                                 debugPrint("Updating object");
                                 unitObject.depthUB = double.parse(_fbKey.currentState.fields['depth-ub'].currentState.value);
                               },*/
-                            ),
-                            FormBuilderTextField(
-                              textInputAction: TextInputAction.next,
-                              focusNode: formNodes[1],
-                              attribute: 'depth-lb',
-                              validators: [FormBuilderValidators.numeric()],
-                              decoration: InputDecoration(labelText: "Depth Lower Bound (m)"),
-                              initialValue: formatValue(unitToBuildFrom.depthLB.toString()),
-                              onChanged: (void nbd){updateUnitObject();},
-                              onFieldSubmitted: (v){
-                                FocusScope.of(context).requestFocus(formNodes[2]);
-                              },
-                              /*onEditingComplete: (){
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
+                                focusNode: formNodes[1],
+                                attribute: 'depth-lb',
+                                validators: [FormBuilderValidators.numeric(), FormBuilderValidators.max(0), FormBuilderValidators.required(), (lower){
+                                  if(_fbKey.currentState != null && lower != null && _fbKey.currentState.fields['depth-ub'].currentState.value != null && double.tryParse(_fbKey.currentState.fields['depth-ub'].currentState.value) != null && double.tryParse(lower) != null && double.tryParse(lower) >= double.tryParse(_fbKey.currentState.fields['depth-ub'].currentState.value))
+                                    return "Lower Bound must be lower than Upper Bound";
+                                  return null;
+                                }],//Custom validator that checks if lower bound is lower than upper bound
+                                maxLength: 15,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Depth Lower Bound (m)", counterText:""),
+                                initialValue: formatValue(unitToBuildFrom.depthLB.toString()),
+                                onChanged: (void nbd){updateUnitObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[2]);
+                                },
+                                /*onEditingComplete: (){
                                 debugPrint("Updating object");
                                 unitObject.depthLB = double.parse(_fbKey.currentState.fields['depth-lb'].currentState.value);
                               },*/
-                            ),
-                            FormBuilderTextField(
-                              focusNode: formNodes[2],
-                              attribute: 'methods',
-                              validators: [],
-                              decoration: InputDecoration(labelText: "Drilling Methods"),
-                              initialValue: formatValue(unitToBuildFrom.drillingMethods),
-                              onChanged: (void nbd){unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value;},
-                              /*onEditingComplete: (){
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.next,
+                                focusNode: formNodes[2],
+                                attribute: 'methods',
+                                validators: [],
+                                maxLength: 100,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Drilling Methods", counterText:""),
+                                initialValue: formatValue(unitToBuildFrom.drillingMethods),
+                                onChanged: (void nbd){updateUnitObject();},
+                                onFieldSubmitted: (v){
+                                  FocusScope.of(context).requestFocus(formNodes[3]);
+                                },
+                                /*onEditingComplete: (){
                                 debugPrint("Updating object");
                                 unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value;
                               },*/
-                            ),
-                            FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: test.dart, 56)
-                              attribute: 'tags',
-                              validators: [],
-                              initialValue: getTags(unitToBuildFrom),
-                              options: [ // TODO need gint's set of tags, ability for user to make own tags.
-                                FormBuilderFieldOption(value: "Asphalt"),
-                                FormBuilderFieldOption(value: "Basalt"),
-                                FormBuilderFieldOption(value: "Bedrock"),
-                                FormBuilderFieldOption(value: "Boulders and Cobbles"),
-                                FormBuilderFieldOption(value: "Breccia"),
-                                FormBuilderFieldOption(value: "USCS High Plasticity Clay"),
-                                FormBuilderFieldOption(value: "Chalk"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Clay"),
-                                FormBuilderFieldOption(value: "USCS Low to High Plasticity Clay"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Gavelly Clay"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Silty Clay"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Sandy Clay"),
-                                FormBuilderFieldOption(value: "Coal"),
-                                FormBuilderFieldOption(value: "Concrete"),
-                                FormBuilderFieldOption(value: "Coral"),
-                                FormBuilderFieldOption(value: "Fill"),
-                                FormBuilderFieldOption(value: "USCS Clayey Gravel"),
-                                FormBuilderFieldOption(value: "USCS Silty Gravel"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Gravel"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Gravel with clay"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Gravel with silt"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Sandy Gravel"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Gravel"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Gravel with Clay"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Gravel with Silt"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Sandy Gravel"),
-                                FormBuilderFieldOption(value: "Gypsum, rocksalt, etc."),
-                                FormBuilderFieldOption(value: "Limestone"),
-                                FormBuilderFieldOption(value: "USCS Elastic Silt"),
-                                FormBuilderFieldOption(value: "USCS Silt"),
-                                FormBuilderFieldOption(value: "USCS Gravely Silt"),
-                                FormBuilderFieldOption(value: "USCS Sandy Silt"),
-                                FormBuilderFieldOption(value: "USCS High Plasticity Organic silt or clay"),
-                                FormBuilderFieldOption(value: "USCS High Plasticity Organic silt or clay with shells"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Organic silt or clay"),
-                                FormBuilderFieldOption(value: "USCS Low Plasticity Organic silt or clay with shells"),
-                                FormBuilderFieldOption(value: "USCS Peat"),
-                                FormBuilderFieldOption(value: "Sandstone"),
-                                FormBuilderFieldOption(value: "USCS Clayey Sand"),
-                                FormBuilderFieldOption(value: "USCS Clayey Sand with silt"),
-                                FormBuilderFieldOption(value: "Shale"),
-                                FormBuilderFieldOption(value: "Siltstone"),
-                                FormBuilderFieldOption(value: "USCS Silty Sand"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Sand"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Gravelly Sand"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Sand with Clay"),
-                                FormBuilderFieldOption(value: "USCS Poorly-graded Sand with Silt"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Sandy Gravel"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Gravelly Sand"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Sand with Clay"),
-                                FormBuilderFieldOption(value: "USCS Well-graded Sand with Silt"),
-                                FormBuilderFieldOption(value: "Glacial Till"),
-                                FormBuilderFieldOption(value: "Topsoil")
-                              ],
-                            )
-                          ]
+                              ),
+                              FormBuilderTextField(
+                                textInputAction: TextInputAction.newline,
+                                focusNode: formNodes[3],
+                                attribute: 'notes',
+                                validators: [],
+                                maxLength: 256,
+                                maxLengthEnforced: true,
+                                decoration: InputDecoration(labelText: "Notes"),
+                                initialValue: formatValue(unitToBuildFrom.notes),
+                                onChanged: (void nbd){updateUnitObject();},
+                              ),
+                              FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: test.dart, 56)
+                                attribute: 'tags',
+                                validators: [],
+                                initialValue: getTags(unitToBuildFrom),
+                                options: [ // TODO need gint's set of tags, ability for user to make own tags.
+                                  FormBuilderFieldOption(value: "Asphalt"),
+                                  FormBuilderFieldOption(value: "Basalt"),
+                                  FormBuilderFieldOption(value: "Bedrock"),
+                                  FormBuilderFieldOption(value: "Boulders and Cobbles"),
+                                  FormBuilderFieldOption(value: "Breccia"),
+                                  FormBuilderFieldOption(value: "USCS High Plasticity Clay"),
+                                  FormBuilderFieldOption(value: "Chalk"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Clay"),
+                                  FormBuilderFieldOption(value: "USCS Low to High Plasticity Clay"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Gavelly Clay"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Silty Clay"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Sandy Clay"),
+                                  FormBuilderFieldOption(value: "Coal"),
+                                  FormBuilderFieldOption(value: "Concrete"),
+                                  FormBuilderFieldOption(value: "Coral"),
+                                  FormBuilderFieldOption(value: "Fill"),
+                                  FormBuilderFieldOption(value: "USCS Clayey Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Silty Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Gravel with clay"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Gravel with silt"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Sandy Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Gravel with Clay"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Gravel with Silt"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Sandy Gravel"),
+                                  FormBuilderFieldOption(value: "Gypsum, rocksalt, etc."),
+                                  FormBuilderFieldOption(value: "Limestone"),
+                                  FormBuilderFieldOption(value: "USCS Elastic Silt"),
+                                  FormBuilderFieldOption(value: "USCS Silt"),
+                                  FormBuilderFieldOption(value: "USCS Gravely Silt"),
+                                  FormBuilderFieldOption(value: "USCS Sandy Silt"),
+                                  FormBuilderFieldOption(value: "USCS High Plasticity Organic silt or clay"),
+                                  FormBuilderFieldOption(value: "USCS High Plasticity Organic silt or clay with shells"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Organic silt or clay"),
+                                  FormBuilderFieldOption(value: "USCS Low Plasticity Organic silt or clay with shells"),
+                                  FormBuilderFieldOption(value: "USCS Peat"),
+                                  FormBuilderFieldOption(value: "Sandstone"),
+                                  FormBuilderFieldOption(value: "USCS Clayey Sand"),
+                                  FormBuilderFieldOption(value: "USCS Clayey Sand with silt"),
+                                  FormBuilderFieldOption(value: "Shale"),
+                                  FormBuilderFieldOption(value: "Siltstone"),
+                                  FormBuilderFieldOption(value: "USCS Silty Sand"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Sand"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Gravelly Sand"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Sand with Clay"),
+                                  FormBuilderFieldOption(value: "USCS Poorly-graded Sand with Silt"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Sandy Gravel"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Gravelly Sand"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Sand with Clay"),
+                                  FormBuilderFieldOption(value: "USCS Well-graded Sand with Silt"),
+                                  FormBuilderFieldOption(value: "Glacial Till"),
+                                  FormBuilderFieldOption(value: "Topsoil")
+                                ],
+                              )
+                            ]
+                          )
                         )
-                      )
-                    ]
+                      ]
+                    )
                   )
-                )
-              ),
-          floatingActionButton: FloatingActionButton(
-              onPressed: () async {
-                if (_fbKey.currentState.saveAndValidate()) {
-                  //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
-                  updateUnitObject();
-                  await saveObject();
-                    currentState.currentRoute = '/UnitsPage';
-                    _showToast("Success", Colors.green);
-                    Navigator.pushReplacementNamed(
+                ),
+            floatingActionButton: FloatingActionButton(
+                onPressed: () async {
+                  if (_fbKey.currentState.saveAndValidate()) {
+                    //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
+                    updateUnitObject();
+                    bool noOverlap = await checkUnitDepthOverlap();
+                    if(noOverlap){
+                      await saveUnitObject();
+                      currentState.currentRoute = '/UnitsPage';
+                      _showToast("Success", Colors.green);
+                      Navigator.pop(context, "Success");
+                    } else {
+                      _showToast("Unit overlaps another Unit", Colors.red);
+                    }
+
+                    /*Navigator.pushReplacementNamed(
                       context,
                       "/UnitsPage",
                       arguments: currentState,
-                    );
-                } else {
-                  _showToast("Error in Fields", Colors.red);
-                }
+                    );*/
+                  } else {
+                    _showToast("Error in Fields", Colors.red);
+                  }
 
-              },
-              child: Icon(Icons.save),
-          ),
+                },
+                child: Icon(Icons.save),
+            ),
+      ),
     );
+  }
+
+  Future<bool> checkUnitDepthOverlap() async {
+    ObjectHandler objectHandler = new ObjectHandler();
+    for(int i = 0; i < currentState.unitList.length; i++){
+      Unit currentCheck = await objectHandler.getUnitData(currentState.unitList[i], currentState.currentDocument);
+      if(currentState.currentUnit != currentState.unitList[i]) {
+        if (unitObject.depthUB < currentCheck.depthUB && unitObject.depthUB > currentCheck.depthLB) {
+          return false;
+        } else if (unitObject.depthLB < currentCheck.depthUB && unitObject.depthLB > currentCheck.depthLB) {
+          return false;
+        } else if (unitObject.depthUB == currentCheck.depthUB || unitObject.depthLB == currentCheck.depthLB) {
+          return false;
+        } else if (currentCheck.depthUB < unitObject.depthUB && currentCheck.depthUB > unitObject.depthLB) {
+          return false;
+        } else if (currentCheck.depthLB < unitObject.depthUB && currentCheck.depthLB > unitObject.depthLB) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   void _showToast(String toShow, MaterialColor color){
@@ -276,25 +360,24 @@ class _UnitPageState extends State<UnitPage> {
     }
     return toReturn;
   }
-  
+
   void updateUnitObject(){
-    try {
-      unitObject.depthLB = double.parse(
-          _fbKey.currentState.fields['depth-lb'].currentState.value);
-    } catch(e) {
-      unitObject.depthLB = null;
-    }
-    try {
-      unitObject.depthUB = double.parse(
-          _fbKey.currentState.fields['depth-ub'].currentState.value);
-    } catch(e) {
+    if(double.tryParse(_fbKey.currentState.fields["depth-ub"].currentState.value) != null) {
+      unitObject.depthUB = double.parse(_fbKey.currentState.fields["depth-ub"].currentState.value);
+    } else {
       unitObject.depthUB = null;
     }
-    unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value;
+    if(double.tryParse(_fbKey.currentState.fields["depth-lb"].currentState.value) != null) {
+      unitObject.depthLB = double.parse(_fbKey.currentState.fields["depth-lb"].currentState.value);
+    } else {
+      unitObject.depthLB = null;
+    }
+    unitObject.drillingMethods = _fbKey.currentState.fields['methods'].currentState.value.toString();
+    unitObject.notes = _fbKey.currentState.fields['notes'].currentState.value.toString();
     unitObject.tags = jsonEncode(_fbKey.currentState.fields['tags'].currentState.value);
   }
 
-  void saveObject() async{
+  Future<void> saveUnitObject() async{
     ObjectHandler toHandle = new ObjectHandler();
     //TODO
     //unitObject.tags = ;
@@ -309,6 +392,16 @@ class _UnitPageState extends State<UnitPage> {
     debugPrint("saving the unitObject: \nLB = ${unitObject.depthLB}\nUB = ${unitObject.depthUB}\nMethods = ${unitObject.drillingMethods}");
   }
 
+  void updateUnitData(String unitName, String documentName) async{
+    ObjectHandler objectHandler = new ObjectHandler();
+    await objectHandler.getUnitData(unitName, documentName).then((onValue){
+      setState(() {
+        unitObject = onValue;
+        debugPrint("In set state: (${unitObject.drillingMethods})");
+        dirty = false;
+      });
+    });
+  }
 //new
   /*void testSave() async {
     ObjectHandler toTest = new ObjectHandler();
@@ -459,17 +552,5 @@ class _UnitPageState extends State<UnitPage> {
     );
     
   }*/
-
-  void updateUnitData(String unitName, String documentName) async{
-    ObjectHandler objectHandler = new ObjectHandler();
-    await objectHandler.getUnitData(unitName, documentName).then((onValue){
-        setState(() {
-          unitObject = onValue;
-          debugPrint("In set state: (${unitObject.drillingMethods})");
-          dirty = false;
-        });
-      });
-    }
-
 }
 

@@ -27,7 +27,7 @@ class _SideMenuState extends State<SideMenu> {
                   decoration: new BoxDecoration(
                       image: new DecorationImage(
                           image: new AssetImage(
-                              'assets/images/OSU-logo.png',)
+                              'assets/images/OSU-eng-logo.png',)
                       )
                   ),
                 ),
@@ -121,6 +121,26 @@ class _SideMenuState extends State<SideMenu> {
                       Navigator.pushReplacementNamed(
                         context,
                         "/ExportPage",
+                        arguments: currentState,
+                      );
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+                Divider(color: Colors.grey),
+                new ListTile(
+                  title: new Text("Overview"),
+                  leading: Icon(
+                      Icons.pageview,
+                      color: Colors.blue
+                  ),
+                  onTap: () {
+                    if (currentState.currentRoute != '/Document') {
+                      currentState.currentRoute = '/Document';
+                      Navigator.pushReplacementNamed(
+                        context,
+                        "/Document",
                         arguments: currentState,
                       );
                     } else {

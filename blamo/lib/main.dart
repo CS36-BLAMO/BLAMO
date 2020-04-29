@@ -2,6 +2,9 @@ import 'package:blamo/routeGenerator.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/File_IO/FileHandler.dart';
 import 'package:blamo/SideMenu.dart';
+import 'package:blamo/CustomActionBar.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 //This class will be used to house all the data between each route
 class StateData {
@@ -113,32 +116,60 @@ class _HomePageState extends State<HomePage> {
     * double drawerEdgeDragWidth )
     *
     * */
-    return new Scaffold(
-      drawer: Drawer(
-        child: SideMenu(currentState),
+    return WillPopScope (  // WillPopScope handles native android back button
+      onWillPop: backPressed,          //Requires a future
+      child: new Scaffold(
+        drawer: Drawer(
+          child: SideMenu(currentState),
+        ),
+
+        appBar: CustomActionBar("Home").getAppBar(),
+
+        body: gridViewBuilder(currentState.list),
+
+        floatingActionButton: floatingActionButtonBuilder(),
+
       ),
+    );
+  }
 
-      appBar: new AppBar(
-          title: new Text("Home"),
-          actions: <Widget>[
-          ],
-          backgroundColor: Colors.deepOrange
-      ),
-
-      body: gridViewBuilder(currentState.list),
-
-      floatingActionButton: floatingActionButtonBuilder(),
-
+  Future<bool> backPressed() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Do you want to exit the BLAMO application?"),
+        actions: <Widget>[
+          FlatButton(
+            child: Text(
+              "No",
+              style: TextStyle(
+                  fontSize: 25,
+              ),
+            ),
+            onPressed: () => Navigator.pop(context,false),
+          ),
+          FlatButton(
+            child: Text(
+              "Yes",
+              style: TextStyle(
+                fontSize: 25,
+                color: Colors.red
+              ),
+            ),
+            onPressed: () => Navigator.pop(context,true),
+          )
+        ]
+      )
     );
   }
 
   //Creates a new document manifest
-  void createNewDocument(String docName) async{
+  Future<void> createNewDocument(String docName) async{
     await currentState.storage.overWriteDocument(docName, "$docName\n0\n0");
   }
 
   //Updates the currentState object to reflect the manifest document
-  void updateStateData() async{
+  Future<void> updateStateData() async{
     await currentState.storage.setStateData(currentState).then((StateData recieved) {
       currentState.list = recieved.list;
       currentState.dirty = 0;
@@ -164,6 +195,60 @@ class _HomePageState extends State<HomePage> {
     //currentState.currentDocument = "";
   }
 
+  void _showToast(String toShow, MaterialColor color){
+    Fluttertoast.showToast(
+        msg: toShow,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIos: 1,
+        backgroundColor: color,
+        textColor: Colors.black,
+        fontSize: 16.0
+    );
+  }
+
+  void _onTileLongPressed(int index) async {
+    currentState.documentIterator = index;
+    currentState.currentDocument = currentState.list[index];
+    String result;
+    result = await showDialog(
+        context: context,
+        builder: (context) =>
+            AlertDialog(
+              title: Text("Are you sure you want to delete ${currentState
+                  .currentDocument}?"),
+              actions: <Widget>[
+                new FlatButton(
+                    child: Text("DELETE"),
+                    textColor: Colors.red,
+                    onPressed: () {
+                      Navigator.pop(context, "DELETE");
+                    }),
+                new FlatButton(
+                  child: Text("CANCEL"),
+                  onPressed: () {
+                    Navigator.pop(context, "CANCEL");
+                  },
+                )
+              ],
+            )
+    );
+    if (result == "DELETE") {
+      debugPrint("(main)LongPressed on: ${currentState.currentDocument}");
+      await currentState.storage.deleteDocument(currentState.currentDocument);
+      _showToast("${currentState.currentDocument} Deleted!", Colors.red);
+      await new Future.delayed(new Duration(microseconds: 3)).then((onValue) {
+        setState(() {
+          currentState.dirty = 1;
+          currentState.list.remove(currentState.currentDocument);
+          currentState.currentDocument = "";
+        });
+      });
+    }
+  }
+
+
+
   /* These are the object builders for the main scaffolding
    *  FloatingActionButtonBuilder -> Builds the functionalty and style of the FAB in the bottom right of the screen, creates new documents onPressed
    *  gridViewBuilder             -> Builds the main gridview dynamically on document creation
@@ -182,9 +267,10 @@ class _HomePageState extends State<HomePage> {
             builder:(context) => AlertDialog(
               title: Text('Enter Document Name'),
               content: TextField(
-                maxLength: 50,
+                maxLength: 20,
                 controller: _textFieldController,
                 decoration: InputDecoration(labelText: 'Name Cannot Be Empty'),
+                inputFormatters: [new BlacklistingTextInputFormatter(new RegExp('[\\,]'))],
               ),
               actions: <Widget> [
                 new FlatButton(
@@ -217,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                         //In order for this to create doc and update homepage there needs to be a comma at the end of the filename
                         //Or else it will fail to create
                         await currentState.storage.overWriteManifest(toWrite);
-                        await currentState.storage.overWriteLogInfo(_textFieldController.text, "{projectName:null,startDate:null,endDate:null,driller:null,projectGeologist:null,recorder:null,northing:null,easting:null,highway:null,county:null,purpose:null,equipment:null,objectID:null,testType:null,project:null,number:null,client:null,lat:null,long:null,location:null,elevationDatum:null,boreholeID:null,surfaceElevation:null,contractor:null,method:null,loggedBy:null,checkedBy:null,holeNo:null,eANo:null,keyNo:null,startCardNo:null,groundElevation:null,tubeHeight:null}");
+                        await currentState.storage.overWriteLogInfo(_textFieldController.text, "{project:null,number:null,client:null,highway:null,county:null,projection:NAD 1983 2011 Oregon Statewide Lambert Ft Intl,north:null,east:null,lat:null,long:null,location:null,elevationDatum:null,tubeHeight:null,boreholeID:null,startDate:null,endDate:null,surfaceElevation:null,contractor:null,equipment:null,method:null,loggedBy:null,checkedBy:null}");
 
                         await updateStateDataCreateDoc(newestDoc);
                         setState(() {});
@@ -255,18 +341,28 @@ class _HomePageState extends State<HomePage> {
             colorVal = 800;
           }
           toReturn = listToBuildFrom[index];
-          return new InkResponse(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                child: Center(
-                    child: Text(toReturn,
-                      textAlign: TextAlign.center,
+          return new Container(
+            child: new Card(
+              child: new Material(
+                child: InkWell(
+                    onTap: () => _onTileClicked(index),
+                    onLongPress: () => _onTileLongPressed(index),
+                    splashColor: Colors.grey,
+                    child: new Container(
+                      child: Center(
+                          child: Text(toReturn,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                          )
+                      ),
                     )
                 ),
-                color: Colors.orange[colorVal],
+                color: Colors.transparent,
               ),
-              enableFeedback: true,
-              onTap: () => _onTileClicked(index));
+              color: Colors.orange[colorVal],
+              elevation: 10,
+            ),
+          );
         }),
       );
     }

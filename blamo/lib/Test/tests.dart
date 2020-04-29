@@ -1,9 +1,11 @@
 import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter/services.dart';
+//import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:blamo/SideMenu.dart';
+import 'package:blamo/CustomActionBar.dart';
 
 class TestsPage extends StatefulWidget {
   final StateData pass; 
@@ -28,7 +30,7 @@ class _TestsPageState extends State<TestsPage> {
     getTestSet(currentState.testList, currentState.currentDocument);
   }
 
-  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  //final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   Widget build(BuildContext context) {
     if(currentState.currentRoute != null) {
       currentState.currentRoute = '/TestsPage'; 
@@ -39,47 +41,54 @@ class _TestsPageState extends State<TestsPage> {
       return getScaffold(tests);
     }
     else {
+      if(currentState.dirty == 1){
+        getTestSet(currentState.testList, currentState.currentDocument);
+      }
       debugPrint("Returning empty scaffold");
-      return new Scaffold(
-          backgroundColor: Colors.white,
-          drawer: new Drawer(
-              child: SideMenu(currentState)
-          ),
-          appBar: new AppBar(
-              title: new Text("Tests Page"),
-              actions: <Widget>[
-
-              ],
-              backgroundColor: Colors.deepOrange
-          ));
+      return WillPopScope(
+        onWillPop: backPressed,
+        child: new Scaffold(
+            backgroundColor: Colors.white,
+            drawer: new Drawer(
+                child: SideMenu(currentState)
+            ),
+          appBar: CustomActionBar("Tests Page").getAppBar(),),
+      );
     }
   }
 
-  Widget getScaffold(List<Test> tests){
-    return new Scaffold(
-        backgroundColor: Colors.white,
-        drawer: new Drawer(
-        child: SideMenu(currentState),
-      ),
-        appBar: new AppBar(
-            title: new Text("Tests Page"),
-            actions: <Widget>[
+  //takes you back to overview of current borehole
+  Future<bool> backPressed() async {
+    Navigator.pushReplacementNamed(
+      context,
+      "/Document",
+      arguments: currentState,
+    );
+    return Future.value(false);
+  }
 
-            ],
-            backgroundColor: Colors.deepOrange
+  Widget getScaffold(List<Test> tests){
+    return WillPopScope(
+      onWillPop: backPressed,
+      child: new Scaffold(
+          backgroundColor: Colors.white,
+          drawer: new Drawer(
+          child: SideMenu(currentState),
+        ),
+        appBar: CustomActionBar("Tests Page").getAppBar(),
+        body: Padding(
+          padding: EdgeInsets.fromLTRB(20,20,20,20),
+          child: ListView.builder(
+            itemCount: 1,
+            itemBuilder: (context,i){
+              return new Column(
+                children: _populateTestList()
+              );
+            }
+          )
+        ),
+      floatingActionButton: floatingActionButtonBuilder(),
       ),
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(20,20,20,20),
-        child: ListView.builder(
-          itemCount: 1,
-          itemBuilder: (context,i){
-            return new Column(
-              children: _populateTestList()
-            );
-          }
-        )
-      ),
-    floatingActionButton: floatingActionButtonBuilder(),
     );
   }
 
@@ -103,6 +112,7 @@ class _TestsPageState extends State<TestsPage> {
                 maxLength: 50,
                 controller: _textFieldController,
                 decoration: InputDecoration(labelText: 'Test Name'),
+                inputFormatters: [new BlacklistingTextInputFormatter(new RegExp('[\\,]'))],
               ),
               actions: <Widget> [
                 new FlatButton(
@@ -135,11 +145,24 @@ class _TestsPageState extends State<TestsPage> {
                       currentState.testList.add(newTestNoComma);
                       currentState.currentTest = newTestNoComma;
                       currentState.currentRoute = '/TestPage';
-                      Navigator.pushReplacementNamed(
+                      Navigator.pop(context);
+
+                      //Await for the test page to get popped
+                      await Navigator.pushNamed(
                         context,
                         "/TestPage",
                         arguments: currentState,
                       );
+
+                      //Update tests and reload page
+                      tests = [];
+                      await getTestSet(currentState.testList, currentState.currentDocument);
+                      await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+                        setState((){
+                          currentState.dirty=0;
+                          dirty = false;
+                        });
+                      });
                     }
                   },
                 )
@@ -154,32 +177,101 @@ class _TestsPageState extends State<TestsPage> {
     List<Widget> testsToReturn = [];
     for (int i = 0; i < tests.length; i++) {
         testsToReturn.add(
-            new ListTile(
-              title: new Container(
-                height: 50,
-                color: Colors.orange[100],
-                child: Center(child: Text(tests[i].beginTest.toString() + " - " + tests[i].endTest.toString() + ", " + tests[i].tags)),
-              ),
-              onTap: () {
-                if(currentState.currentRoute != '/TestPage'){ // TODO - dynamically populate test edit page
-                  currentState.currentRoute = '/TestPage';
-                  currentState.currentTest=currentState.testList[i];
-                  Navigator.pushReplacementNamed(
-                    context,
-                    "/TestPage",
-                    arguments: currentState,
-                  );
-                } else {
-                  Navigator.pop(context);
-                }
-              },
-            )
+          new Container(
+              height: 50,
+              child: new Card(
+                  elevation: 10,
+                  color: Colors.brown[100],
+
+                  child: new Material(
+                    child: InkWell(
+                      onTap: () => _onTileClicked(i),
+                      onLongPress: () => _onTileLongClicked(i),
+                      splashColor: Colors.grey,
+                      child: Center(child: Text((i+1).toString() + "." + tests[i].beginTest.toString() + " - " + tests[i].endTest.toString())),
+                    ),
+                    color: Colors.transparent,
+                  )
+              )
+          )
         );
       }
     return testsToReturn;
   }
 
-  void getTestSet(List<String> testNames, String documentName) async{
+  void _onTileClicked(int i) async {
+    if(currentState.currentRoute != '/TestPage'){ // TODO - dynamically populate test edit page
+      currentState.currentRoute = '/TestPage';
+      currentState.currentTest=currentState.testList[i];
+      await Navigator.pushNamed(
+        context,
+        "/TestPage",
+        arguments: currentState,
+      );
+      tests = [];
+      await getTestSet(currentState.testList, currentState.currentDocument);
+      await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+        setState((){
+          currentState.dirty=0;
+          dirty = false;
+        });
+      });
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
+  void _onTileLongClicked(int i) async {
+    String result;
+    result = await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Are you sure you want to delete this test?"),
+          actions: <Widget>[
+            new FlatButton(
+                child: Text("DELETE"),
+                textColor: Colors.red,
+                onPressed: () {
+                  Navigator.pop(context, "DELETE");
+                }),
+            new FlatButton(
+              child: Text("CANCEL"),
+              onPressed: (){
+                Navigator.pop(context, "CANCEL");
+              },
+            )
+          ],
+        )
+    );
+    if(result == "DELETE") {
+      await currentState.storage.deleteTest(
+          currentState.currentDocument, currentState.testList[i]);
+      currentState.testList.removeAt(i);
+
+      String toWrite = "${currentState.currentDocument}\n${currentState.testList
+          .length}\n${currentState.unitList.length}\n";
+      for (int i = 0; i < currentState.testList.length; i++) {
+        toWrite = toWrite + currentState.testList[i] + ',';
+      }
+      for (int i = 0; i < currentState.unitList.length; i++) {
+        toWrite = toWrite + currentState.unitList[i] + ',';
+      }
+      debugPrint(toWrite);
+
+      await currentState.storage.overWriteDocument(
+          currentState.currentDocument, toWrite);
+      tests = [];
+      await getTestSet(currentState.testList, currentState.currentDocument);
+      await new Future.delayed(new Duration(microseconds: 3)).then((onValue) {
+        setState(() {
+          currentState.dirty = 0;
+          dirty = false;
+        });
+      });
+    }
+  }
+
+  Future<void> getTestSet(List<String> testNames, String documentName) async{
     debugPrint("In getTestSet");
     ObjectHandler objectHandler = new ObjectHandler();
     for(int i = 0; i < currentState.testList.length; i++){
@@ -193,6 +285,7 @@ class _TestsPageState extends State<TestsPage> {
     }
     await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
       setState((){
+        currentState.dirty=0;
         dirty = false;
       });
     });

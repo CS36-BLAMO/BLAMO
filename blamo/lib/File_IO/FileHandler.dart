@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'dart:convert';
-
+//import 'package:blamo/CustomActionBar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:blamo/main.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -291,6 +291,102 @@ class PersistentStorage {
     // Write the file
     return await file.writeAsString(toWrite, mode: FileMode.append, encoding: utf8 ,flush: true);
   }
+
+  /* Deletion functions for removing Documents, Units, and Tests
+  *  deleteDocument     -> deletes the document from the manifest and all of its correlated files
+  *  deleteUnit         -> deletes an individual unit, takes in doc name and unit name
+  *  deleteTest         -> deletes an individual test, takes in doc name and test name
+  *  deleteLogInfo      -> deletes an individual loginfo, takes in doc name
+  *  deleteDocumentMeta -> deletes an individual document-meta, takes in doc name
+  * */
+
+  Future<int> deleteDocument(String documentName) async {
+    //getFile arch for document manifest and unit/test list
+    StateData tempStateData = new StateData("");
+    tempStateData.currentDocument = documentName;
+    tempStateData = await setStateData(tempStateData);
+    String manifestString = "";
+
+    //Delete the units from the unitList
+    for(int i = 0; i < tempStateData.unitList.length; i++){
+      debugPrint("(FH)Document Deletion - Deleting Unit: ${tempStateData.unitList[i]}");
+      await deleteUnit(documentName, tempStateData.unitList[i]);
+    }
+
+    //Delete the tests from the testList
+    for(int i = 0; i < tempStateData.testList.length; i++){
+      debugPrint("(FH)Document Deletion - Deleting test: ${tempStateData.testList[i]}");
+      await deleteTest(documentName, tempStateData.testList[i]);
+    }
+
+
+    //Delete documentmeta manifest
+    await deleteDocumentMeta(documentName);
+
+    //Delete logInfo
+    await deleteLogInfo(documentName);
+
+    //
+    tempStateData.currentRoute = "/";
+    tempStateData = await setStateData(tempStateData);
+
+    //Remove documentName from manifest
+    for(int i = 0; i < tempStateData.list.length; i++){
+      if(tempStateData.list[i] != documentName && tempStateData.list[i] != ""){
+        debugPrint("(FH) Adding ${tempStateData.list[i] + ","} to new document manifest");
+        manifestString += tempStateData.list[i] + ",";
+      }
+    }
+    overWriteManifest(manifestString);
+
+    return 0;
+  }
+
+  Future<int> deleteTest(String documentName, String testName) async {
+    File fp = File(await _localPath + "/$documentName" + '_$testName.txt');
+    try {
+      await fp.delete();
+      return 0;
+    } catch(e) {
+      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      return 1;
+    }
+  }
+
+  Future<int> deleteUnit(String documentName, String unitName) async {
+    File fp = File(await _localPath + "/$documentName" + '_$unitName.txt');
+    try {
+      await fp.delete();
+      return 0;
+    } catch(e) {
+      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      return 1;
+    }
+  }
+
+  Future<int> deleteLogInfo(String documentName) async {
+    File fp = File(await _localPath + "/$documentName" + '_LogInfo.txt');
+    try {
+      await fp.delete();
+      return 0;
+    } catch(e) {
+      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      return 1;
+    }
+  }
+
+  Future<int> deleteDocumentMeta(String documentName) async {
+    File fp = File(await _localPath + "/$documentName" + '_Document-Meta.txt');
+    try {
+      await fp.delete();
+      return 0;
+    } catch(e) {
+      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      return 1;
+    }
+  }
+
+  /*---End Of file deletion functions---*/
 
   /*---Boolean file Checking, checks for the existence of Specific files---
   * checkForManifest() -> Checks the root directory if the manifest exists
