@@ -355,9 +355,8 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 attribute: "startDate",
                                 inputType: InputType.date,
                                 validators: [],
-                                format: DateFormat("dd-MM-yyyy"),
+                                format: DateFormat("yyyy-MM-dd"),
                                 decoration: InputDecoration(labelText: "Start Date"),
-                                //Todo
                                 initialValue: DateTime.tryParse(logInfoToBuildFrom.startDate + " 00:00:00"),
                                 onChanged: (void nbd){updateLogObject();},
                               ),
@@ -370,9 +369,8 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                     return "End Date must be after Start Date";
                                   return null;
                                 }], //Custom validator that checks that the end date is after the start date
-                                format: DateFormat('dd-MM-yyyy'),
+                                format: DateFormat('yyyy-MM-dd'),
                                 decoration: InputDecoration(labelText: "End Date"),
-                                //Todo
                                 initialValue: DateTime.tryParse(logInfoToBuildFrom.endDate + " 00:00:00"),
                                 onChanged: (void nbd){updateLogObject();},
                               ),
