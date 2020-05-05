@@ -87,33 +87,64 @@ class _UnitPageState extends State<UnitPage> {
   }
   //takes you back to units page with a pop up confirmation to not allow data loss
   Future<bool> backPressed() async {
-    return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-            title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(
-                  "No",
-                  style: TextStyle(
-                    fontSize: 25,
+    if(_fbKey.currentState.validate()) {
+      return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+              title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    "No",
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
                   ),
+                  onPressed: () => Navigator.pop(context,false),
                 ),
-                onPressed: () => Navigator.pop(context,false),
-              ),
-              FlatButton(
-                child: Text(
+                FlatButton(
+                  child: Text(
                     "Yes",
-                  style: TextStyle(
-                    fontSize: 25,
-                    color: Colors.red
+                    style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.red
+                    ),
                   ),
+                  onPressed: () => Navigator.pop(context,true),
+                )
+              ]
+          )
+      );
+    } else {
+      return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+              title: Text("There are fields with invalid inputs\n\nUnit will be deleted"),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    "Edit",
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                  onPressed: () => Navigator.pop(context,false),
                 ),
-                onPressed: () => Navigator.pop(context,true),
-              )
-            ]
-        )
-    );
+                FlatButton(
+                  child: Text(
+                    "Delete",
+                    style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.red
+                    ),
+                  ),
+                  onPressed: () => deleteBadUnit(),
+                )
+              ]
+          )
+      );
+    }
+
   }
 
   String formatValue(String value){
@@ -379,7 +410,7 @@ class _UnitPageState extends State<UnitPage> {
     unitObject.tags = jsonEncode(_fbKey.currentState.fields['tags'].currentState.value);
   }
 
-  void saveObject() async{
+  Future<void> saveObject() async{
     ObjectHandler toHandle = new ObjectHandler(currentState.currentProject);
     //TODO
     //unitObject.tags = ;
@@ -403,6 +434,26 @@ class _UnitPageState extends State<UnitPage> {
         dirty = false;
       });
     });
+  }
+
+  void deleteBadUnit() async {
+    await currentState.storage.deleteUnit(
+        currentState.currentDocument, currentState.currentUnit);
+    currentState.unitList.remove(currentState.currentUnit);
+
+    String toWrite = "${currentState.currentDocument}\n${currentState.testList
+        .length}\n${currentState.unitList.length}\n";
+    for (int i = 0; i < currentState.testList.length; i++) {
+      toWrite = toWrite + currentState.testList[i] + ',';
+    }
+    for (int i = 0; i < currentState.unitList.length; i++) {
+      toWrite = toWrite + currentState.unitList[i] + ',';
+    }
+    debugPrint(toWrite);
+
+    await currentState.storage.overWriteDocument(
+        currentState.currentDocument, toWrite);
+    Navigator.pop(context,true);
   }
 
 //new

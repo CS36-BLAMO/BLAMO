@@ -85,33 +85,63 @@ class _TestPageState extends State<TestPage> {
   //takes you back to units page with pop up to protect data
   // from being lost without saving
   Future<bool> backPressed() async {
-    return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-            title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(
-                  "No",
-                  style: TextStyle(
+    if(_fbKey.currentState.validate()) {
+      return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+              title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    "No",
+                    style: TextStyle(
                       fontSize: 25,
+                    ),
                   ),
+                  onPressed: () => Navigator.pop(context,false),
                 ),
-                onPressed: () => Navigator.pop(context,false),
-              ),
-              FlatButton(
-                child: Text(
-                  "Yes",
-                  style: TextStyle(
-                    fontSize: 25,
-                    color: Colors.red
+                FlatButton(
+                  child: Text(
+                    "Yes",
+                    style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.red
+                    ),
                   ),
+                  onPressed: () => Navigator.pop(context,true),
+                )
+              ]
+          )
+      );
+    } else {
+      return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+              title: Text("There are fields with invalid inputs\n\nTest will be deleted"),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    "Edit",
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                  onPressed: () => Navigator.pop(context,false),
                 ),
-                onPressed: () => Navigator.pop(context,true),
-              )
-            ]
-        )
-    );
+                FlatButton(
+                  child: Text(
+                    "Delete",
+                    style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.red
+                    ),
+                  ),
+                  onPressed: () => deleteBadTest(),
+                )
+              ]
+          )
+      );
+    }
   }
 
   Widget getTestScaffold(Test testObjectToBuildFrom){
@@ -549,7 +579,7 @@ class _TestPageState extends State<TestPage> {
 
   }
 
-  void saveTestObject() async{
+  Future<void> saveTestObject() async{
     ObjectHandler toHandle = new ObjectHandler(currentState.currentProject);
     //TODO
     //unitObject.tags = ;
@@ -573,5 +603,25 @@ class _TestPageState extends State<TestPage> {
         dirty = false;
       });
     });
+  }
+
+  void deleteBadTest() async {
+    await currentState.storage.deleteTest(
+        currentState.currentDocument, currentState.currentTest);
+    currentState.testList.remove(currentState.currentTest);
+
+    String toWrite = "${currentState.currentDocument}\n${currentState.testList
+        .length}\n${currentState.unitList.length}\n";
+    for (int i = 0; i < currentState.testList.length; i++) {
+      toWrite = toWrite + currentState.testList[i] + ',';
+    }
+    for (int i = 0; i < currentState.unitList.length; i++) {
+      toWrite = toWrite + currentState.unitList[i] + ',';
+    }
+    debugPrint(toWrite);
+
+    await currentState.storage.overWriteDocument(
+        currentState.currentDocument, toWrite);
+    Navigator.pop(context,true);
   }
 }

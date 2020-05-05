@@ -355,10 +355,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 attribute: "startDate",
                                 inputType: InputType.date,
                                 validators: [],
-                                format: DateFormat("dd-MM-yyyy"),
+                                format: DateFormat("yyyy-MM-dd"),
                                 decoration: InputDecoration(labelText: "Start Date"),
-                                //Todo
-                                initialValue: DateTime.tryParse(logInfoToBuildFrom.startDate),
+                                initialValue: DateTime.tryParse(logInfoToBuildFrom.startDate + " 00:00:00"),
                                 onChanged: (void nbd){updateLogObject();},
                               ),
                               FormBuilderDateTimePicker(
@@ -370,10 +369,9 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                     return "End Date must be after Start Date";
                                   return null;
                                 }], //Custom validator that checks that the end date is after the start date
-                                format: DateFormat('dd-MM-yyyy'),
+                                format: DateFormat('yyyy-MM-dd'),
                                 decoration: InputDecoration(labelText: "End Date"),
-                                //Todo
-                                initialValue: DateTime.tryParse(logInfoToBuildFrom.endDate),
+                                initialValue: DateTime.tryParse(logInfoToBuildFrom.endDate + " 00:00:00"),
                                 onChanged: (void nbd){updateLogObject();},
                               ),
                               FormBuilderTextField(
@@ -509,13 +507,13 @@ class _LogInfoPageState extends State<LogInfoPage> {
     logInfoObject.boreholeID = _fbKey.currentState.fields["boreholeID"].currentState.value;
     if(_fbKey.currentState.fields["startDate"].currentState.value != null) {
       //Updates date and removes time values
-      logInfoObject.startDate = "" + DateTime(_fbKey.currentState.fields["startDate"].currentState.value.year, _fbKey.currentState.fields["startDate"].currentState.value.month, _fbKey.currentState.fields["startDate"].currentState.value.day).toString();
+      logInfoObject.startDate = "" + _fbKey.currentState.fields["startDate"].currentState.value.year.toString() + "-" + _fbKey.currentState.fields["startDate"].currentState.value.month.toString().padLeft(2, '0') + "-" + _fbKey.currentState.fields["startDate"].currentState.value.day.toString().padLeft(2, '0');
     }
     else {
       logInfoObject.startDate = ""+_fbKey.currentState.fields["startDate"].currentState.value.toString();
     }
     if(_fbKey.currentState.fields["endDate"].currentState.value != null) {
-      logInfoObject.endDate = "" + DateTime(_fbKey.currentState.fields["endDate"].currentState.value.year, _fbKey.currentState.fields["endDate"].currentState.value.month, _fbKey.currentState.fields["endDate"].currentState.value.day).toString();
+      logInfoObject.endDate = "" + _fbKey.currentState.fields["endDate"].currentState.value.year.toString() + "-" + _fbKey.currentState.fields["endDate"].currentState.value.month.toString().padLeft(2, '0') + "-" + _fbKey.currentState.fields["endDate"].currentState.value.day.toString().padLeft(2, '0');
     }
     else {
       logInfoObject.endDate = ""+_fbKey.currentState.fields["endDate"].currentState.value.toString();
