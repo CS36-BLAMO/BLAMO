@@ -1,6 +1,6 @@
 import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+//import 'package:flutter/services.dart';
 //import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,7 +21,7 @@ class UnitsPage extends StatefulWidget {
 }
 
 class _UnitsPageState extends State<UnitsPage> {
-  TextEditingController _textFieldController = TextEditingController();
+  //TextEditingController _textFieldController = TextEditingController();
   final routeName = '/UnitsPage';
   StateData currentState;
   _UnitsPageState(this.currentState);
@@ -109,7 +109,7 @@ class _UnitsPageState extends State<UnitsPage> {
 
     String newUnit ="Unit_" + nextUnitNum.toString() + ',';
     String newUnitNoComma = "Unit_" + nextUnitNum.toString();
-    String unit = "{depthUB:null,depthLB:null,beginUnitDepth:null,unitMethods:null,drillingMethods:null,tags:null}";
+    String unit = "{depthUB:null,depthLB:null,drillingMethods:null,note:null,tags:null}";
     String toWrite = '';
     toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length + 1}\n";
     for(int i = 0; i < currentState.testList.length; i++){
@@ -254,32 +254,16 @@ class _UnitsPageState extends State<UnitsPage> {
     }
   }
 
-void testBuiildingList() async {
-    List<Unit> units = [];
-    ObjectHandler objectHandler = new ObjectHandler(currentState.currentProject);
-
-    for(int i = 0; i < currentState.unitList.length; i++){
-      debugPrint("(getUnitSet): Searching: ${currentState.currentDocument}_${currentState.unitList[i]}.txt");
-      await objectHandler.getUnitData(currentState.unitList[i], currentState.currentDocument).then((onValue){
-        setState((){
-          units.add(onValue);
-          debugPrint("(getUnitSet): ${currentState.unitList[i]} added");
-        });
+  Future<void> getUnitSet(List<String> unitNames, String documentName) async {
+    for (int i = 0; i < currentState.unitList.length; i++) {
+      ObjectHandler handler = new ObjectHandler(currentState.currentProject);
+      await handler.getUnitsData(unitNames, documentName).then((onValue){
+          setState(() {
+            units = onValue;
+            debugPrint("Units initialized.");
+            dirty = false;
+          });
       });
     }
-
-}
-
-void getUnitSet(List<String> unitNames, String documentName) async {
-  for (int i = 0; i < currentState.unitList.length; i++) {
-    ObjectHandler handler = new ObjectHandler(currentState.currentProject);
-    await handler.getUnitsData(unitNames, documentName).then((onValue){
-        setState(() {
-          units = onValue;
-          debugPrint("Units initialized.");
-          dirty = false;
-        });
-    });
   }
-}
 }
