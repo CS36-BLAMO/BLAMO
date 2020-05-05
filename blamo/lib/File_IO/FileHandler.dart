@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'dart:convert';
 //import 'package:blamo/CustomActionBar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:blamo/main.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'dart:async';
@@ -15,10 +15,13 @@ class PersistentStorage {
   String devicePath;
   String fileName;
   String pathExtension; //Structure for a path is $path/pathExtension/filename
+  String projectPrepend;
   int nameIterator;
+
 
   PersistentStorage(){
     fileName = "Manifest.txt";
+    projectPrepend = "";
     pathExtension = "";
     nameIterator = 0;
   }
@@ -40,6 +43,15 @@ class PersistentStorage {
 
   void changeNameIterator(int newIterator){
     nameIterator = newIterator;
+  }
+
+  void changeProjectName(String newProjectName){
+    if(newProjectName == ""){
+      projectPrepend = "";
+    } else {
+      projectPrepend = newProjectName + "_";
+    }
+
   }
 
   void setFileToManifest(){
@@ -83,7 +95,7 @@ class PersistentStorage {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/' + pathExtension + fileName);
+    return File('$path/' + projectPrepend + pathExtension + fileName);
   }
 
   /*---End Path Getters---*/
@@ -114,7 +126,7 @@ class PersistentStorage {
 
   Future<String> readDocument(String documentName) async {
     //--Debug
-    debugPrint("(FH)Reading from: /$documentName" + "_Document-Meta.txt\n");
+    debugPrint("(FH)Reading from: /" + projectPrepend + "$documentName"  + "_Document-Meta.txt\n");
 
     changePathExtension(documentName);
     changeFilename('_Document-Meta.txt');
@@ -133,7 +145,7 @@ class PersistentStorage {
 
   Future<String> readTest(String documentName, String testName) async {
     //--Debug
-    debugPrint("(FH)Reading from: /$documentName" + "_$testName.txt\n");
+    debugPrint("(FH)Reading from: /" + projectPrepend + "$documentName"  + "_$testName.txt\n");
 
     changePathExtension(documentName);
     changeFilename('_$testName.txt');
@@ -152,7 +164,7 @@ class PersistentStorage {
 
   Future<String> readUnit(String documentName, String unitName) async {
     //--Debug
-    debugPrint("(FH)Reading from: /$documentName" + "_$unitName.txt\n");
+    debugPrint("(FH)Reading from: /" + projectPrepend + "$documentName" + "_$unitName.txt\n");
 
     changePathExtension(documentName);
     changeFilename('_$unitName.txt');
@@ -171,7 +183,7 @@ class PersistentStorage {
 
     Future<String> readLogInfo(String documentName) async {
     //--Debug
-    debugPrint("(FH)Reading from: /$documentName" + "_LogInfo.txt\n");
+    debugPrint("(FH)Reading from: /$projectPrepend"+ "$documentName" + "_LogInfo.txt\n");
 
     changePathExtension(documentName);
     changeFilename('_LogInfo.txt');
@@ -293,6 +305,7 @@ class PersistentStorage {
   }
 
   /* Deletion functions for removing Documents, Units, and Tests
+  *  deleteProject      -> deletes the project, including all documents(renamed to boreholes)
   *  deleteDocument     -> deletes the document from the manifest and all of its correlated files
   *  deleteUnit         -> deletes an individual unit, takes in doc name and unit name
   *  deleteTest         -> deletes an individual test, takes in doc name and test name
@@ -300,10 +313,82 @@ class PersistentStorage {
   *  deleteDocumentMeta -> deletes an individual document-meta, takes in doc name
   * */
 
-  Future<int> deleteDocument(String documentName) async {
+  Future<int> deleteProject(String projectName) async{
+    changeProjectName(projectName);
+    bool isProjectInit = await checkForManifest();
+    List<String> tempLocProject = [];
+    String toParseProjects = await readManifest();
+    debugPrint("(FH) readManifest in SD: $toParseProjects");
+
+    if(isProjectInit) {
+      tempLocProject = toParseProjects.split(",");
+      debugPrint("(FH)Project deletion list to delete from: ${tempLocProject
+          .toString()}");
+      for (int i = 0; i < tempLocProject.length; i++) {
+        if(tempLocProject[i] != '') {
+          debugPrint("(FH) deleting document: ${tempLocProject[i]}");
+          await deleteProjectHelper(tempLocProject[i], projectName);
+          await new Future.delayed(new Duration(microseconds: 10));
+        }
+      }
+
+
+      await deleteProjectManifest();
+      await new Future.delayed(new Duration(microseconds: 5));
+    }
+    changeProjectName("");
+    toParseProjects = await readManifest();
+    tempLocProject = toParseProjects.split(",");
+    //Remove documentName from manifest
+    toParseProjects = "";
+    debugPrint("(FH)Project deletion list to build new manifest from: ${tempLocProject.toString()}");
+    for(int i = 0; i < tempLocProject.length; i++){
+      if(tempLocProject[i] != projectName && tempLocProject[i] != ''){
+        debugPrint("(FH) Adding ${tempLocProject[i]} to new document manifest");
+        toParseProjects += tempLocProject[i] + ",";
+      }
+    }
+
+    await overWriteManifest(toParseProjects);
+    await new Future.delayed(new Duration(microseconds: 3));
+    return 0;
+  }
+
+  Future<int> deleteProjectHelper(String documentName, String projectName) async {
     //getFile arch for document manifest and unit/test list
     StateData tempStateData = new StateData("");
     tempStateData.currentDocument = documentName;
+    tempStateData.currentProject = projectName;
+    changeProjectName(projectName);
+    tempStateData = await setStateData(tempStateData);
+
+    //Delete the units from the unitList
+    for(int i = 0; i < tempStateData.unitList.length; i++){
+      debugPrint("(FH)Document Deletion - Deleting Unit: ${tempStateData.unitList[i]}");
+      await deleteUnit(documentName, tempStateData.unitList[i]);
+    }
+
+    //Delete the tests from the testList
+    for(int i = 0; i < tempStateData.testList.length; i++){
+      debugPrint("(FH)Document Deletion - Deleting test: ${tempStateData.testList[i]}");
+      await deleteTest(documentName, tempStateData.testList[i]);
+    }
+
+    //Delete documentmeta manifest
+    await deleteDocumentMeta(documentName);
+
+    //Delete logInfo
+    await deleteLogInfo(documentName);
+
+    return 0;
+  }
+
+  Future<int> deleteDocument(String documentName, String projectName) async {
+    //getFile arch for document manifest and unit/test list
+    StateData tempStateData = new StateData("");
+    tempStateData.currentDocument = documentName;
+    tempStateData.currentProject = projectName;
+    changeProjectName(projectName);
     tempStateData = await setStateData(tempStateData);
     String manifestString = "";
 
@@ -343,45 +428,56 @@ class PersistentStorage {
   }
 
   Future<int> deleteTest(String documentName, String testName) async {
-    File fp = File(await _localPath + "/$documentName" + '_$testName.txt');
+    File fp = File(await _localPath + "/$projectPrepend" + documentName + '_$testName.txt');
     try {
       await fp.delete();
       return 0;
     } catch(e) {
-      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      debugPrint("(FH)Deletion of Test failed with error: ${e.toString()}");
       return 1;
     }
   }
 
   Future<int> deleteUnit(String documentName, String unitName) async {
-    File fp = File(await _localPath + "/$documentName" + '_$unitName.txt');
+    File fp = File(await _localPath + "/$projectPrepend" + documentName + '_$unitName.txt');
     try {
       await fp.delete();
       return 0;
     } catch(e) {
-      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      debugPrint("(FH)Deletion of Unit failed with error: ${e.toString()}");
       return 1;
     }
   }
 
   Future<int> deleteLogInfo(String documentName) async {
-    File fp = File(await _localPath + "/$documentName" + '_LogInfo.txt');
+    File fp = File(await _localPath + "/$projectPrepend" + documentName + '_LogInfo.txt');
     try {
       await fp.delete();
       return 0;
     } catch(e) {
-      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      debugPrint("(FH)Deletion of Log Info failed with error: ${e.toString()}\n--PathVariables--\nProject: $projectPrepend\nDocument: $documentName\n");
       return 1;
     }
   }
 
   Future<int> deleteDocumentMeta(String documentName) async {
-    File fp = File(await _localPath + "/$documentName" + '_Document-Meta.txt');
+    File fp = File(await _localPath + "/$projectPrepend" + documentName + '_Document-Meta.txt');
     try {
       await fp.delete();
       return 0;
     } catch(e) {
-      debugPrint("(FH)Deletion failed with error: ${e.toString()}");
+      debugPrint("(FH)Deletion of Document Meta failed with error: ${e.toString()}");
+      return 1;
+    }
+  }
+
+  Future<int> deleteProjectManifest() async {
+    File fp = File(await _localPath + "/$projectPrepend" + 'Manifest.txt');
+    try {
+      await fp.delete();
+      return 0;
+    } catch(e) {
+      debugPrint("(FH)Deletion of Project Manifest failed with error: ${e.toString()}");
       return 1;
     }
   }
@@ -393,33 +489,33 @@ class PersistentStorage {
   * */
   Future<bool> checkForManifest() async {
     setFileToManifest();
-    return File(await _localPath + "/Manifest.txt").exists();
+    return File(await _localPath + "/$projectPrepend" + "Manifest.txt").exists();
   }
 
   Future<bool> checkDocument(String documentName) async {
     setFileToManifest();
-    return File(await _localPath + "/$documentName" + '_Document-Meta.txt').exists();
+    return File(await _localPath + "/$projectPrepend" + documentName + '_Document-Meta.txt').exists();
   }
 
   Future<bool> checkTest(String documentName, String testName) async {
     setFileToManifest();
-    return File(await _localPath + "/$documentName" + '_$testName.txt').exists();
+    return File(await _localPath + "/$projectPrepend" + "$documentName" + '_$testName.txt').exists();
   }
 
   Future<bool> checkUnit(String documentName, String unitName) async {
     setFileToManifest();
-    return File(await _localPath + "/$documentName" + '_$unitName.txt').exists();
+    return File(await _localPath + "/$projectPrepend" + "$documentName" + '_$unitName.txt').exists();
   }
   /*---End Of file checking functions---*/
 
   //Updates the statedata object with the currentDocument
-  Future<StateData> setStateData(StateData toRead) async{
+  Future<StateData> setStateData(StateData toRead) async {
     String toParse;
     List<String> tempLoc = [];
     toRead.testList = [];
     toRead.unitList = [];
-
-    if(toRead.currentRoute == "/") {
+    changeProjectName(toRead.currentProject);
+    if(toRead.currentRoute == "/" || toRead.currentRoute == "/BoreholeList") {
       setFileToManifest();
       toParse = await readManifest();
       debugPrint("(FH) readManifest in SD: $toParse");
@@ -479,7 +575,7 @@ class PersistentStorage {
       print("Permission denied. PDF write cancelled."); // TODO - Better handle permission denied case.
     } else {
       final output = await getExternalStorageDirectory();
-      String filepath = "${output.path}/$documentName.$extension";
+      String filepath = "${output.path}/$projectPrepend$documentName.$extension";
       return File(filepath).exists();
     }
     return false;
@@ -498,7 +594,7 @@ class PersistentStorage {
       print("Permission denied. PDF write cancelled."); // TODO - Better handle permission denied case.
     } else {
       final output = await getExternalStorageDirectory();
-      String filepath = "${output.path}/$documentName.$extension";
+      String filepath = "${output.path}/$projectPrepend$documentName.$extension";
       return filepath;
     }
     return null;

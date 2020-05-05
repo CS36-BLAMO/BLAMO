@@ -1,4 +1,4 @@
-import 'package:blamo/main.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 //import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -31,7 +31,7 @@ class _UnitsPageState extends State<UnitsPage> {
   @override
   void initState(){
     super.initState();
-    dirty = true;
+    dirty = false;
     getUnitSet(currentState.unitList, currentState.currentDocument);
   }
   //final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
@@ -41,7 +41,7 @@ class _UnitsPageState extends State<UnitsPage> {
     }
 
     if(!dirty){
-      //debugPrint("Returning scaffold $units");
+      debugPrint("Returning scaffold $units");
       return getScaffold(units);
     }
     else {
@@ -92,79 +92,65 @@ class _UnitsPageState extends State<UnitsPage> {
     );
     return Future.value(false);
   }
-  createUnit(){
-    debugPrint("Create Unit button hit. Create unit here."); // TODO
+  Future<void> createUnit() async {
+    //Create a unit with the number of the last unit in unitList and increment by 1
+    //Cannot rename or shuffle names after created.
+    var nextUnitNum;
+    //debugPrint("Length of Unit list: " + currentState.unitList.length.toString());
+    if (currentState.unitList.length == 0) {
+      nextUnitNum = 1;
+    } else {
+      //debugPrint("Last Unit in List: " + currentState.unitList[currentState.unitList.length - 1]); //Last item in list is - 1 index(Dart language req)
+      var lastUnitName = currentState.unitList[currentState.unitList.length - 1];
+      var lastUnitNum = lastUnitName.substring(lastUnitName.indexOf('_') + 1, lastUnitName.length); //Takes string after _ in name to grab integer
+      nextUnitNum = int.parse(lastUnitNum) + 1;
+      //debugPrint("next unit num: " + nextUnitNum.toString());
+    }
+
+    String newUnit ="Unit_" + nextUnitNum.toString() + ',';
+    String newUnitNoComma = "Unit_" + nextUnitNum.toString();
+    String unit = "{depthUB:null,depthLB:null,beginUnitDepth:null,unitMethods:null,drillingMethods:null,tags:null}";
+    String toWrite = '';
+    toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length + 1}\n";
+    for(int i = 0; i < currentState.testList.length; i++){
+      toWrite = toWrite + currentState.testList[i] + ',';
+    }
+    for(int i = 0; i < currentState.unitList.length; i++){
+      toWrite = toWrite + currentState.unitList[i] + ',';
+    }
+    toWrite = toWrite + newUnit;
+    debugPrint(toWrite);
+    await currentState.storage.overWriteDocument(currentState.currentDocument, toWrite);
+    await currentState.storage.overWriteUnit(currentState.currentDocument,newUnitNoComma, unit);
+    currentState.unitList.add(newUnitNoComma);
+    currentState.currentUnit = newUnitNoComma;
+    currentState.currentRoute = '/UnitPage';
+
+    //Await for the test page to get popped
+    await Navigator.pushNamed(
+      context,
+      "/UnitPage",
+      arguments: currentState,
+    );
+    units = [];
+    await getUnitSet(currentState.unitList, currentState.currentDocument);
+    await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+      setState((){
+        currentState.dirty=0;
+        dirty = false;
+      });
+    });
   }
 
   FloatingActionButton floatingActionButtonBuilder(){
-    return new FloatingActionButton(
-      child: Icon(Icons.add),
-      tooltip: 'New Unit Document',
+    return new FloatingActionButton.extended(
+      label: Text("New Unit"),
+      tooltip: 'New Unit',
+      icon: new Icon(Icons.add),
       foregroundColor: Colors.black,
       backgroundColor: Colors.grey,
       elevation: 50.0,
-      onPressed:(){
-        showDialog(
-          context: context,
-          builder:(context) => AlertDialog(
-              title: Text('Enter Unit Name'),
-              content: TextField(
-                maxLength: 50,
-                controller: _textFieldController,
-                decoration: InputDecoration(labelText: 'Unit Name'),
-                inputFormatters: [new BlacklistingTextInputFormatter(new RegExp('[\\,]'))],
-              ),
-              actions: <Widget> [
-                new FlatButton(
-                  child: new Text('CANCEL'),
-                  textColor: Colors.red,
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                new FlatButton(
-                  child: new Text('ACCEPT'),
-                  onPressed: () async {
-                    String newUnit = _textFieldController.text + ',';
-                    String newUnitNoComma = _textFieldController.text;
-                    String unit = "{depthUB:null,depthLB:null,drillingMethods:null,notes:null,tags:null}";
-                    String toWrite = '';
-                    if(_textFieldController.text.isNotEmpty){
-                      toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length + 1}\n";
-                      for(int i = 0; i < currentState.testList.length; i++){
-                        toWrite = toWrite + currentState.testList[i] + ',';
-                      }
-                      for(int i = 0; i < currentState.unitList.length; i++){
-                        toWrite = toWrite + currentState.unitList[i] + ',';
-                      }
-                      toWrite = toWrite + newUnit;
-                      debugPrint(toWrite);
-                      await currentState.storage.overWriteDocument(currentState.currentDocument, toWrite);
-                      await currentState.storage.overWriteUnit(currentState.currentDocument,newUnitNoComma, unit);
-                      currentState.unitList.add(newUnitNoComma);
-                      currentState.currentUnit = newUnitNoComma;
-                      currentState.currentRoute = '/UnitPage';
-                      Navigator.pop(context);
-                      await Navigator.pushNamed(
-                        context,
-                        "/UnitPage",
-                        arguments: currentState,
-                      );
-                      units = [];
-                      await getUnitSet(currentState.unitList, currentState.currentDocument);
-                      await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
-                        setState((){
-                          currentState.dirty=0;
-                          dirty = false;
-                        });
-                      });
-                    }
-                  },
-                )
-              ]
-          ),
-        );
-      },
+      onPressed: createUnit,
     );
   }
 
@@ -268,8 +254,10 @@ class _UnitsPageState extends State<UnitsPage> {
     }
   }
 
-  Future<void> getUnitSet(List<String> unitNames, String documentName) async{
-    ObjectHandler objectHandler = new ObjectHandler();
+void testBuiildingList() async {
+    List<Unit> units = [];
+    ObjectHandler objectHandler = new ObjectHandler(currentState.currentProject);
+
     for(int i = 0; i < currentState.unitList.length; i++){
       debugPrint("(getUnitSet): Searching: ${currentState.currentDocument}_${currentState.unitList[i]}.txt");
       await objectHandler.getUnitData(currentState.unitList[i], currentState.currentDocument).then((onValue){
@@ -279,18 +267,19 @@ class _UnitsPageState extends State<UnitsPage> {
         });
       });
     }
-    await new Future.delayed(new Duration(microseconds: 1)).then((onValue){
-      setState((){
-        dirty = false;
-      });
+
+}
+
+void getUnitSet(List<String> unitNames, String documentName) async {
+  for (int i = 0; i < currentState.unitList.length; i++) {
+    ObjectHandler handler = new ObjectHandler(currentState.currentProject);
+    await handler.getUnitsData(unitNames, documentName).then((onValue){
+        setState(() {
+          units = onValue;
+          debugPrint("Units initialized.");
+          dirty = false;
+        });
     });
-    //ObjectHandler handler = new ObjectHandler();
-    //await handler.getUnitsData(unitNames, documentName).then((onValue){
-    //    setState(() {
-    //      units = onValue;
-    //      debugPrint("Units initialized.");
-    //      dirty = false;
-    //    });
-    //});
   }
+}
 }

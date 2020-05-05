@@ -1,4 +1,4 @@
-import 'package:blamo/main.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
@@ -474,7 +474,7 @@ class _TestPageState extends State<TestPage> {
   }
 
   Future<bool> checkTestDepthOverlap() async {
-    ObjectHandler objectHandler = new ObjectHandler();
+    ObjectHandler objectHandler = new ObjectHandler(currentState.currentProject);
     for(int i = 0; i < currentState.testList.length; i++){
       Test currentCheck = await objectHandler.getTestData(currentState.testList[i], currentState.currentDocument);
       if (currentState.currentTest != currentState.testList[i]) {
@@ -508,7 +508,10 @@ class _TestPageState extends State<TestPage> {
 
   List<String> getTags(Test testObj) {
     List<String> toReturn = [];
-    List<dynamic> ba = jsonDecode(testObj.tags);
+    List<dynamic> ba;
+    if(testObj.tags != null){
+      ba = jsonDecode(testObj.tags);
+    }
     if(ba != null) {
       for (int i = 0; i < ba.length; i++) {
         toReturn.add(ba[i].toString());
@@ -546,8 +549,8 @@ class _TestPageState extends State<TestPage> {
 
   }
 
-  Future<void> saveTestObject() async{
-    ObjectHandler toHandle = new ObjectHandler();
+  void saveTestObject() async{
+    ObjectHandler toHandle = new ObjectHandler(currentState.currentProject);
     //TODO
     //unitObject.tags = ;
 
@@ -562,7 +565,7 @@ class _TestPageState extends State<TestPage> {
   }
 
   void updateTestData(String testName, String documentName) async{
-    ObjectHandler objectHandler = new ObjectHandler();
+    ObjectHandler objectHandler = new ObjectHandler(currentState.currentProject);
     await objectHandler.getTestData(testName, documentName).then((onValue){
       setState(() {
         testObject = onValue;

@@ -6,7 +6,7 @@ import 'package:pdf/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:blamo/PDF/pdf_classes.dart';
-import 'package:blamo/main.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:blamo/ObjectHandler.dart' as handler;
 
 Document pdf = Document();
@@ -22,7 +22,7 @@ Future<String> docCreate(StateData currentState) async{
   // Create levels from provided lists of tests and units 
   var tests = await getTests(currentState);
   var units = await getUnits(currentState);
-  var loginfo = await getLogInfo(currentState.currentDocument);
+  var loginfo = await getLogInfo(currentState.currentDocument, currentState.currentProject);
 
   List<Level> levels = [];
   List<int> testIndexesStored = [];
@@ -218,9 +218,9 @@ Future<String> docCreate(StateData currentState) async{
   }
 }
 
-Future<handler.LogInfo> getLogInfo(String currentDocument) async{
+Future<handler.LogInfo> getLogInfo(String currentDocument, String currentProject) async{
     print("(pdf): in getLogInfo");
-    handler.ObjectHandler objectHandler = new handler.ObjectHandler();
+    handler.ObjectHandler objectHandler = new handler.ObjectHandler(currentProject);
     handler.LogInfo info;
     await objectHandler.getLogInfoData(currentDocument).then((onValue){
         print("(pdf): got loginfo for "+currentDocument);
@@ -231,7 +231,7 @@ Future<handler.LogInfo> getLogInfo(String currentDocument) async{
 
 Future<List<handler.Test>> getTests(StateData currentState) async{
     print("(pdf) In getTests");
-    handler.ObjectHandler objectHandler = new handler.ObjectHandler();
+    handler.ObjectHandler objectHandler = new handler.ObjectHandler(currentState.currentProject);
     List<handler.Test> fetchedTests = [];
     for(int i = 0; i < currentState.testList.length; i++){
       print("(pdf): Searching: ${currentState.currentDocument}");
@@ -247,7 +247,7 @@ Future<List<handler.Test>> getTests(StateData currentState) async{
 
 Future<List<handler.Unit>> getUnits(StateData currentState) async{
     print("(pdf) In getUnits");
-    handler.ObjectHandler objectHandler = new handler.ObjectHandler();
+    handler.ObjectHandler objectHandler = new handler.ObjectHandler(currentState.currentProject);
     List<handler.Unit> fetchedUnits = [];
     for(int i = 0; i < currentState.unitList.length; i++){
       print("(pdf): Searching: ${currentState.currentDocument}");
@@ -279,7 +279,7 @@ Future<String> pdf_write(StateData currentState) async{
   }
   else {
     final output = await getExternalStorageDirectory();
-    String filepath = "${output.path}/${currentState.currentDocument}" +".pdf"; //Took out + now.toString() can version files later with backend work to find most recent file
+    String filepath = "${output.path}/${currentState.currentProject}_${currentState.currentDocument}" +".pdf"; //Took out + now.toString() can version files later with backend work to find most recent file
     final file = File(filepath);
     print("writing to file at path: "+ filepath);
     await file.writeAsBytes(pdf.save()); // TODO - Name files better

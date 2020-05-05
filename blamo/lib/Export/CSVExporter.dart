@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:blamo/ObjectHandler.dart';
-import 'package:blamo/main.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class CSVExporter {
-  ObjectHandler objectHandler = new ObjectHandler();
+  ObjectHandler objectHandler;
   StateData stateData;
-
   LogInfo logInfo;
   List<Unit> units;
   List<Test> tests;
   List<String> lines = [];
 
-  CSVExporter(this.stateData);
+  CSVExporter(this.stateData){
+    objectHandler = new ObjectHandler(stateData.currentProject);
+  }
 
   Future<String> exportToCSV() async{
     String toWrite;
@@ -128,7 +129,7 @@ class CSVExporter {
       print("Permission denied. PDF write cancelled."); // TODO - Better handle permission denied case.
     } else {
       final output = await getExternalStorageDirectory();
-      String filepathCSV = "${output.path}/$csvName.csv";
+      String filepathCSV = "${output.path}/${stateData.currentProject}_$csvName.csv";
       //String filepathTXT = "${output.path}/$csvName.txt";
       final file = File(filepathCSV);
       debugPrint("(CSV) printing csv to: $filepathCSV");

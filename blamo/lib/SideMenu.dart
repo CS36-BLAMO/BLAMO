@@ -1,4 +1,4 @@
-import 'package:blamo/main.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
 
 //Side menu class that creates the side menu state
@@ -41,6 +41,7 @@ class _SideMenuState extends State<SideMenu> {
                   onTap: () {
                     if (currentState.currentRoute != '/') {
                       currentState.currentRoute = '/';
+                      currentState.currentProject = "";
                       currentState.currentDocument = "";
                       Navigator.pushReplacementNamed(
                         context,
@@ -121,6 +122,27 @@ class _SideMenuState extends State<SideMenu> {
                       Navigator.pushReplacementNamed(
                         context,
                         "/ExportPage",
+                        arguments: currentState,
+                      );
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+                Divider(color: Colors.grey),
+                new ListTile(
+                  title: new Text("Borehole List"),
+                  leading: Icon(
+                      Icons.list,
+                      color: Colors.blue
+                  ),
+                  onTap: () {
+                    if (currentState.currentRoute != '/BoreholeList') {
+                      currentState.currentRoute = '/BoreholeList';
+                      currentState.currentDocument="";
+                      Navigator.pushReplacementNamed(
+                        context,
+                        "/BoreholeList",
                         arguments: currentState,
                       );
                     } else {

@@ -10,10 +10,10 @@ import 'package:permission_handler/permission_handler.dart';
 // Needs docName and extension type csv or pdf with future option of having it zipped
 // Will throw exception if pdf/csv filepath is not found
 // TODO need to create backend to vacuum up all doc files and create pdf/csv based only on doc name
-Future<String> sendEmail(String documentName,String docType) async {
+Future<String> sendEmail(String documentName,String docType, String projectName) async {
   List<String> attachments = [];
 
-  ObjectHandler objectHandler = new ObjectHandler();
+  ObjectHandler objectHandler = new ObjectHandler(projectName);
   //String outputPath = "storage/emulated/0/Android/data/edu.oregonstate.blamo/files/output_test.pdf";
   String outputPath;
   debugPrint("EMAIL.dart - Send email");

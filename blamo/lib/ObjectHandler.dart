@@ -5,7 +5,7 @@ import 'package:gson/gson.dart';
 
 //TOREMOVE
 /*import 'package:flutter/cupertino.dart';
-import 'package:blamo/main.dart';
+import 'package:blamo/BoreholeList.dart';
 import 'package:blamo/PDF/pdf_classes.dart';
 import 'dart:convert';*/
 
@@ -21,7 +21,13 @@ import 'dart:convert';*/
 //This will be the backend object that accepts requests from UI/features-does fileI/O and
 //returns object requested
 class ObjectHandler {
-  PersistentStorage storage = new PersistentStorage();
+  PersistentStorage storage;
+
+  ObjectHandler(String projectName){
+    storage = new PersistentStorage();
+    storage.changeProjectName(projectName);
+  }
+
   //Can we make a generic function to parse JSON from storage and map it to correct object properties?
   // Or just do a dif parser for each?
   //TODO GENERIC JSON PARSER?

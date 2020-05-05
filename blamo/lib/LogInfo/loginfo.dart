@@ -1,4 +1,4 @@
-import 'package:blamo/main.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
@@ -111,7 +111,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
   }
 
   void updateLogInfoData(String documentName) async{
-    ObjectHandler objectHandler = new ObjectHandler();
+    ObjectHandler objectHandler = new ObjectHandler(currentState.currentProject);
     await objectHandler.getLogInfoData(documentName).then((onValue){
       setState(() {
         logInfoObject = onValue;
@@ -529,7 +529,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
   }
 
   void saveLogObject() async{
-    ObjectHandler toHandle = new ObjectHandler();
+    ObjectHandler toHandle = new ObjectHandler(currentState.currentProject);
     try {
       toHandle.saveLogInfoData(currentState.currentDocument, logInfoObject);
     } finally {

@@ -1,4 +1,4 @@
-import 'package:blamo/main.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/File_IO/FileHandler.dart';
 import 'package:blamo/SideMenu.dart';
@@ -95,16 +95,29 @@ class _DocumentPageState extends State<DocumentPage> {
       ),
     );
   }
+
+  void _onLogInfoTileClicked(){
+    //TODO - Take me to log info
+  }
+
+  void _onTestTileClicked(){
+    //TODO - Take me to clicked Test
+  }
+
+  void _onUnitTileClicked(){
+    //TODO - Take me to clicked Unit
+  }
+
   //Takes you back to borehole landing page
   //Removes currentDoc from currentState
   Future<bool> backPressed() async {
-    if (currentState.currentRoute != '/') {
-      currentState.currentRoute = '/';
+    if (currentState.currentRoute != '/BoreholeList') {
+      currentState.currentRoute = '/BoreholeList';
       currentState.currentDocument = "";
     }
     Navigator.pushReplacementNamed(
       context,
-      "/",
+      "/BoreholeList",
       arguments: currentState,
     );
     return Future.value(false);
