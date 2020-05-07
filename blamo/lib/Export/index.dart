@@ -70,7 +70,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
     //TODO THIS NEEDS TO BE REMOVED WHEN EMPTY STRING BUG IS FIXED FOR currentState.list
     boreholeList = []..addAll(currentState.list);
     boreholeList.removeLast();
-    boreholeList.add("BH_111");
+    
 
     return WillPopScope(
       onWillPop: backPressed,
