@@ -30,9 +30,11 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
   StateData currentState;
   //Creating structured list of output types
   List<String> docTypes = ['csv','pdf','both'];
+  //parameters to save file
+  String saveDoc;
   //parameters to pass to emailer
-  String pickedDoc = null;
-  String pickedDocType = null;
+  String pickedDoc;
+  String pickedDocType;
 
   //Variable for animations
   int _emailState = 0;
@@ -68,6 +70,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
     //TODO THIS NEEDS TO BE REMOVED WHEN EMPTY STRING BUG IS FIXED FOR currentState.list
     boreholeList = []..addAll(currentState.list);
     boreholeList.removeLast();
+    boreholeList.add("BH_111");
 
     return WillPopScope(
       onWillPop: backPressed,
@@ -79,14 +82,6 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
 
         body: new Stack(
           children: <Widget> [
-            new Container(
-              //decoration: new BoxDecoration(
-              //  image: new DecorationImage(
-              //      image: myImage.image,
-              //      fit: BoxFit.cover,
-              //  )
-              //)
-            ),
             new Container(
               child: Align(
                 alignment: Alignment.topCenter,
@@ -101,7 +96,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                           fit: FlexFit.loose,
                           child: Container(
                               width: 500,
-                              height: 160,
+                              height: 180,
                               child: _saveFileGFTile(context)
                           ),
                         ),
@@ -144,7 +139,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
     content: new Column(
       children: <Widget>[
         new Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Flexible (
@@ -155,7 +150,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                     hint: Text(
                       'Borehole',
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 20,
                           color: Color.fromRGBO(89,89,89,1)
                       )
                     ),
@@ -168,8 +163,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                         child: new Text(
                           value,
                           style: TextStyle(
-                              fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                              fontSize: 23,
                               color: Color.fromRGBO(89,89,89,1),
                           )
                         ),
@@ -192,7 +186,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                       hint: Text(
                           'Type',
                           style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 19,
                               color: Color.fromRGBO(89,89,89,1)
                           )
                       ),
@@ -206,7 +200,6 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                               value,
                               style: TextStyle(
                                 fontSize: 20,
-                                fontWeight: FontWeight.bold,
                                 color: Color.fromRGBO(89,89,89,1),
                               )
                           ),
@@ -267,15 +260,62 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Flexible (
-          flex: 3,
+          flex: 2,
           fit: FlexFit.loose,
-          child: Text(
-            "Save ${currentState.currentDocument}",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 25,
-              color: Color.fromRGBO(89,89,89,1)
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Flexible (
+                flex: 2,
+                fit: FlexFit.loose,
+                child: Text(
+                  "Save",
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: 40,
+                    color: Color.fromRGBO(89,89,89,1)
+                  ),
+                ),
+              ),
+              Spacer(flex: 1),
+              Flexible (
+                flex: 3,
+                fit: FlexFit.loose,
+                child: new DropdownButtonHideUnderline(
+                    child: DropdownButton<String> (
+                        hint: Text(
+                            'Borehole',
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Color.fromRGBO(89,89,89,1)
+                            )
+                        ),
+                        value: saveDoc,
+                        items:
+                        boreholeList.map((String value) {
+                          //print("Value from List of strings " + value);
+                          return new DropdownMenuItem(
+                            value: value,
+                            child: new Text(
+                                value,
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  color: Color.fromRGBO(89,89,89,1),
+                                )
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String value){
+                          //Will be needed in future
+                          setState(() {
+                            saveDoc = value;
+                            //currentState.currentDocument = value;
+                          });
+                        }
+                    )
+                ),
+              ),
+            ],
           ),
         ),
         SizedBox(height:20),
@@ -310,7 +350,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                                 _pdfState = 0;
                               });
                               Fluttertoast.showToast(
-                                  msg: "Failed to save ${currentState.currentDocument} as .pdf",
+                                  msg: "Failed to save $saveDoc as .pdf",
                                   toastLength: Toast.LENGTH_LONG,
                                   gravity: ToastGravity.BOTTOM,
                                   timeInSecForIos: 3,
@@ -353,7 +393,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                                 _csvState = 0;
                               });
                               Fluttertoast.showToast(
-                                  msg: "Failed to save ${currentState.currentDocument} as .csv",
+                                  msg: "Failed to save $saveDoc as .csv",
                                   toastLength: Toast.LENGTH_LONG,
                                   gravity: ToastGravity.BOTTOM,
                                   timeInSecForIos: 3,
