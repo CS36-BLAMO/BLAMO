@@ -121,12 +121,21 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
   }
   //Takes you back to the Overview page for the selected borehole
   Future<bool> backPressed() async {
-    Navigator.pushReplacementNamed(
-      context,
-      "/Document",
-      arguments: currentState,
-    );
-    return Future.value(false);
+    if (currentState.currentDocument != null) {
+      Navigator.pushReplacementNamed(
+        context,
+        "/Document",
+        arguments: currentState,
+      );
+      return Future.value(false);
+    } else {
+      Navigator.pushReplacementNamed(
+        context,
+        "/BoreholeList",
+        arguments: currentState,
+      );
+      return Future.value(false);
+    }
   }
 
   GFCard _emailGFTile(BuildContext context, List<String> boreholeList) => GFCard(

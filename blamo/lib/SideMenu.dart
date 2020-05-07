@@ -53,6 +53,48 @@ class _SideMenuState extends State<SideMenu> {
                     }
                   },
                 ),
+                Divider(color: Colors.grey),
+                new ListTile(
+                  title: new Text("Export"),
+                  leading: Icon(
+                      Icons.import_export,
+                      color: Colors.blue
+                  ),
+                  onTap: () {
+                    if (currentState.currentRoute != '/ExportPage') {
+                      currentState.currentRoute = '/ExportPage';
+                      Navigator.pushReplacementNamed(
+                        context,
+                        "/ExportPage",
+                        arguments: currentState,
+                      );
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+                Divider(color: Colors.grey),
+                new ListTile(
+                  title: new Text("Borehole List"),
+                  leading: Icon(
+                      Icons.list,
+                      color: Colors.blue
+                  ),
+                  onTap: () {
+                    if (currentState.currentRoute != '/BoreholeList') {
+                      currentState.currentRoute = '/BoreholeList';
+                      currentState.currentDocument="";
+                      Navigator.pushReplacementNamed(
+                        context,
+                        "/BoreholeList",
+                        arguments: currentState,
+                      );
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+                Divider(color: Colors.grey),
               ]
           )
       );
