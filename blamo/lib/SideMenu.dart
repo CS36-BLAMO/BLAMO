@@ -54,25 +54,6 @@ class _SideMenuState extends State<SideMenu> {
                   },
                   key: Key('homeNav'),
                 ),
-                Divider(color: Colors.grey),
-                new ListTile(
-                    title: new Text("Settings"),
-                    leading: Icon(
-                        Icons.settings,
-                        color: Colors.blue
-                    ),
-                    onTap: () {
-                      if (currentState.currentRoute != '/SettingsPage') {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          "/SettingsPage",
-                          arguments: currentState,
-                        );
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    }),
-                Divider(color: Colors.grey),
               ]
           )
       );
@@ -234,26 +215,7 @@ class _SideMenuState extends State<SideMenu> {
                   },
                   key: Key('testsNav'),
                 ),
-                Divider(color: Colors.grey),
-                new ListTile(
-                    title: new Text("Settings"),
-                    leading: Icon(
-                        Icons.settings,
-                        color: Colors.blue
-                    ),
-                    onTap: () {
-                      if (currentState.currentRoute != '/SettingsPage') {
-                        currentState.currentDocument = "";
-                        Navigator.pushReplacementNamed(
-                          context,
-                          "/SettingsPage",
-                          arguments: currentState,
-                        );
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    }),
-                Divider(color: Colors.grey),
+                Divider(color: Colors.grey[900]),
               ]
           )
       );
