@@ -17,7 +17,7 @@ import 'package:blamo/PDF/pdf_classes.dart';*/
 class UnitPage extends StatefulWidget {
   final StateData pass; //Passes the StateData object to the stateful constructor
 
-  UnitPage(this.pass);
+  UnitPage(this.pass, {Key key}) : super(key:key);
 
   @override
   _UnitPageState createState() => new _UnitPageState(pass);
@@ -87,33 +87,64 @@ class _UnitPageState extends State<UnitPage> {
   }
   //takes you back to units page with a pop up confirmation to not allow data loss
   Future<bool> backPressed() async {
-    return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-            title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(
-                  "No",
-                  style: TextStyle(
-                    fontSize: 25,
+    if(_fbKey.currentState.validate()) {
+      return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+              title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    "No",
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
                   ),
+                  onPressed: () => Navigator.pop(context,false),
                 ),
-                onPressed: () => Navigator.pop(context,false),
-              ),
-              FlatButton(
-                child: Text(
+                FlatButton(
+                  child: Text(
                     "Yes",
-                  style: TextStyle(
-                    fontSize: 25,
-                    color: Colors.red
+                    style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.red
+                    ),
                   ),
+                  onPressed: () => Navigator.pop(context,true),
+                )
+              ]
+          )
+      );
+    } else {
+      return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+              title: Text("There are fields with invalid inputs\n\nUnit will be deleted"),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    "Edit",
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                  onPressed: () => Navigator.pop(context,false),
                 ),
-                onPressed: () => Navigator.pop(context,true),
-              )
-            ]
-        )
-    );
+                FlatButton(
+                  child: Text(
+                    "Delete",
+                    style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.red
+                    ),
+                  ),
+                  onPressed: () => deleteBadUnit(),
+                )
+              ]
+          )
+      );
+    }
+
   }
 
   String formatValue(String value){
@@ -148,6 +179,7 @@ class _UnitPageState extends State<UnitPage> {
                         child: Column(
                             children: <Widget>[
                               FormBuilderTextField(
+                                key: Key('depth-ubField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[0],
@@ -167,6 +199,7 @@ class _UnitPageState extends State<UnitPage> {
                               },*/
                               ),
                               FormBuilderTextField(
+                                key: Key('depth-lbField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[1],
@@ -190,6 +223,7 @@ class _UnitPageState extends State<UnitPage> {
                               },*/
                               ),
                               FormBuilderTextField(
+                                key: Key('methodsField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[2],
                                 attribute: 'methods',
@@ -208,6 +242,7 @@ class _UnitPageState extends State<UnitPage> {
                               },*/
                               ),
                               FormBuilderTextField(
+                                key: Key('notesField'),
                                 textInputAction: TextInputAction.newline,
                                 focusNode: formNodes[3],
                                 attribute: 'notes',
@@ -223,7 +258,7 @@ class _UnitPageState extends State<UnitPage> {
                                 validators: [],
                                 initialValue: getTags(unitToBuildFrom),
                                 options: [ // TODO need gint's set of tags, ability for user to make own tags.
-                                  FormBuilderFieldOption(value: "Asphalt"),
+                                  FormBuilderFieldOption(value: "Asphalt", key: Key('unitAsphaltTag'),),
                                   FormBuilderFieldOption(value: "Basalt"),
                                   FormBuilderFieldOption(value: "Bedrock"),
                                   FormBuilderFieldOption(value: "Boulders and Cobbles"),
@@ -286,6 +321,7 @@ class _UnitPageState extends State<UnitPage> {
                   )
                 ),
             floatingActionButton: FloatingActionButton(
+                key: Key('saveUnit'),
                 onPressed: () async {
                   if (_fbKey.currentState.saveAndValidate()) {
                     //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
@@ -379,7 +415,7 @@ class _UnitPageState extends State<UnitPage> {
     unitObject.tags = jsonEncode(_fbKey.currentState.fields['tags'].currentState.value);
   }
 
-  void saveObject() async{
+  Future<void> saveObject() async{
     ObjectHandler toHandle = new ObjectHandler(currentState.currentProject);
     //TODO
     //unitObject.tags = ;
@@ -403,6 +439,26 @@ class _UnitPageState extends State<UnitPage> {
         dirty = false;
       });
     });
+  }
+
+  void deleteBadUnit() async {
+    await currentState.storage.deleteUnit(
+        currentState.currentDocument, currentState.currentUnit);
+    currentState.unitList.remove(currentState.currentUnit);
+
+    String toWrite = "${currentState.currentDocument}\n${currentState.testList
+        .length}\n${currentState.unitList.length}\n";
+    for (int i = 0; i < currentState.testList.length; i++) {
+      toWrite = toWrite + currentState.testList[i] + ',';
+    }
+    for (int i = 0; i < currentState.unitList.length; i++) {
+      toWrite = toWrite + currentState.unitList[i] + ',';
+    }
+    debugPrint(toWrite);
+
+    await currentState.storage.overWriteDocument(
+        currentState.currentDocument, toWrite);
+    Navigator.pop(context,true);
   }
 
 //new

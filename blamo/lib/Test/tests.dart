@@ -1,6 +1,6 @@
 import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+//import 'package:flutter/services.dart';
 //import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,13 +10,13 @@ import 'package:blamo/CustomActionBar.dart';
 class TestsPage extends StatefulWidget {
   final StateData pass; 
 
-  TestsPage(this.pass);
+  TestsPage(this.pass, {Key key}) : super(key:key);
   @override
   _TestsPageState createState() => new _TestsPageState(pass);
 }
 
 class _TestsPageState extends State<TestsPage> {
-  TextEditingController _textFieldController = TextEditingController();
+  //TextEditingController _textFieldController = TextEditingController();
   final routeName = '/TestPage';
   StateData currentState;
   _TestsPageState(this.currentState);
@@ -172,6 +172,7 @@ class _TestsPageState extends State<TestsPage> {
 
                   child: new Material(
                     child: InkWell(
+                      key: Key('test_' + (i+1).toString()),
                       onTap: () => _onTileClicked(i),
                       onLongPress: () => _onTileLongClicked(i),
                       splashColor: Colors.grey,
@@ -218,6 +219,7 @@ class _TestsPageState extends State<TestsPage> {
             new FlatButton(
                 child: Text("DELETE"),
                 textColor: Colors.red,
+                key: Key('deleteTest'),
                 onPressed: () {
                   Navigator.pop(context, "DELETE");
                 }),
