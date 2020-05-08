@@ -1,5 +1,4 @@
-import 'package:blamo/main.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
@@ -88,33 +87,64 @@ class _UnitPageState extends State<UnitPage> {
   }
   //takes you back to units page with a pop up confirmation to not allow data loss
   Future<bool> backPressed() async {
-    return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-            title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(
-                  "No",
-                  style: TextStyle(
-                    fontSize: 25,
+    if(_fbKey.currentState.validate()) {
+      return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+              title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    "No",
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
                   ),
+                  onPressed: () => Navigator.pop(context,false),
                 ),
-                onPressed: () => Navigator.pop(context,false),
-              ),
-              FlatButton(
-                child: Text(
+                FlatButton(
+                  child: Text(
                     "Yes",
-                  style: TextStyle(
-                    fontSize: 25,
-                    color: Colors.red
+                    style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.red
+                    ),
                   ),
+                  onPressed: () => Navigator.pop(context,true),
+                )
+              ]
+          )
+      );
+    } else {
+      return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+              title: Text("There are fields with invalid inputs\n\nUnit will be deleted"),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    "Edit",
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                  onPressed: () => Navigator.pop(context,false),
                 ),
-                onPressed: () => Navigator.pop(context,true),
-              )
-            ]
-        )
-    );
+                FlatButton(
+                  child: Text(
+                    "Delete",
+                    style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.red
+                    ),
+                  ),
+                  onPressed: () => deleteBadUnit(),
+                )
+              ]
+          )
+      );
+    }
+
   }
 
   String formatValue(String value){
@@ -293,7 +323,7 @@ class _UnitPageState extends State<UnitPage> {
                     updateUnitObject();
                     bool noOverlap = await checkUnitDepthOverlap();
                     if(noOverlap){
-                      await saveUnitObject();
+                      await saveObject();
                       currentState.currentRoute = '/UnitsPage';
                       _showToast("Success", Colors.green);
                       Navigator.pop(context, "Success");
@@ -318,7 +348,7 @@ class _UnitPageState extends State<UnitPage> {
   }
 
   Future<bool> checkUnitDepthOverlap() async {
-    ObjectHandler objectHandler = new ObjectHandler();
+    ObjectHandler objectHandler = new ObjectHandler(currentState.currentProject);
     for(int i = 0; i < currentState.unitList.length; i++){
       Unit currentCheck = await objectHandler.getUnitData(currentState.unitList[i], currentState.currentDocument);
       if(currentState.currentUnit != currentState.unitList[i]) {
@@ -352,7 +382,10 @@ class _UnitPageState extends State<UnitPage> {
 
   List<String> getTags(Unit unitObj) {
     List<String> toReturn = [];
-    List<dynamic> ba = jsonDecode(unitObj.tags);
+    List<dynamic> ba;
+    if(unitObj.tags != null){
+      ba = jsonDecode(unitObj.tags);
+    }
     if(ba != null) {
       for(int i = 0; i < ba.length; i++){
         toReturn.add(ba[i].toString());
@@ -377,8 +410,8 @@ class _UnitPageState extends State<UnitPage> {
     unitObject.tags = jsonEncode(_fbKey.currentState.fields['tags'].currentState.value);
   }
 
-  Future<void> saveUnitObject() async{
-    ObjectHandler toHandle = new ObjectHandler();
+  Future<void> saveObject() async{
+    ObjectHandler toHandle = new ObjectHandler(currentState.currentProject);
     //TODO
     //unitObject.tags = ;
 
@@ -393,7 +426,7 @@ class _UnitPageState extends State<UnitPage> {
   }
 
   void updateUnitData(String unitName, String documentName) async{
-    ObjectHandler objectHandler = new ObjectHandler();
+    ObjectHandler objectHandler = new ObjectHandler(currentState.currentProject);
     await objectHandler.getUnitData(unitName, documentName).then((onValue){
       setState(() {
         unitObject = onValue;
@@ -402,6 +435,27 @@ class _UnitPageState extends State<UnitPage> {
       });
     });
   }
+
+  void deleteBadUnit() async {
+    await currentState.storage.deleteUnit(
+        currentState.currentDocument, currentState.currentUnit);
+    currentState.unitList.remove(currentState.currentUnit);
+
+    String toWrite = "${currentState.currentDocument}\n${currentState.testList
+        .length}\n${currentState.unitList.length}\n";
+    for (int i = 0; i < currentState.testList.length; i++) {
+      toWrite = toWrite + currentState.testList[i] + ',';
+    }
+    for (int i = 0; i < currentState.unitList.length; i++) {
+      toWrite = toWrite + currentState.unitList[i] + ',';
+    }
+    debugPrint(toWrite);
+
+    await currentState.storage.overWriteDocument(
+        currentState.currentDocument, toWrite);
+    Navigator.pop(context,true);
+  }
+
 //new
   /*void testSave() async {
     ObjectHandler toTest = new ObjectHandler();
@@ -552,5 +606,17 @@ class _UnitPageState extends State<UnitPage> {
     );
     
   }*/
+
+  /*void updateUnitData(String unitName, String documentName) async{
+    ObjectHandler objectHandler = new ObjectHandler(currentState.currentProject);
+    await objectHandler.getUnitData(unitName, documentName).then((onValue){
+        setState(() {
+          unitObject = onValue;
+          debugPrint("In set state: (${unitObject.drillingMethods})");
+          dirty = false;
+        });
+      });
+    }*/
+
 }
 

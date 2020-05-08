@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:blamo/Export/CSVExporter.dart';
-import 'package:blamo/main.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/PDF/pdf_builder.dart';
 import 'package:blamo/SideMenu.dart';
@@ -39,6 +39,8 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
   int _pdfState = 0;
   int _csvState = 0;
 
+  List<String> boreholeList;
+
   _ExportPageState(this.currentState);
 
   //Pre cache image in order to be loaded when user first sees page
@@ -58,11 +60,14 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
     if (currentState.currentRoute != null) {
       currentState.currentRoute =
       '/ExportPage'; //Assigns currentState.currentRoute to the name of the current named route
     }
+
+    //TODO THIS NEEDS TO BE REMOVED WHEN EMPTY STRING BUG IS FIXED FOR currentState.list
+    boreholeList = []..addAll(currentState.list);
+    boreholeList.removeLast();
 
     return WillPopScope(
       onWillPop: backPressed,
@@ -103,7 +108,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                         Container(
                             width: 500,
                             height: 170,
-                            child:_emailGFTile(context)
+                            child:_emailGFTile(context,boreholeList)
                         )
                       ]),
                 )
@@ -124,7 +129,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
     return Future.value(false);
   }
 
-  GFCard _emailGFTile(BuildContext context) => GFCard(
+  GFCard _emailGFTile(BuildContext context, List<String> boreholeList) => GFCard(
     boxFit: BoxFit.cover,
     color: Color.fromRGBO(255,255,255,0.9),
     content: new Column(
@@ -147,7 +152,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                     ),
                     value: pickedDoc,
                     items:
-                    currentState.list.map((String value) {
+                    boreholeList.map((String value) {
                       //print("Value from List of strings " + value);
                       return new DropdownMenuItem(
                         value: value,
@@ -222,7 +227,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                     animateEmail();
                   }
                 });
-                return sendEmail(pickedDoc, pickedDocType).then((onValue) {
+                return sendEmail(pickedDoc, pickedDocType, currentState.currentProject).then((onValue) {
                   setState(() {
                     _emailState = 0;
                   });

@@ -1,9 +1,9 @@
 import 'package:blamo/LogInfo/loginfo.dart';
-import 'package:blamo/Settings/settings.dart';
+import 'package:blamo/main.dart';
 import 'package:flutter/material.dart';
 import 'package:blamo/Unit/unit.dart';
 import 'package:blamo/Unit/units.dart';
-import 'package:blamo/main.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:blamo/Export/index.dart';
 import 'package:blamo/Test/test.dart';
 import 'package:blamo/Document/overview.dart';
@@ -23,6 +23,9 @@ class RouteGenerator {
       case '/':
         return MaterialPageRoute(builder: (_) => HomePage(args));
         break;
+      case '/BoreholeList':
+        return MaterialPageRoute(builder: (_) => BoreholePage(args));
+        break;
       case "/ExportPage":
         return MaterialPageRoute(builder: (_) => ExportPage(args));
         break;
@@ -40,9 +43,6 @@ class RouteGenerator {
         break;
       case "/TestsPage":
         return MaterialPageRoute(builder: (_) => TestsPage(args));
-        break;
-      case "/SettingsPage":
-        return MaterialPageRoute(builder: (_) => SettingsPage(args));
         break;
       case "/Document":
         return MaterialPageRoute(builder: (_) => DocumentPage(args));

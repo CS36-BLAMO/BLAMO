@@ -1,6 +1,6 @@
-import 'package:blamo/main.dart';
+import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+//import 'package:flutter/services.dart';
 //import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,7 +16,7 @@ class TestsPage extends StatefulWidget {
 }
 
 class _TestsPageState extends State<TestsPage> {
-  TextEditingController _textFieldController = TextEditingController();
+  //TextEditingController _textFieldController = TextEditingController();
   final routeName = '/TestPage';
   StateData currentState;
   _TestsPageState(this.currentState);
@@ -92,84 +92,71 @@ class _TestsPageState extends State<TestsPage> {
     );
   }
 
-  createTest(){
-    debugPrint("Create Test button pressed. Create test here"); // TODO
+  Future<void> createTest() async {
+
+    //Create a test with the number of the last test that is in the testList and increment value by 1
+    //Cannot rename or shuffle names after created.
+    var nextTestNum;
+    //debugPrint("Length of Test list: " + currentState.testList.length.toString());
+    if (currentState.testList.length == 0) {
+      debugPrint("Length of test is 0, creating test 1");
+      nextTestNum = 1;
+    } else {
+      //debugPrint("Last Test in List: " + currentState.testList[currentState.testList.length - 1]); //Last item in list is - 1 index(Dart language req)
+      var lastTestName = currentState.testList[currentState.testList.length - 1];
+      var lastTestNum = lastTestName.substring(lastTestName.indexOf('_') + 1, lastTestName.length); //Takes string after _ in name to grab integer
+      nextTestNum = int.parse(lastTestNum) + 1;
+      //debugPrint("next unit num: " + nextTestNum.toString());
+    }
+
+    //int testNum = currentState.testList.length + 1;
+    String newTest = "Test_" + nextTestNum.toString() + ',';
+    String newTestNoComma = "Test_" + nextTestNum.toString();
+    String test = "{testType:null,beginTest:null,endTest:null,percentRecovery:null,soilDrivingResistance:null,rockDiscontinuityData:null,rockQualityDesignation:null,moistureContent:null,dryDensity:null,liquidLimit:null,plasticLimit:null,fines:null,blows1:null,blows2:null,blows3:null,blowCount:null,tags:null}";
+    String toWrite = '';
+    toWrite = "${currentState.currentDocument}\n${currentState.testList.length + 1}\n${currentState.unitList.length}\n";
+    for(int i = 0; i < currentState.testList.length; i++){
+      toWrite = toWrite + currentState.testList[i] + ',';
+    }
+    toWrite = toWrite + newTest;
+    for(int i = 0; i < currentState.unitList.length; i++){
+      toWrite = toWrite + currentState.unitList[i] + ',';
+    }
+    debugPrint(toWrite);
+
+    await currentState.storage.overWriteDocument(currentState.currentDocument, toWrite);
+    await currentState.storage.overWriteUnit(currentState.currentDocument,newTestNoComma, test);
+    currentState.testList.add(newTestNoComma);
+    currentState.currentTest = newTestNoComma;
+    currentState.currentRoute = '/TestPage';
+
+    //Await for the test page to get popped
+    await Navigator.pushNamed(
+      context,
+      "/TestPage",
+      arguments: currentState,
+    );
+
+    //Update tests and reload page
+    tests = [];
+    await getTestSet(currentState.testList, currentState.currentDocument);
+    await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
+      setState((){
+        currentState.dirty=0;
+        dirty = false;
+      });
+    });
   }
 
   FloatingActionButton floatingActionButtonBuilder(){
-    return new FloatingActionButton(
-      child: Icon(Icons.add),
+    return new FloatingActionButton.extended(
+      label: Text("New Test"),
+      icon: new Icon(Icons.add),
       tooltip: 'New Test Document',
       foregroundColor: Colors.black,
       backgroundColor: Colors.grey,
       elevation: 50.0,
-      onPressed:(){
-        showDialog(
-          context: context,
-          builder:(context) => AlertDialog(
-              title: Text('Enter Test Name'),
-              content: TextField(
-                maxLength: 50,
-                controller: _textFieldController,
-                decoration: InputDecoration(labelText: 'Test Name'),
-                inputFormatters: [new BlacklistingTextInputFormatter(new RegExp('[\\,]'))],
-              ),
-              actions: <Widget> [
-                new FlatButton(
-                  child: new Text('CANCEL'),
-                  textColor: Colors.red,
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                new FlatButton(
-                  child: new Text('ACCEPT'),
-                  onPressed: () async {
-                    String newTest = _textFieldController.text + ',';
-                    String newTestNoComma = _textFieldController.text;
-                    String test = "{testType:null,beginTest:null,endTest:null,percentRecovery:null,soilDrivingResistance:null,rockDiscontinuityData:null,rockQualityDesignation:null,moistureContent:null,dryDensity:null,liquidLimit:null,plasticLimit:null,fines:null,blows1:null,blows2:null,blows3:null,blowCount:null,tags:null}";
-                    String toWrite = '';
-                    if(_textFieldController.text.isNotEmpty){
-                      toWrite = "${currentState.currentDocument}\n${currentState.testList.length + 1}\n${currentState.unitList.length}\n";
-                      for(int i = 0; i < currentState.testList.length; i++){
-                        toWrite = toWrite + currentState.testList[i] + ',';
-                      }
-                      toWrite = toWrite + newTest;
-                      for(int i = 0; i < currentState.unitList.length; i++){
-                        toWrite = toWrite + currentState.unitList[i] + ',';
-                      }
-                      debugPrint(toWrite);
-
-                      await currentState.storage.overWriteDocument(currentState.currentDocument, toWrite);
-                      await currentState.storage.overWriteUnit(currentState.currentDocument,newTestNoComma, test);
-                      currentState.testList.add(newTestNoComma);
-                      currentState.currentTest = newTestNoComma;
-                      currentState.currentRoute = '/TestPage';
-                      Navigator.pop(context);
-
-                      //Await for the test page to get popped
-                      await Navigator.pushNamed(
-                        context,
-                        "/TestPage",
-                        arguments: currentState,
-                      );
-
-                      //Update tests and reload page
-                      tests = [];
-                      await getTestSet(currentState.testList, currentState.currentDocument);
-                      await new Future.delayed(new Duration(microseconds: 3)).then((onValue){
-                        setState((){
-                          currentState.dirty=0;
-                          dirty = false;
-                        });
-                      });
-                    }
-                  },
-                )
-              ]
-          ),
-        );
-      },
+      onPressed: createTest,
     );
   }
 
@@ -188,7 +175,7 @@ class _TestsPageState extends State<TestsPage> {
                       onTap: () => _onTileClicked(i),
                       onLongPress: () => _onTileLongClicked(i),
                       splashColor: Colors.grey,
-                      child: Center(child: Text((i+1).toString() + "." + tests[i].beginTest.toString() + " - " + tests[i].endTest.toString())),
+                      child: Center(child: Text(tests[i].beginTest.toString() + " - " + tests[i].endTest.toString())),
                     ),
                     color: Colors.transparent,
                   )
@@ -273,7 +260,7 @@ class _TestsPageState extends State<TestsPage> {
 
   Future<void> getTestSet(List<String> testNames, String documentName) async{
     debugPrint("In getTestSet");
-    ObjectHandler objectHandler = new ObjectHandler();
+    ObjectHandler objectHandler = new ObjectHandler(currentState.currentProject);
     for(int i = 0; i < currentState.testList.length; i++){
       debugPrint("(getTestSet): Searching: ${currentState.currentDocument}");
       await objectHandler.getTestData(currentState.testList[i], currentState.currentDocument).then((onValue){
