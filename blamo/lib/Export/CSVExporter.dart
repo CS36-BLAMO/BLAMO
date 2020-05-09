@@ -28,6 +28,24 @@ class CSVExporter {
     return response;
   }
 
+  Future<String> exportProjectToCSV() async {
+    String toWrite;
+    String header = "OBJECTID,Test Type,PROJECT,Number,Client,LATITUDE,LONGITUDE,Projection,North,East,Location,Elevation Datum,Borehole ID,Date Started,Date Completed,Surface Elevation (ft),Contractor/Driller,Method,Logged By,Checked By,Begin Depth (ft),End Depth (ft),Soil Type,Description,Moisture Content,Dry Density (pcf),Liquid Limit (%),Plastic Limit (%),Fines (%),Blows 1st,Blows 2nd,Blows 3rd,N Value";
+    lines.add(header);
+    String holdCurrentDoc= stateData.currentDocument;
+    for(int i = 0; i < stateData.list.length; i++){
+      debugPrint('stateData.list[$i]: ${stateData.list[i]}');
+      if(stateData.list[i] != ''){
+        stateData.currentDocument = stateData.list[i];
+        await getData();
+        buildCSVLines();
+      }
+    }
+    toWrite = formatLinesToString();
+    debugPrint('Writing to csv: \n $toWrite');
+    stateData.currentDocument = holdCurrentDoc;
+  }
+
   Future<int> getData() async{
     logInfo = await objectHandler.getLogInfoData(stateData.currentDocument);
     try{
@@ -45,45 +63,55 @@ class CSVExporter {
     return 0;
   }
 
+  String scrubData(String toScrub){
+    if(toScrub != null){
+      return toScrub.replaceAll(",", " ").replaceAll('\n', '') + ",";
+    } else {
+      return ",";
+    }
+  }
+
   void buildCSVLines(){
-    String header = "OBJECTID,Test Type,PROJECT,Number,Client,LATITUDE,LONGITUDE,Projection,North,East,Location,Elevation Datum,Borehole ID,Date Started,Date Completed,Surface Elevation (ft),Contractor/Driller,Method,Logged By,Checked By,Begin Depth (ft),End Depth (ft),Soil Type,Description,Moisture Content,Dry Density (pcf),Liquid Limit (%),Plastic Limit (%),Fines (%),Blows 1st,Blows 2nd,Blows 3rd,N Value";
-    lines.add(header);
+//    String header = "OBJECTID,Test Type,PROJECT,Number,Client,LATITUDE,LONGITUDE,Projection,North,East,Location,Elevation Datum,Borehole ID,Date Started,Date Completed,Surface Elevation (ft),Contractor/Driller,Method,Logged By,Checked By,Begin Depth (ft),End Depth (ft),Soil Type,Description,Moisture Content,Dry Density (pcf),Liquid Limit (%),Plastic Limit (%),Fines (%),Blows 1st,Blows 2nd,Blows 3rd,N Value";
+//    lines.add(header);
 
     //TODO SizeofTest
     for(int i = 0; i < tests.length; i++){
       lines.add("$i,"
-          "${tests[i].testType.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.project.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.number.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.client.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.lat.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.long.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.projection.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.north.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.east.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.location.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.elevationDatum.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.boreholeID.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.startDate},"
-          "${logInfo.endDate},"
-          "${logInfo.surfaceElevation.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.contractor.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.method.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.loggedBy.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${logInfo.checkedBy.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${tests[i].beginTest},"
-          "${tests[i].endTest},"
-          ","
-          "${formatTags(tests[i].tags)},"
-          "${tests[i].moistureContent.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${tests[i].dryDensity.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${tests[i].liquidLimit.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${tests[i].plasticLimit.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${tests[i].fines.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${tests[i].blows1.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${tests[i].blows2.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${tests[i].blows3.replaceAll(",", " ").replaceAll('\n', '')},"
-          "${tests[i].blowCount.replaceAll(",", " ").replaceAll('\n', '')}");
+          + scrubData(tests[i].testType)
+          + scrubData(logInfo.project)
+          + scrubData(logInfo.number)
+          + scrubData(logInfo.client)
+          + scrubData(logInfo.lat)
+          + scrubData(logInfo.long)
+          + scrubData(logInfo.projection)
+          + scrubData(logInfo.north)
+          + scrubData(logInfo.east)
+          + scrubData(logInfo.location)
+          + scrubData(logInfo.elevationDatum)
+          + scrubData(logInfo.boreholeID)
+          + scrubData(logInfo.startDate)
+          + scrubData(logInfo.endDate)
+          + scrubData(logInfo.surfaceElevation)
+          + scrubData(logInfo.contractor)
+          + scrubData(logInfo.method)
+          + scrubData(logInfo.loggedBy)
+          + scrubData(logInfo.checkedBy)
+          + scrubData("${tests[i].beginTest}")
+          + scrubData("${tests[i].endTest}")
+          + ","
+          + scrubData(formatTags(tests[i].tags))
+          + scrubData(tests[i].moistureContent)
+          + scrubData(tests[i].dryDensity)
+          + scrubData(tests[i].liquidLimit)
+          + scrubData(tests[i].plasticLimit)
+          + scrubData(tests[i].fines)
+          + scrubData(tests[i].blows1)
+          + scrubData(tests[i].blows2)
+          + scrubData(tests[i].blows3)
+          + scrubData(tests[i].blowCount)
+          + "\n\n"
+      );
     }
   }
   String formatTags(String tags){
