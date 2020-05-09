@@ -106,27 +106,27 @@ class LogInfoPDF {
   //void init(String project, number, client, highway, county, projection, north, east, lat, long, location, elevationDatum, tubeHeight, boreholeID, 
   //startDate, endDate, surfaceElevation, contractor, equipment, method, loggedBy, checkedBy){
   void init(LogInfo i){
-    this.project = i.project ?? "";
-    this.number = i.number ?? "";
-    this.client = i.client ?? "";
-    this.highway = i.highway ?? "";
-    this.county = i.county ?? "";
-    this.projection = i.projection ?? "";
-    this.north = i.north ?? "";
-    this.east = i.east ?? "";
-    this.lat = i.lat ?? "";
-    this.long = i.long ?? "";
-    this.location = i.location ?? "";
-    this.elevationDatum = i.elevationDatum ?? "";
-    this.tubeHeight = i.tubeHeight ?? "";
-    this.boreholeID = i.boreholeID ?? "";
-    this.startDate = i.startDate ?? "";
-    this.endDate = i.endDate ?? "";
-    this.surfaceElevation = i.surfaceElevation ?? "";
-    this.contractor = i.contractor ?? "";
-    this.equipment = i.equipment ?? "";
-    this.method = i.method ?? "";
-    this.loggedBy = i.loggedBy ?? "";
-    this.checkedBy = i.checkedBy ?? "";
+    this.project = i.project == "null" ? "n/a" : i.project;
+    this.number = i.number == "null" ? "n/a" : i.number;
+    this.client = i.client == "null" ? "n/a" : i.client;
+    this.highway = i.highway == "null" ? "n/a" : i.highway;
+    this.county = i.county == "null" ? "n/a" : i.county;
+    this.projection = i.projection == "null" ? "n/a" : i.projection;
+    this.north = i.north == "null" ? "n/a" : i.north;
+    this.east = i.east == "null" ? "n/a" : i.east;
+    this.lat = i.lat == "null" ? "n/a" : i.lat;
+    this.long = i.long  == "null" ? "n/a" : i.long;
+    this.location = i.location == "null" ? "n/a" : i.location;
+    this.elevationDatum = i.elevationDatum == "null" ? "n/a" : i.elevationDatum;
+    this.tubeHeight = i.tubeHeight == "null" ? "n/a" : i.tubeHeight;
+    this.boreholeID = i.boreholeID == "null" ? "n/a" : i.boreholeID;
+    this.startDate = i.startDate == "null" ? "n/a" : i.startDate;
+    this.endDate = i.endDate == "null" ? "n/a" : i.endDate;
+    this.surfaceElevation = i.surfaceElevation == "null" ? "n/a" : i.surfaceElevation;
+    this.contractor = i.contractor == "null" ? "n/a" : i.contractor;
+    this.equipment = i.equipment == "null" ? "n/a" : i.equipment;
+    this.method = i.method == "null" ? "n/a" : i.method;
+    this.loggedBy = i.loggedBy == "null" ? "n/a" : i.loggedBy;
+    this.checkedBy = i.checkedBy == "null" ? "n/a" : i.checkedBy;
   }
 }

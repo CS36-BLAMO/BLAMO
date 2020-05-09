@@ -22,9 +22,10 @@ Future<String> docCreate(StateData currentState) async{
   // Create levels from provided lists of tests and units 
   var tests = await getTests(currentState);
   var units = await getUnits(currentState);
-  var loginfoInit = await getLogInfo(currentState.currentDocument);
+  var loginfoInit = await getLogInfo(currentState.currentDocument, currentState.currentProject);
   var loginfo = new LogInfoPDF();
   loginfo.init(loginfoInit);
+  //var loginfo = await getLogInfo(currentState.currentDocument, currentState.currentProject);
   List<Level> levels = [];
   List<int> testIndexesStored = [];
   var testsToDisplay = [];
@@ -210,18 +211,28 @@ Future<String> docCreate(StateData currentState) async{
       }
     }
   }
-  else {
+  else if (max_level_indeces.length == 1) {
     max_level_index = max_level_indeces[0];
   }
 
-  max_box_height = widgetLevels[max_level_index].box.height;
-  var scale = max_box_height/(levels[max_level_index].unit.depthLB.abs()-levels[max_level_index].unit.depthUB.abs()); // Scale is in pixels per meter
-  var testsScaled = [];
+  var scale;
+  var testsScaled;
+  
+  if(max_level_indeces.length >= 1){
+    max_box_height = widgetLevels[max_level_index].box.height;
+    scale = max_box_height/(levels[max_level_index].unit.depthLB.abs()-levels[max_level_index].unit.depthUB.abs()); // Scale is in pixels per meter
+    testsScaled = [];
+  }
 
   for(int i = 0; i < levels.length; i++){
     try {
-      levels[i].scaledRenderHeight = scale * (levels[i].unit.depthUB-levels[i].unit.depthLB);
-      testsScaled.add(i);
+      if (max_level_indeces.length >= 1){
+        levels[i].scaledRenderHeight = scale * (levels[i].unit.depthUB-levels[i].unit.depthLB);
+        testsScaled.add(i);
+      }
+      else{
+        levels[i].scaledRenderHeight = 1;
+      }
     } catch(e){
       continue;
     }
