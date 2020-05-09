@@ -295,13 +295,13 @@ Future<String> docCreate(StateData currentState) async{
                 children: <Widget>[
                   Container(
                     padding: const EdgeInsets.all(5),
-                    constraints: BoxConstraints(maxWidth: 194, maxHeight: 80),
+                    constraints: BoxConstraints(maxWidth: 114, maxHeight: 80),
                     decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
                     child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Container(
                           padding: const EdgeInsets.only(bottom: 2),
-                          child: Text("Test Type", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 10)),
+                          child: Text("Test Type", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 9)),
                         ),
                         Container(
                           child: Text('"A" - Auger Core\n"X" - Auger"\n"C" - Core, Barrel Type\n"N" - Standard Penetration\n"U" - Undisturbed Sample\n"T" - Test Pit', style: TextStyle(fontSize: 8)) 
@@ -311,31 +311,43 @@ Future<String> docCreate(StateData currentState) async{
                   ),
                   Container(
                     padding: const EdgeInsets.all(5),
-                    constraints: BoxConstraints(maxWidth: 194, maxHeight: 80),
+                    constraints: BoxConstraints(maxWidth: 254, maxHeight: 80),
                     decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
                     child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Container(
                           padding: const EdgeInsets.only(bottom: 2),
-                          child: Text("Rock Abbreviations", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 10)),
+                          child: Text("Rock Abbreviations", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 9)),
                         ),
                         Container(
-                          child: Text('"A" - Auger Core\n"X" - Auger"\n"C" - Core, Barrel Type\n"N" - Standard Penetration\n"U" - Undisturbed Sample\n"T" - Test Pit', style: TextStyle(fontSize: 8)) 
-                        ),
+                          //child: Text("Discontinuity\tShape\tSurface Roughness")
+                          child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                                Container(constraints: BoxConstraints(maxWidth: 80), child:Text('Discontinuity\nJ - Joint\nF - Fault\nB - Bedding\nFo - Foliation\nS - Shear', style: TextStyle(fontSize: 8))),
+                                Container(constraints: BoxConstraints(maxWidth: 80), child:Text('Shape\nPl - Planar\nC - Curved\nU - Undulating\nSt - Stepped\nIr - Irregular', style: TextStyle(fontSize: 8))),
+                                Container(constraints: BoxConstraints(maxWidth: 80), child:Text('Surface Roughness\nP - Polished\nSl - Slickensided\nSm - Smooth\nR - Rough\nVR - Very Rough', style: TextStyle(fontSize: 8))) 
+                            ] 
+                          )
+                        )
                       ]
                     )),
                   Container(
                     padding: const EdgeInsets.all(5),
-                    constraints: BoxConstraints(maxWidth: 194, maxHeight: 80),
+                    constraints: BoxConstraints(maxWidth: 214, maxHeight: 80),
                     decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
                     child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Container(
                           padding: const EdgeInsets.only(bottom: 2),
-                          child: Text("Typical Drilling Abbreviations", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 10))
+                          child: Text("Typical Drilling Abbreviations", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 9))
                         ),
                         Container(
-                          child: Text('"A" - Auger Core\n"X" - Auger"\n"C" - Core, Barrel Type\n"N" - Standard Penetration\n"U" - Undisturbed Sample\n"T" - Test Pit', style: TextStyle(fontSize: 8)) 
+                          child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                                Container(constraints: BoxConstraints(maxWidth: 90), child:Text('Drilling Methods\nWL - Wire Line\nHS - Hollow Stem Auger\nDP - Drill Fluid\nSA - Solid Fligh Auger\nCA - Casing Advancer\nHA - Hand Auger', style: TextStyle(fontSize: 7))),
+                                Container(constraints: BoxConstraints(maxWidth: 90), child:Text('Drilling Remarks\nLW - Lost Water\nWR - Water Return\nWC - Water Color\nD - Down Pressure\nDR - Drill Rate\nDA - Drill Action', style: TextStyle(fontSize: 7))),
+                            ] 
+                          )
                         ),
                       ]
                     )),
