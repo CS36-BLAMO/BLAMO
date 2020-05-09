@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 class CSVExporter {
   ObjectHandler objectHandler;
   StateData stateData;
+  StateData tempData;
   LogInfo logInfo;
   List<Unit> units;
   List<Test> tests;
@@ -16,6 +17,11 @@ class CSVExporter {
 
   CSVExporter(this.stateData){
     objectHandler = new ObjectHandler(stateData.currentProject);
+    tempData = new StateData("/Export");
+    tempData.currentProject = stateData.currentProject;
+    tempData.list = stateData.list;
+    tempData.unitList = stateData.unitList;
+    tempData.testList = stateData.testList;
   }
 
   Future<String> exportToCSV() async{
@@ -32,30 +38,30 @@ class CSVExporter {
     String toWrite;
     String header = "OBJECTID,Test Type,PROJECT,Number,Client,LATITUDE,LONGITUDE,Projection,North,East,Location,Elevation Datum,Borehole ID,Date Started,Date Completed,Surface Elevation (ft),Contractor/Driller,Method,Logged By,Checked By,Begin Depth (ft),End Depth (ft),Soil Type,Description,Moisture Content,Dry Density (pcf),Liquid Limit (%),Plastic Limit (%),Fines (%),Blows 1st,Blows 2nd,Blows 3rd,N Value";
     lines.add(header);
-    String holdCurrentDoc= stateData.currentDocument;
-    for(int i = 0; i < stateData.list.length; i++){
-      debugPrint('stateData.list[$i]: ${stateData.list[i]}');
-      if(stateData.list[i] != ''){
-        stateData.currentDocument = stateData.list[i];
+    for(int i = 0; i < tempData.list.length; i++){
+      debugPrint('tempData.list[$i]: ${tempData.list[i]}');
+      if(tempData.list[i] != ''){
+        tempData.currentDocument = tempData.list[i];
+        await tempData.storage.setStateData(tempData);
         await getData();
+        await new Future.delayed(new Duration(milliseconds: 100));
         buildCSVLines();
       }
     }
     toWrite = formatLinesToString();
     debugPrint('Writing to csv: \n $toWrite');
-    stateData.currentDocument = holdCurrentDoc;
   }
 
   Future<int> getData() async{
-    logInfo = await objectHandler.getLogInfoData(stateData.currentDocument);
+    logInfo = await objectHandler.getLogInfoData(tempData.currentDocument);
     try{
-      units = await objectHandler.getUnitsData(stateData.unitList, stateData.currentDocument);
+      units = await objectHandler.getUnitsData(tempData.unitList, tempData.currentDocument);
     } catch (e){
       debugPrint("(CSV)ERROR getting units");
     }
 
     try{
-      tests = await objectHandler.getTestsData(stateData.testList, stateData.currentDocument);
+      tests = await objectHandler.getTestsData(tempData.testList, tempData.currentDocument);
     } catch (e){
       debugPrint("(CSV)ERROR getting tests");
     }
@@ -110,7 +116,6 @@ class CSVExporter {
           + scrubData(tests[i].blows2)
           + scrubData(tests[i].blows3)
           + scrubData(tests[i].blowCount)
-          + "\n\n"
       );
     }
   }
