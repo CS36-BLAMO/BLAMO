@@ -11,6 +11,7 @@ import 'package:blamo/ObjectHandler.dart' as handler;
 
 Document pdf = Document();
 List<handler.Test> testsToDisplay = [];
+double pageHeight = 763.6;
 
 List<Widget> testsToWidgetList(List<handler.Test> tests){
   // Takes a list of tests and returns a list of tests as widgets
@@ -71,6 +72,62 @@ Widget testsToWidget(List<handler.Test> tests, String unitDescriptor){
     );
 }
 
+List<Level> trimSplitAtIndex(List<Level> splits, int i, double maxHeight){
+  Context tempContext;
+  Widget mock;
+  Document canvas = new Document();
+  mock = testsToWidget(splits[i].tests,"");
+  List<Widget> mockWrapper = [mock];
+  //mock.paint(tempContext); 
+  canvas.addPage(MultiPage(
+    pageFormat:
+        PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
+                                      marginTop: 0.5 * PdfPageFormat.cm,
+                                      marginLeft: 0.5 * PdfPageFormat.cm,
+                                      marginRight: 0.5 * PdfPageFormat.cm), 
+    crossAxisAlignment: CrossAxisAlignment.start,
+    build: (Context context) => <Widget>[Wrap( 
+              children: mockWrapper)
+    ]));
+
+  if (mock.box.height > maxHeight){
+    if (i+1 <= splits.length-1){ 
+      // if another free split exists, dump our last test into it.
+       splits[i+1].tests.add(splits[i].tests.last);
+       splits[i].tests.removeLast();
+       splits = trimSplitAtIndex(splits, i, maxHeight);
+    }
+    else{
+      // otherwise we need a new split.
+      splits.add(new Level());
+      splits[i+1].descriptor = splits[i].descriptor;
+      splits[i+1].tests.add(splits[i].tests.last);
+      splits[i].tests.removeLast();
+      splits = trimSplitAtIndex(splits, i, maxHeight);
+    }
+   }
+   else{
+     splits[i].descriptor = "*" + splits[i].descriptor;
+     splits[i].scaledRenderHeight = mock.box.height;
+     return splits;
+   }
+}
+
+List<Level> boxSplit(Level l, double maxHeight){ 
+  List<Level> splits = [];
+  splits.add(l);
+  for (int i = 0; i < splits.length; i++){
+    if (splits[i].tests.length > 0){
+      splits = trimSplitAtIndex(splits, i, maxHeight);
+    }
+    else{
+      splits.remove(splits[i]);
+    }
+  }
+
+  return splits;
+}
+
 Future<String> docCreate(StateData currentState) async{
 
   // Create levels from provided lists of tests and units 
@@ -123,7 +180,9 @@ Future<String> docCreate(StateData currentState) async{
   
   // Convert all bounded tests to widgets, format level tags
   for(var i = 0; i < levels.length; i++){
-    widgetLevels.add(testsToWidget(levels[i].tests, (levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + "\n")));
+
+    levels[i].descriptor = levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + "\n";
+    widgetLevels.add(testsToWidget(levels[i].tests, levels[i].descriptor));
     for(var j = 0; j < levels[i].tests.length; j++){
       testsToDisplay.remove(levels[i].tests[j]);
     }
@@ -139,16 +198,15 @@ Future<String> docCreate(StateData currentState) async{
 
   // Dump all uncaught tests into a level at the end
   if (testsToDisplay.length > 0){
-    widgetLevels.add(testsToWidget(testsToDisplay, "Unbounded tests"));
+    Level overflowLevel = new Level();
+    overflowLevel.tests = testsToDisplay;
+    overflowLevel.descriptor = "Unbounded tests\n";
+    levels.add(overflowLevel);
+    widgetLevels.add(testsToWidget(testsToDisplay, "Unbounded tests\n"));
   }
 
 
-  String leveltags = "";
-  //build unit tag text block
-  for(int i = 0; i < levels.length; i++){
-    leveltags = leveltags + "("+levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + ")  |  " + 
-                    levels[i].tags + ' | ' + levels[i].unit.drillingMethods + ' | ' + levels[i].unit.notes + '\n';
-  } 
+
   //"render" the pdf to get the flex height of level with most tests
   pdf.addPage(MultiPage(
     pageFormat:
@@ -185,6 +243,12 @@ Future<String> docCreate(StateData currentState) async{
   }
 
   for(int i = 0; i < levels.length; i++){
+    if(levels[i].descriptor == "Unbounded tests\n"){
+      levels[i].scaledRenderHeight = widgetLevels.last.box.height;
+    }
+  }
+
+  for(int i = 0; i < levels.length; i++){
   try {
     if (max_level_indeces.length >= 1){
       levels[i].scaledRenderHeight = scale * (levels[i].unit.depthLB-levels[i].unit.depthUB);
@@ -200,29 +264,63 @@ Future<String> docCreate(StateData currentState) async{
     continue;
   }
   }
-  //for(int i = 0; i < levels.length; i++){
-  //  try {
-  //    if (max_level_indeces.length >= 1){
-  //      levels[i].scaledRenderHeight = scale * (levels[i].unit.depthUB-levels[i].unit.depthLB);
-  //      testsScaled.add(i);
-  //    }
-  //    else{
-  //      levels[i].scaledRenderHeight = 1;
-  //    }
-  //  } catch(e){
-  //    continue;
-  //  }
-  //}
-  for(int i = 0; i < widgetLevels.length; i++){
-    if(testsScaled.contains(i)){
-      widgetLevels[i] = Container(height: levels[i].scaledRenderHeight,
-                                  decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-                                  child: widgetLevels[i]);
-    }else{
-      widgetLevels[i] = Container(decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-                                  child: widgetLevels[i]);
+
+  // Once rendered and scaled, iterate over and split oversized levels so they can fit on individual pages
+  List<Level> pageScaledLevels = [];
+  for(int j = 0; j < levels.length; j++){
+    if (levels[j].scaledRenderHeight > pageHeight){ 
+      levels[j].notToScale = "*";
+    // if we can't display on one page, need to handle it
+      if (levels[j].tests.length > 0){              
+        // if we have tests, split box over pages and redistribute tests
+        List<Level> splitLevels = boxSplit(levels[j], pageHeight);
+        for (int k = 0; k < splitLevels.length; k++){
+          pageScaledLevels.add(splitLevels[k]);
+        }
+      }
+      else{                                        
+         // if we don't have tests, just trim to display range
+        levels[j].scaledRenderHeight = 23;
+        pageScaledLevels.add(levels[j]);        
+      }
+    }
+    else{
+    // we're good to display on one page with current scaling, add to lsit
+      pageScaledLevels.add(levels[j]);
     }
   }
+
+  List<Widget> widgetScaledLevels = [];
+  for(int i = 0; i < pageScaledLevels.length; i++){
+      widgetScaledLevels.add(testsToWidget(pageScaledLevels[i].tests, pageScaledLevels[i].descriptor));
+  }
+
+  for(int i = 0; i < widgetScaledLevels.length; i++){
+    //if(testsScaled.contains(i)){
+    if(pageScaledLevels[i].scaledRenderHeight is double){
+      // if scaled, add it with the scaled height.
+      widgetScaledLevels[i] = Container(height: pageScaledLevels[i].scaledRenderHeight,
+                                  decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                                  //child: widgetLevels[i]);
+                                  child: widgetScaledLevels[i]);
+    }
+    else{
+      // if not, add it without.
+      widgetScaledLevels[i] = Container(decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                                  //child: widgetLevels[i]);
+                                  child: widgetScaledLevels[i]);
+    }
+  }
+
+  String leveltags = "";
+  //build unit tag text block
+  for(int i = 0; i < levels.length; i++){
+    if(levels[i].descriptor != "Unbounded tests\n"){
+      leveltags = leveltags + levels[i].notToScale+"("+levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + ")"+"  |  " + 
+                      levels[i].tags + ' | ' + levels[i].unit.drillingMethods + ' | ' + levels[i].unit.notes + '\n';
+    }
+  } 
+  leveltags = leveltags + "* = layer not displayed to scale in output";
   pdf = Document();
 
   // Build it all
@@ -345,7 +443,7 @@ Future<String> docCreate(StateData currentState) async{
                     )
             ),
             Wrap( 
-              children: widgetLevels),
+              children: widgetScaledLevels),
             ]));
   String onFinished = await pdf_write(currentState); //
   if(onFinished == "done"){
