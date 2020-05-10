@@ -10,12 +10,66 @@ import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:blamo/ObjectHandler.dart' as handler;
 
 Document pdf = Document();
+List<handler.Test> testsToDisplay = [];
 
-// Log Info fields:
-// project, number, client, highway, county, startDate, endDate
-// projection, north, east, lat, long, location
-// elevationDatum, tubeHeight, boreholeID, surfaceElevation
-// equipment, method, loggedBy, checkedBy, contractor
+List<Widget> testsToWidgetList(List<handler.Test> tests){
+  // Takes a list of tests and returns a list of tests as widgets
+  List<Widget> tempWidgets = [];
+  for(var k = 0; k < tests.length; k++){
+    String testTags = tests[k].tags;
+    testTags = testTags.replaceAll('"', '');
+    testTags = testTags.replaceAll('[','');
+    testTags = testTags.replaceAll(']','');
+    testTags = testTags.replaceAll(',', ', ');
+    tempWidgets.add(Container( 
+        child: Text( // TESTS
+            tests[k].testType + 
+            "("+tests[k].beginTest.toString() + " to " + tests[k].endTest.toString() + "m)\t|\t" + 
+            "Soil tags: " + testTags + "\t|\t" + // TODO - clean up tag display
+            "% Recovery: " + tests[k].percentRecovery.toString() + "\t|\t" +
+            "SDR: " + tests[k].soilDrivingResistance + "\t|\t" +
+            "RDD: " + tests[k].rockDiscontinuityData + "\t|\t" +
+            "RQD: " + tests[k].rockQualityDesignation + "\t|\t" +
+            "Moisture content: " + tests[k].moistureContent + "\t|\t" +
+            "Dry density: " + tests[k].dryDensity + "\t|\t" +
+            "Liquid limit: " + tests[k].liquidLimit + "\t|\t" +
+            "Plastic limit: " + tests[k].plasticLimit + "\t|\t" +
+            "Fines: " + tests[k].fines + "\t|\t" +
+            "Blows 1: " + tests[k].blows1 + "\t|\t" +
+            "Blows 2: " + tests[k].blows2 + "\t|\t" + 
+            "Blows 3: " + tests[k].blows3 + "\t|\t" +
+            "Blow count: " + tests[k].blowCount, textScaleFactor: 0.65),
+          decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 0.5)),
+          padding: const EdgeInsets.all(5),
+          width: 494
+        ));
+  }
+  return tempWidgets;
+}
+
+
+Widget testsToWidget(List<handler.Test> tests, String unitDescriptor){
+    // Takes a list of tests and a unit description and returns a list of tests formatted as level widgets.
+    // Unit description is usually bounds or some other text descriptor
+    List<Widget>  widgetTests = [];
+    widgetTests = testsToWidgetList(tests);
+    return(Container(
+        child:Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+          Container(
+            constraints: BoxConstraints(maxWidth: 90),
+            child: Text(unitDescriptor, style: TextStyle(fontSize: 10)),
+            padding: const EdgeInsets.all(5),
+          ),
+          Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
+            children: widgetTests
+          )
+          ]
+        )
+      )
+    );
+}
 
 Future<String> docCreate(StateData currentState) async{
 
@@ -28,7 +82,6 @@ Future<String> docCreate(StateData currentState) async{
   //var loginfo = await getLogInfo(currentState.currentDocument, currentState.currentProject);
   List<Level> levels = [];
   List<int> testIndexesStored = [];
-  var testsToDisplay = [];
   for (var i = 0; i < tests.length; i++){
     testsToDisplay.add(tests[i]);
   }
@@ -68,121 +121,27 @@ Future<String> docCreate(StateData currentState) async{
   List<Widget> widgetLevels = [];
   List<Widget> widgetTests = [];
   
-  // Create test widgets
+  // Convert all bounded tests to widgets, format level tags
   for(var i = 0; i < levels.length; i++){
-    widgetTests = [];
+    widgetLevels.add(testsToWidget(levels[i].tests, (levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + "\n")));
+    for(var j = 0; j < levels[i].tests.length; j++){
+      testsToDisplay.remove(levels[i].tests[j]);
+    }
+
+    // format tags from unit to level object
     String unitTags = levels[i].unit.tags;
     unitTags = unitTags.replaceAll('"', '');
     unitTags = unitTags.replaceAll('[','');
     unitTags = unitTags.replaceAll(']','');
     unitTags = unitTags.replaceAll(',', ', ');
     levels[i].tags = unitTags;
-    for(var j = 0; j < levels[i].tests.length; j++){
-      String testTags = levels[i].tests[j].tags;
-      testTags = testTags.replaceAll('"', '');
-      testTags = testTags.replaceAll('[','');
-      testTags = testTags.replaceAll(']','');
-      testTags = testTags.replaceAll(',', ', ');
-      widgetTests.add(
-        Container( 
-          child: Text( // TESTS
-            levels[i].tests[j].testType + 
-            "("+levels[i].tests[j].beginTest.toString() + " to " + levels[i].tests[j].endTest.toString() + "m)\t|\t" + 
-            "Soil tags: " + testTags + "\t|\t" + // TODO - clean up tag display
-            "% Recovery: " + levels[i].tests[j].percentRecovery.toString() + "\t|\t" +
-            "SDR: " + levels[i].tests[j].soilDrivingResistance + "\t|\t" +
-            "RDD: " + levels[i].tests[j].rockDiscontinuityData + "\t|\t" +
-            "RQD: " + levels[i].tests[j].rockQualityDesignation + "\t|\t" +
-            "Moisture content: " + levels[i].tests[j].moistureContent + "\t|\t" +
-            "Dry density: " + levels[i].tests[j].dryDensity + "\t|\t" +
-            "Liquid limit: " + levels[i].tests[j].liquidLimit + "\t|\t" +
-            "Plastic limit: " + levels[i].tests[j].plasticLimit + "\t|\t" +
-            "Fines: " + levels[i].tests[j].fines + "\t|\t" +
-            "Blows 1: " + levels[i].tests[j].blows1 + "\t|\t" +
-            "Blows 2: " + levels[i].tests[j].blows2 + "\t|\t" + 
-            "Blows 3: " + levels[i].tests[j].blows3 + "\t|\t" +
-            "Blow count: " + levels[i].tests[j].blowCount, textScaleFactor: 0.65),
-          decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 0.5)),
-          padding: const EdgeInsets.all(5),
-          width: 494
-        ));
-      testsToDisplay.remove(levels[i].tests[j]);
-    }
-
-    widgetLevels.add(
-      Container(
-        //decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-        //margin: const EdgeInsets.only(bottom:10),
-        child:Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-          Container(
-            constraints: BoxConstraints(maxWidth: 90),
-            child: Text(levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + "\n", style: TextStyle(fontSize: 10)),
-            padding: const EdgeInsets.all(5),
-          ),
-          Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
-            children: widgetTests
-          )
-          ]
-        )
-      )
-    );
   }
 
-  // unbounded test handling
-  // SUPER gross, should tuck these all away into a function to clean up the file. TODO
+  // Dump all uncaught tests into a level at the end
   if (testsToDisplay.length > 0){
-    widgetTests = [];
-    for (var i = 0; i < testsToDisplay.length; i++){
-      String testTags = testsToDisplay[i].tags;
-      testTags = testTags.replaceAll('"', '');
-      testTags = testTags.replaceAll('[','');
-      testTags = testTags.replaceAll(']','');
-      testTags = testTags.replaceAll(',', ', ');
-      widgetTests.add(
-        Container( 
-          child: Text( // TESTS
-            testsToDisplay[i].testType + 
-            " ("+testsToDisplay[i].beginTest.toString() + " to " + testsToDisplay[i].endTest.toString() + "m)\t|\t" + 
-            "Soil tags: " + testTags + "\t|\t" + // TODO - clean up tag display
-            "% Recovery: " + testsToDisplay[i].percentRecovery.toString() + "\t|\t" +
-            "SDR: " + testsToDisplay[i].soilDrivingResistance + "\t|\t" +
-            "RDD: " + testsToDisplay[i].rockDiscontinuityData + "\t|\t" +
-            "RQD: " + testsToDisplay[i].rockQualityDesignation + "\t|\t" +
-            "Moisture content: " + testsToDisplay[i].moistureContent + "\t|\t" +
-            "Dry density: " + testsToDisplay[i].dryDensity + "\t|\t" +
-            "Liquid limit: " + testsToDisplay[i].liquidLimit + "\t|\t" +
-            "Plastic limit: " + testsToDisplay[i].plasticLimit + "\t|\t" +
-            "Fines: " + testsToDisplay[i].fines + "\t|\t" +
-            "Blows 1: " + testsToDisplay[i].blows1 + "\t|\t" +
-            "Blows 2: " + testsToDisplay[i].blows2 + "\t|\t" + 
-            "Blows 3: " + testsToDisplay[i].blows3 + "\t|\t" +
-            "Blow count: " + testsToDisplay[i].blowCount, textScaleFactor: 0.65),
-          decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 0.5)),
-          padding: const EdgeInsets.all(5),
-          width: 494
-        ));
-    }
-    widgetLevels.add(
-      Container(
-        //margin: const EdgeInsets.only(bottom:10),
-        child:Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-          Container(
-            width: 90,
-            child: Text("Unbounded Tests",style: TextStyle(fontSize: 10)),
-            padding: const EdgeInsets.all(10),
-          ),
-          Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
-            children: widgetTests
-          )
-          ]
-        )
-      )
-    );
+    widgetLevels.add(testsToWidget(testsToDisplay, "Unbounded tests"));
   }
+
 
   String leveltags = "";
   //build unit tag text block
