@@ -44,7 +44,7 @@ Future<String> docCreate(StateData currentState) async{
     levels[i].setDepth();
     print("Populating level "+i.toString());
     for (var k = 0; k < tests.length; k++){
-      if (tests[k].beginTest > levels[i].endDepth && !testIndexesStored.contains(k)){ // TODO - confirm client is ok with this functionality in output. if a test is majority in another level but starts in another, which should it be in?
+      if (tests[k].beginTest >= levels[i].beginDepth && tests[k].beginTest < levels[i].endDepth && !testIndexesStored.contains(k)){ // TODO - confirm client is ok with this functionality in output. if a test is majority in another level but starts in another, which should it be in?
         levels[i].tests.add(tests[k]);
         testIndexesStored.add(k);
         print("Stored test"+(k+1).toString());
@@ -86,6 +86,7 @@ Future<String> docCreate(StateData currentState) async{
       widgetTests.add(
         Container( 
           child: Text( // TESTS
+            levels[i].tests[j].testType + 
             "("+levels[i].tests[j].beginTest.toString() + " to " + levels[i].tests[j].endTest.toString() + "m)\t|\t" + 
             "Soil tags: " + testTags + "\t|\t" + // TODO - clean up tag display
             "% Recovery: " + levels[i].tests[j].percentRecovery.toString() + "\t|\t" +
@@ -103,7 +104,7 @@ Future<String> docCreate(StateData currentState) async{
             "Blow count: " + levels[i].tests[j].blowCount, textScaleFactor: 0.65),
           decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 0.5)),
           padding: const EdgeInsets.all(5),
-          width: 434
+          width: 494
         ));
       testsToDisplay.remove(levels[i].tests[j]);
     }
@@ -116,9 +117,8 @@ Future<String> docCreate(StateData currentState) async{
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
           Container(
-            constraints: BoxConstraints(maxWidth: 150),
-            child: Text(levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + "\n" + 
-                        levels[i].unit.drillingMethods + "\n", style: TextStyle(fontSize: 10)),
+            constraints: BoxConstraints(maxWidth: 90),
+            child: Text(levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + "\n", style: TextStyle(fontSize: 10)),
             padding: const EdgeInsets.all(5),
           ),
           Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
@@ -143,7 +143,8 @@ Future<String> docCreate(StateData currentState) async{
       widgetTests.add(
         Container( 
           child: Text( // TESTS
-            "("+testsToDisplay[i].beginTest.toString() + " to " + testsToDisplay[i].endTest.toString() + "m)\t|\t" + 
+            testsToDisplay[i].testType + 
+            " ("+testsToDisplay[i].beginTest.toString() + " to " + testsToDisplay[i].endTest.toString() + "m)\t|\t" + 
             "Soil tags: " + testTags + "\t|\t" + // TODO - clean up tag display
             "% Recovery: " + testsToDisplay[i].percentRecovery.toString() + "\t|\t" +
             "SDR: " + testsToDisplay[i].soilDrivingResistance + "\t|\t" +
@@ -160,7 +161,7 @@ Future<String> docCreate(StateData currentState) async{
             "Blow count: " + testsToDisplay[i].blowCount, textScaleFactor: 0.65),
           decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 0.5)),
           padding: const EdgeInsets.all(5),
-          width: 434
+          width: 494
         ));
     }
     widgetLevels.add(
@@ -170,7 +171,7 @@ Future<String> docCreate(StateData currentState) async{
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
           Container(
-            width: 150,
+            width: 90,
             child: Text("Unbounded Tests",style: TextStyle(fontSize: 10)),
             padding: const EdgeInsets.all(10),
           ),
@@ -187,7 +188,7 @@ Future<String> docCreate(StateData currentState) async{
   //build unit tag text block
   for(int i = 0; i < levels.length; i++){
     leveltags = leveltags + "("+levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + ")  |  " + 
-                    levels[i].tags + '\n';
+                    levels[i].tags + ' | ' + levels[i].unit.drillingMethods + ' | ' + levels[i].unit.notes + '\n';
   } 
   //"render" the pdf to get the flex height of level with most tests
   pdf.addPage(MultiPage(
@@ -225,18 +226,34 @@ Future<String> docCreate(StateData currentState) async{
   }
 
   for(int i = 0; i < levels.length; i++){
-    try {
-      if (max_level_indeces.length >= 1){
-        levels[i].scaledRenderHeight = scale * (levels[i].unit.depthUB-levels[i].unit.depthLB);
-        testsScaled.add(i);
+  try {
+    if (max_level_indeces.length >= 1){
+      levels[i].scaledRenderHeight = scale * (levels[i].unit.depthLB-levels[i].unit.depthUB);
+      if (levels[i].scaledRenderHeight < 23){
+        levels[i].scaledRenderHeight = 23;
       }
-      else{
-        levels[i].scaledRenderHeight = 1;
-      }
-    } catch(e){
-      continue;
+      testsScaled.add(i);
     }
+    else{
+      levels[i].scaledRenderHeight = 1;
+    }
+  } catch(e){
+    continue;
   }
+  }
+  //for(int i = 0; i < levels.length; i++){
+  //  try {
+  //    if (max_level_indeces.length >= 1){
+  //      levels[i].scaledRenderHeight = scale * (levels[i].unit.depthUB-levels[i].unit.depthLB);
+  //      testsScaled.add(i);
+  //    }
+  //    else{
+  //      levels[i].scaledRenderHeight = 1;
+  //    }
+  //  } catch(e){
+  //    continue;
+  //  }
+  //}
   for(int i = 0; i < widgetLevels.length; i++){
     if(testsScaled.contains(i)){
       widgetLevels[i] = Container(height: levels[i].scaledRenderHeight,
