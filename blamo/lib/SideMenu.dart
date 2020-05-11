@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 //Side menu class that creates the side menu state
 class SideMenu extends StatefulWidget {
   final StateData pass;
-  SideMenu(this.pass);
+  SideMenu(this.pass, {Key key}) : super(key:key);
 
   @override
   _SideMenuState createState() => _SideMenuState(pass);
@@ -52,6 +52,7 @@ class _SideMenuState extends State<SideMenu> {
                       Navigator.pop(context);
                     }
                   },
+                  key: Key('homeNav'),
                 ),
               ]
           )
@@ -109,6 +110,7 @@ class _SideMenuState extends State<SideMenu> {
                       Navigator.pop(context);
                     }
                   },
+                  key: Key('exportNav'),
                 ),
                 Divider(color: Colors.grey),
                 new ListTile(
@@ -130,6 +132,7 @@ class _SideMenuState extends State<SideMenu> {
                       Navigator.pop(context);
                     }
                   },
+                  key: Key('boreholeListNav'),
                 ),
                 Divider(color: Colors.grey),
                 new ListTile(
@@ -150,61 +153,68 @@ class _SideMenuState extends State<SideMenu> {
                       Navigator.pop(context);
                     }
                   },
+                  key: Key('overviewNav'),
                 ),
                 Divider(color: Colors.grey),
                 new ListTile(
-                    title: new Text("Log Info"),
-                    leading: Icon(
-                        Icons.info,
-                        color: Colors.blue
-                    ),
-                    onTap: () {
-                      if (currentState.currentRoute != '/LogInfoPage') {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          "/LogInfoPage",
-                          arguments: currentState,
-                        );
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    }),
+                  title: new Text("Log Info"),
+                  leading: Icon(
+                      Icons.info,
+                      color: Colors.blue
+                  ),
+                  onTap: () {
+                    if (currentState.currentRoute != '/LogInfoPage') {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        "/LogInfoPage",
+                        arguments: currentState,
+                      );
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                  key: Key('loginfoNav'),
+                ),
                 Divider(color: Colors.grey),
                 new ListTile(
-                    title: new Text("Units"),
-                    leading: Icon(
-                        Icons.assessment,
-                        color: Colors.blue
-                    ),
-                    onTap: () {
-                      if (currentState.currentRoute != '/UnitsPage') {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          "/UnitsPage",
-                          arguments: currentState,
-                        );
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    }),
+                  title: new Text("Units"),
+                  leading: Icon(
+                      Icons.assessment,
+                      color: Colors.blue
+                  ),
+                  onTap: () {
+                    if (currentState.currentRoute != '/UnitsPage') {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        "/UnitsPage",
+                        arguments: currentState,
+                      );
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                  key: Key('unitsNav'),
+                ),
                 Divider(color: Colors.grey[900]),
                 new ListTile(
-                    title: new Text("Tests"),
-                    leading: Icon(
-                        Icons.assignment,
-                        color: Colors.blue
-                    ),
-                    onTap: () {
-                      if (currentState.currentRoute != '/TestsPage') {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          "/TestsPage",
-                          arguments: currentState,
-                        );
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    }),
+                  title: new Text("Tests"),
+                  leading: Icon(
+                      Icons.assignment,
+                      color: Colors.blue
+                  ),
+                  onTap: () {
+                    if (currentState.currentRoute != '/TestsPage') {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        "/TestsPage",
+                        arguments: currentState,
+                      );
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                  key: Key('testsNav'),
+                ),
                 Divider(color: Colors.grey[900]),
               ]
           )

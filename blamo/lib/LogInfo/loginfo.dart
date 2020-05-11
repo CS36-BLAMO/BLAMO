@@ -11,7 +11,7 @@ import 'package:blamo/ObjectHandler.dart';
 class LogInfoPage extends StatefulWidget {
   final StateData pass; //Passes the StateData object to the stateful constructor
 
-  LogInfoPage(this.pass);
+  LogInfoPage(this.pass, {Key key}) : super(key:key);
 
   @override
   _LogInfoPageState createState() => new _LogInfoPageState(pass);
@@ -141,6 +141,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
         body: Padding(
             padding: EdgeInsets.fromLTRB(40,0,40,40),
             child: SingleChildScrollView(
+                key: Key('logInfoScroll'),
                 child: Column(
                   children: <Widget>[
                     FormBuilder(key: _fbKey,
@@ -152,6 +153,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                         child: Column(
                             children: <Widget>[
                               FormBuilderTextField(
+                                key: Key('projectField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[0],
                                 attribute: 'project',
@@ -166,6 +168,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('numberField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[1],
@@ -181,6 +184,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('clientField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[2],
                                 attribute: 'client',
@@ -195,6 +199,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('highwayField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[3],
                                 attribute: 'highway',
@@ -209,6 +214,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('countyField'),
                                 textInputAction: TextInputAction.done,
                                 focusNode: formNodes[4],
                                 attribute: 'county',
@@ -220,6 +226,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 onChanged: (void nbd){updateLogObject();},
                               ),
                               FormBuilderDropdown(
+                                key: Key('projectionField'),
                                 attribute: 'projection',
                                 decoration: InputDecoration(labelText: "Projection",
                                   border: InputBorder.none,
@@ -228,15 +235,16 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                   errorBorder: InputBorder.none,
                                   disabledBorder: InputBorder.none,),
                                 validators: [],
-                                items: ["NAD 1983 2011 Oregon Statewide Lambert Ft Intl", "GCS WGS 1984 "].map(
+                                items: ["NAD 1983 2011 Oregon Statewide Lambert Ft Intl", "GCS WGS 1984"].map(
                                     (projection) => DropdownMenuItem(
                                       value: projection,
-                                      child: Text("$projection", overflow: TextOverflow.visible)
+                                      child: Text("$projection", key: Key('projection_' + projection), overflow: TextOverflow.visible)
                                     )).toList(),
                                 initialValue: formatValue(logInfoToBuildFrom.projection),
                                 onChanged: (void nbd){updateLogObject();},
                               ),
                               FormBuilderTextField(
+                                key: Key('northField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[5],
@@ -252,6 +260,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('eastField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[6],
@@ -267,6 +276,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('latField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[7],
@@ -282,6 +292,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('longField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[8],
@@ -297,6 +308,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('locationField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[9],
                                 attribute: 'location',
@@ -311,6 +323,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('elevationDatumField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[10],
                                 attribute: 'elevationDatum',
@@ -325,6 +338,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('tubeHeightField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[11],
@@ -340,6 +354,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('boreholeIDField'),
                                 textInputAction: TextInputAction.done,
                                 focusNode: formNodes[12],
                                 attribute: 'boreholeID',
@@ -351,6 +366,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 onChanged: (void nbd){updateLogObject();},
                               ),
                               FormBuilderDateTimePicker(
+                                key: Key('startDateField'),
                                 focusNode: formNodes[13],
                                 attribute: "startDate",
                                 inputType: InputType.date,
@@ -361,6 +377,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 onChanged: (void nbd){updateLogObject();},
                               ),
                               FormBuilderDateTimePicker(
+                                key: Key('endDateField'),
                                 focusNode: formNodes[14],
                                 attribute: 'endDate',
                                 inputType: InputType.date,
@@ -375,6 +392,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 onChanged: (void nbd){updateLogObject();},
                               ),
                               FormBuilderTextField(
+                                key: Key('surfaceElevationField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[15],
@@ -390,6 +408,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('contractorField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[16],
                                 attribute: 'contractor',
@@ -404,6 +423,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('equipmentField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[17],
                                 attribute: 'equipment',
@@ -418,6 +438,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('methodField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[18],
                                 attribute: 'method',
@@ -432,6 +453,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('loggedByField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[19],
                                 attribute: 'loggedBy',
@@ -446,6 +468,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('checkedByField'),
                                 textInputAction: TextInputAction.done,
                                 focusNode: formNodes[20],
                                 attribute: 'checkedBy',
@@ -462,6 +485,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
                   ],
                 ))),
         floatingActionButton: FloatingActionButton(
+          key: Key('saveLogInfo'),
           onPressed: () {
             if (_fbKey.currentState.saveAndValidate()) {
               //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.

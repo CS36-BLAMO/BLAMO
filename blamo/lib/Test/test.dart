@@ -15,7 +15,7 @@ import 'package:flutter_test/flutter_test.dart';*/
 class TestPage extends StatefulWidget {
   final StateData pass; //Passes the StateData object to the stateful constructor
 
-  TestPage(this.pass);
+  TestPage(this.pass, {Key key}) : super(key:key);
   @override
   _TestPageState createState() => new _TestPageState(pass);
 }
@@ -156,6 +156,7 @@ class _TestPageState extends State<TestPage> {
         body: Padding(
             padding: EdgeInsets.fromLTRB(40,0,40,40),
             child: SingleChildScrollView(
+                key: Key('testScroll'),
                 child: Column(
                   children: <Widget>[
                     FormBuilder(key: _fbKey,
@@ -167,6 +168,7 @@ class _TestPageState extends State<TestPage> {
                         child: Column(
                             children: <Widget>[
                               FormBuilderTextField(
+                                key: Key('testTypeField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[0],
                                 attribute: 'testType',
@@ -181,6 +183,7 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('beginTestField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[1],
@@ -196,6 +199,7 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('endTestField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[2],
@@ -215,6 +219,7 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('perRecField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[3],
@@ -230,11 +235,12 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('sdrField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[4],
                                 attribute: 'soilDrivingResistance',
-                                validators: [],
+                                validators: [FormBuilderValidators.numeric()],
                                 maxLength: 15,
                                 maxLengthEnforced: true,
                                 decoration: InputDecoration(labelText: "Soil Driving Resistance", counterText:""), //ASK - preferred title?
@@ -245,11 +251,12 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('rddField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[5],
                                 attribute: 'rockDiscontinuityData',
-                                validators: [],
+                                validators: [FormBuilderValidators.numeric()],
                                 maxLength: 15,
                                 maxLengthEnforced: true,
                                 decoration: InputDecoration(labelText: "Rock Discontinuity Data", counterText:""), //ASK - preferred title?
@@ -260,11 +267,12 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('rqdField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[6],
                                 attribute: 'rockQualityDesignation',
-                                validators: [],
+                                validators: [FormBuilderValidators.numeric()],
                                 maxLength: 15,
                                 maxLengthEnforced: true,
                                 decoration: InputDecoration(labelText: "Rock Quality Designation", counterText:""), //ASK - preferred title?
@@ -275,6 +283,7 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('mConField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[7],
@@ -290,11 +299,12 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('dryDensityField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[8],
                                 attribute: 'dryDensity',
-                                validators: [],
+                                validators: [FormBuilderValidators.numeric()],
                                 maxLength: 15,
                                 maxLengthEnforced: true,
                                 decoration: InputDecoration(labelText: "Dry Density (pcf)", counterText:""),
@@ -305,6 +315,7 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('liquidLimitField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[9],
@@ -320,6 +331,7 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('plasticLimitField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[10],
@@ -335,6 +347,7 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('finesField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[11],
@@ -350,6 +363,7 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('blows1Field'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[12],
@@ -365,6 +379,7 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('blows2Field'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[13],
@@ -380,6 +395,7 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('blows3Field'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[14],
@@ -395,6 +411,7 @@ class _TestPageState extends State<TestPage> {
                                 },
                               ),
                               FormBuilderTextField(
+                                key: Key('blowCountField'),
                                 textInputAction: TextInputAction.done,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[15],
@@ -412,7 +429,7 @@ class _TestPageState extends State<TestPage> {
                                 decoration: InputDecoration(labelText: "Description"),
                                 initialValue: getTags(testObjectToBuildFrom),
                                 options: [ // TODO need gint's set of tags, ability for user to make own tags.
-                                  FormBuilderFieldOption(value: "Asphalt"),
+                                  FormBuilderFieldOption(value: "Asphalt", key: Key('testAsphaltTag'),),
                                   FormBuilderFieldOption(value: "Basalt"),
                                   FormBuilderFieldOption(value: "Bedrock"),
                                   FormBuilderFieldOption(value: "Boulders and Cobbles"),
@@ -474,6 +491,7 @@ class _TestPageState extends State<TestPage> {
                   ],
                 ))),
         floatingActionButton: FloatingActionButton(
+          key: Key('saveTest'),
           onPressed: () async {
             if (_fbKey.currentState.saveAndValidate()) {
               updateTestObject();
