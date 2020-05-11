@@ -73,7 +73,6 @@ Widget testsToWidget(List<handler.Test> tests, String unitDescriptor){
 }
 
 List<Level> trimSplitAtIndex(List<Level> splits, int i, double maxHeight){
-  Context tempContext;
   Widget mock;
   Document canvas = new Document();
   mock = testsToWidget(splits[i].tests,"");
@@ -192,7 +191,6 @@ Future<String> docCreate(StateData currentState) async{
 
   // Convert levels to widgets
   List<Widget> widgetLevels = [];
-  List<Widget> widgetTests = [];
   
   // Convert all bounded tests to widgets, format level tags
   for(var i = 0; i < levels.length; i++){
@@ -273,6 +271,8 @@ Future<String> docCreate(StateData currentState) async{
     if (max_level_indeces.length >= 1){
       levels[i].scaledRenderHeight = scale * (levels[i].unit.depthLB-levels[i].unit.depthUB);
       if (levels[i].scaledRenderHeight < 23){
+        levels[i].notToScale = "*";
+        levels[i].descriptor = levels[i].notToScale + levels[i].descriptor;
         levels[i].scaledRenderHeight = 23;
       }
       testsScaled.add(i);
@@ -290,6 +290,7 @@ Future<String> docCreate(StateData currentState) async{
   for(int j = 0; j < levels.length; j++){
     if (levels[j].scaledRenderHeight > pageHeight){ 
       levels[j].notToScale = "*";
+
     // if we can't display on one page, need to handle it
       if (levels[j].tests.length > 0){              
         // if we have tests, split box over pages and redistribute tests
