@@ -79,6 +79,7 @@ List<Level> trimSplitAtIndex(List<Level> splits, int i, double maxHeight){
   mock = testsToWidget(splits[i].tests,"");
   List<Widget> mockWrapper = [mock];
   //mock.paint(tempContext); 
+  try{
   canvas.addPage(MultiPage(
     pageFormat:
         PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
@@ -89,7 +90,9 @@ List<Level> trimSplitAtIndex(List<Level> splits, int i, double maxHeight){
     build: (Context context) => <Widget>[Wrap( 
               children: mockWrapper)
     ]));
+  }catch(e){
 
+  }
   if (mock.box.height > maxHeight){
     if (i+1 <= splits.length-1){ 
       // if another free split exists, dump our last test into it.
@@ -107,11 +110,24 @@ List<Level> trimSplitAtIndex(List<Level> splits, int i, double maxHeight){
     }
    }
    else{
-     splits[i].descriptor = "*" + splits[i].descriptor;
-     splits[i].scaledRenderHeight = mock.box.height;
-     return splits;
-   }
+      // touch up the layers visually before we return
+      if(splits[i].descriptor != "Unbounded tests\n"){
+          splits[i].descriptor = "*" + splits[i].descriptor;
+       }
+      List<handler.Test> tempList = [];
+      if(i+1 < splits.length){ // if we have a valid next split to sort, sort it
+        if (splits[i+1].tests.length > 1){
+          for(int x = splits[i+1].tests.length; x > 0; x--){
+            tempList.add(splits[i+1].tests[x-1]);
+          }
+          splits[i+1].tests = tempList;
+        }
+      } 
+      splits[i].scaledRenderHeight = mock.box.height;
+    }
+  return splits;
 }
+
 
 List<Level> boxSplit(Level l, double maxHeight){ 
   List<Level> splits = [];
@@ -208,6 +224,7 @@ Future<String> docCreate(StateData currentState) async{
 
 
   //"render" the pdf to get the flex height of level with most tests
+  try{
   pdf.addPage(MultiPage(
     pageFormat:
         PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
@@ -218,6 +235,9 @@ Future<String> docCreate(StateData currentState) async{
     build: (Context context) => <Widget>[Wrap( 
               children: widgetLevels)
   ]));
+  }catch(e){
+
+  }
 
   var max_level_index;
   if (max_level_indeces.length > 1){
