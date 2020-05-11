@@ -344,7 +344,9 @@ Future<String> docCreate(StateData currentState) async{
   pdf = Document();
 
   // Build it all
+  try{ // DEBUG - set maxPages to 1 and create a doc larger than 1 page to induce error.
   pdf.addPage(MultiPage(
+    maxPages: 50,
     pageFormat:
         PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
                                       marginTop: 0.5 * PdfPageFormat.cm,
@@ -465,6 +467,27 @@ Future<String> docCreate(StateData currentState) async{
             Wrap( 
               children: widgetScaledLevels),
             ]));
+  }catch(e){
+    pdf = Document();
+    pdf.addPage(MultiPage(
+    pageFormat:
+        PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
+                                      marginTop: 0.5 * PdfPageFormat.cm,
+                                      marginLeft: 0.5 * PdfPageFormat.cm,
+                                      marginRight: 0.5 * PdfPageFormat.cm), 
+    crossAxisAlignment: CrossAxisAlignment.start,
+    footer: (Context context) {
+      return Container(
+        alignment: Alignment.centerRight,
+        margin: const EdgeInsets.only(top: 1.0 * PdfPageFormat.cm),
+        child: Text('ERROR',
+                style: Theme.of(context)
+                    .defaultTextStyle
+                    .copyWith(color: PdfColors.grey, fontSize: 10)));
+    },
+    build:(Context context) => <Widget>[
+        Text("ERROR - Uncaught exception in PDF creation. Try spreading data across multiple boreholes.\n"+e.toString())])); // TODO - toss a toast to the user? 
+  }
   String onFinished = await pdf_write(currentState); //
   if(onFinished == "done"){
     //print("max level: -"+max_level.unit.depthUB.toString()+" - "+max_level.unit.depthLB.toString());
