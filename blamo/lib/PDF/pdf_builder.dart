@@ -210,6 +210,9 @@ Future<String> docCreate(StateData currentState) async{
     levels[i].tags = unitTags;
   }
 
+  // sort so they go in descending order
+  levels.sort((a,b)=> a.beginDepth.compareTo(b.beginDepth));
+
   // Dump all uncaught tests into a level at the end
   if (testsToDisplay.length > 0){
     Level overflowLevel = new Level();
