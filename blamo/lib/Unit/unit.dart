@@ -17,7 +17,7 @@ import 'package:blamo/PDF/pdf_classes.dart';*/
 class UnitPage extends StatefulWidget {
   final StateData pass; //Passes the StateData object to the stateful constructor
 
-  UnitPage(this.pass);
+  UnitPage(this.pass, {Key key}) : super(key:key);
 
   @override
   _UnitPageState createState() => new _UnitPageState(pass);
@@ -179,6 +179,7 @@ class _UnitPageState extends State<UnitPage> {
                         child: Column(
                             children: <Widget>[
                               FormBuilderTextField(
+                                key: Key('depth-ubField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[0],
@@ -198,6 +199,7 @@ class _UnitPageState extends State<UnitPage> {
                               },*/
                               ),
                               FormBuilderTextField(
+                                key: Key('depth-lbField'),
                                 textInputAction: TextInputAction.next,
                                 keyboardType: TextInputType.number,
                                 focusNode: formNodes[1],
@@ -221,6 +223,7 @@ class _UnitPageState extends State<UnitPage> {
                               },*/
                               ),
                               FormBuilderTextField(
+                                key: Key('methodsField'),
                                 textInputAction: TextInputAction.next,
                                 focusNode: formNodes[2],
                                 attribute: 'methods',
@@ -239,6 +242,7 @@ class _UnitPageState extends State<UnitPage> {
                               },*/
                               ),
                               FormBuilderTextField(
+                                key: Key('notesField'),
                                 textInputAction: TextInputAction.newline,
                                 focusNode: formNodes[3],
                                 attribute: 'notes',
@@ -254,7 +258,7 @@ class _UnitPageState extends State<UnitPage> {
                                 validators: [],
                                 initialValue: getTags(unitToBuildFrom),
                                 options: [ // TODO need gint's set of tags, ability for user to make own tags.
-                                  FormBuilderFieldOption(value: "Asphalt"),
+                                  FormBuilderFieldOption(value: "Asphalt", key: Key('unitAsphaltTag'),),
                                   FormBuilderFieldOption(value: "Basalt"),
                                   FormBuilderFieldOption(value: "Bedrock"),
                                   FormBuilderFieldOption(value: "Boulders and Cobbles"),
@@ -317,6 +321,7 @@ class _UnitPageState extends State<UnitPage> {
                   )
                 ),
             floatingActionButton: FloatingActionButton(
+                key: Key('saveUnit'),
                 onPressed: () async {
                   if (_fbKey.currentState.saveAndValidate()) {
                     //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.

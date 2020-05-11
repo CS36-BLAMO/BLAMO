@@ -27,7 +27,7 @@ class BLAMO extends StatelessWidget {
 class HomePage extends StatefulWidget {
   final StateData pass; //Passes the StateData object to the stateful constructor
 
-  HomePage(this.pass);
+  HomePage(this.pass, {Key key}) : super(key:key);
 
   @override
   _HomePageState createState() => _HomePageState(pass);
@@ -152,6 +152,7 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold,
                         fontSize: 22,
                       ),
+                      key: Key('project_' + projectName),
                     )
                 ),
               )
@@ -186,6 +187,7 @@ class _HomePageState extends State<HomePage> {
               actions: <Widget>[
                 new FlatButton(
                     child: Text("DELETE"),
+                    key: Key('projectDelete'),
                     textColor: Colors.red,
                     onPressed: () {
                       Navigator.pop(context, "DELETE");
@@ -220,6 +222,7 @@ class _HomePageState extends State<HomePage> {
       foregroundColor: Colors.white,
       backgroundColor: Colors.blueGrey,
       elevation: 50.0,
+      key: Key('newProject'),
       onPressed: () {
         showDialog(
             context: context,
@@ -230,6 +233,7 @@ class _HomePageState extends State<HomePage> {
               controller: _textFieldController,
               decoration: InputDecoration(labelText: 'Name cannot be empty'),
               inputFormatters: [new BlacklistingTextInputFormatter(new RegExp('[\\,]'))],
+              key: Key('projectTextField'),
             ),
             actions: <Widget>[
               new FlatButton(
@@ -241,6 +245,7 @@ class _HomePageState extends State<HomePage> {
               ),
               new FlatButton(
                 child: new Text('Accept'),
+                key: Key('projectAccept'),
                 onPressed: () async {
                   if(_textFieldController.text.isNotEmpty && !currentState.list.contains(_textFieldController.text.toString())) {
                     await createProject(_textFieldController.text.toString());
