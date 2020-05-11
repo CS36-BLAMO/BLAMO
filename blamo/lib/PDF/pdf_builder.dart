@@ -334,14 +334,67 @@ Future<String> docCreate(StateData currentState) async{
   }
 
   String leveltags = "";
+  int consecutiveChars = 0;
   //build unit tag text block
   for(int i = 0; i < levels.length; i++){
+    // have to manually trim overflowing information. pdf library flexes atomically on words, not characters
+    // maxchar set to 256 in form validation
+  
     if(levels[i].descriptor != "Unbounded tests\n"){
-      leveltags = leveltags + levels[i].notToScale+"("+levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + ")"+"  |  Tags: " + 
-                      levels[i].tags + ' | Methods: ' + levels[i].unit.drillingMethods + ' | Notes: ' + levels[i].unit.notes + '\n';
+      leveltags = leveltags + levels[i].notToScale+"("+levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + ")"+"  |  Tags: ";
+      
+      consecutiveChars = 0;
+      for(int j = 0; j < levels[i].tags.length; j++){
+        if (levels[i].tags[j] == " " || levels[i].tags[j] == "\n"){
+          consecutiveChars = 0;
+        }
+        if (consecutiveChars == 100){
+           leveltags = leveltags + "\n";
+           consecutiveChars = 0;
+        }
+        else {
+          leveltags = leveltags + levels[i].tags[j];
+          consecutiveChars++;
+        }
+      }
+
+      consecutiveChars = 0;
+      leveltags = leveltags + ' | Methods: ';
+      for(int j = 0; j < levels[i].unit.drillingMethods.length; j++){
+        if (levels[i].unit.drillingMethods[j] == " " || levels[i].unit.drillingMethods[j] == "\n"){
+          consecutiveChars = 0;
+        }
+        if (consecutiveChars == 100){
+          leveltags = leveltags + "\n";
+          consecutiveChars = 0;
+        }
+        else {
+          leveltags = leveltags + levels[i].unit.drillingMethods[j];
+          consecutiveChars++;
+        }
+      }
+
+      consecutiveChars = 0;
+      leveltags = leveltags + ' | Notes: ';
+      for(int j = 0; j < levels[i].unit.notes.length; j++){
+        if (levels[i].unit.notes[j] == " " || levels[i].unit.notes[j] == "\n"){
+          consecutiveChars = 0;
+        }
+        if (consecutiveChars == 100){
+          leveltags = leveltags + "\n";
+          consecutiveChars = 0;
+        }
+        else {
+          leveltags = leveltags + levels[i].unit.notes[j];
+          consecutiveChars++;
+        }
+      }
+      leveltags = leveltags + '\n';
+                      //levels[i].tags + ' | Methods: ' + levels[i].unit.drillingMethods + ' | Notes: ' + levels[i].unit.notes + '\n';
     }
   } 
   leveltags = leveltags + "* = layer not displayed to scale in output";
+
   pdf = Document();
 
   // Build it all
@@ -455,15 +508,18 @@ Future<String> docCreate(StateData currentState) async{
             //Column(mainAxisAlignment: MainAxisAlignment.start,
             Container(
               padding: const EdgeInsets.all(5),
-                    constraints: BoxConstraints(maxWidth: 582),
-                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-                    child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.only(bottom: 2),
-                          child: Text(leveltags))
-                      ]
-                    )
+              constraints: BoxConstraints(maxWidth: 582),
+              decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+              child: Text(leveltags, style: TextStyle(fontSize: 10))
+                    //Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
+                     // children: <Widget>[
+                     //   Container(
+                     //     padding: const EdgeInsets.only(bottom: 2),
+                     //     child: Flexible(
+                     //             fit: FlexFit.tight,
+                     //             child:Text(leveltags)))
+                     // ]
+                    //)
             ),
             Wrap( 
               children: widgetScaledLevels),
