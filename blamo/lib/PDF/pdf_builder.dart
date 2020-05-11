@@ -154,6 +154,7 @@ Future<String> docCreate(StateData currentState) async{
   //var loginfo = await getLogInfo(currentState.currentDocument, currentState.currentProject);
   List<Level> levels = [];
   List<int> testIndexesStored = [];
+  testsToDisplay = [];
   for (var i = 0; i < tests.length; i++){
     testsToDisplay.add(tests[i]);
   }
