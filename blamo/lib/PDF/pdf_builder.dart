@@ -336,8 +336,8 @@ Future<String> docCreate(StateData currentState) async{
   //build unit tag text block
   for(int i = 0; i < levels.length; i++){
     if(levels[i].descriptor != "Unbounded tests\n"){
-      leveltags = leveltags + levels[i].notToScale+"("+levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + ")"+"  |  " + 
-                      levels[i].tags + ' | ' + levels[i].unit.drillingMethods + ' | ' + levels[i].unit.notes + '\n';
+      leveltags = leveltags + levels[i].notToScale+"("+levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + ")"+"  |  Tags: " + 
+                      levels[i].tags + ' | Methods: ' + levels[i].unit.drillingMethods + ' | Notes: ' + levels[i].unit.notes + '\n';
     }
   } 
   leveltags = leveltags + "* = layer not displayed to scale in output";
