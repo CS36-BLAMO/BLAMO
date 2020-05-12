@@ -160,9 +160,9 @@ Future<String> docCreate(StateData currentState) async{
   }
 
 //  var max_levels = [];
-  var max_level_indeces = [];
-  var max_level_size = 0.0;
-  var max_box_height = 0.0;
+  var maxLevelIndeces = [];
+  var maxLevelSize = 0.0;
+  var maxBoxHeight = 0.0;
   var tpm; // test per meter
   for (var i = 0; i < units.length; i++){ // TODO - need to add validator in Units page so that no Unit depths overlap.
     levels.add(new Level());
@@ -177,16 +177,16 @@ Future<String> docCreate(StateData currentState) async{
       }
     }
     tpm = levels[i].tests.length/(levels[i].unit.depthLB.abs() - levels[i].unit.depthUB.abs());
-    if (tpm > max_level_size){
-      max_level_size = tpm;
+    if (tpm > maxLevelSize){
+      maxLevelSize = tpm;
       //max_levels.clear();
       //max_levels.add(levels[i]);
-      max_level_indeces.clear();
-      max_level_indeces.add(i);
+      maxLevelIndeces.clear();
+      maxLevelIndeces.add(i);
     }
-    else if (tpm == max_level_size){
+    else if (tpm == maxLevelSize){
       //max_levels.add(levels[i]);
-      max_level_indeces.add(i);
+      maxLevelIndeces.add(i);
     }
   }
 
@@ -241,26 +241,26 @@ Future<String> docCreate(StateData currentState) async{
 
   }
 
-  var max_level_index;
-  if (max_level_indeces.length > 1){
-    var highest_box = 0.0;
-    for(int i = 0; i < max_level_indeces.length; i++){
-      if (widgetLevels[max_level_indeces[i]].box.height > highest_box){
-        highest_box = widgetLevels[max_level_indeces[i]].box.height;
-        max_level_index = max_level_indeces[i];
+  var maxLevelIndex;
+  if (maxLevelIndeces.length > 1){
+    var highestBox = 0.0;
+    for(int i = 0; i < maxLevelIndeces.length; i++){
+      if (widgetLevels[maxLevelIndeces[i]].box.height > highestBox){
+        highestBox = widgetLevels[maxLevelIndeces[i]].box.height;
+        maxLevelIndex = maxLevelIndeces[i];
       }
     }
   }
-  else if (max_level_indeces.length == 1) {
-    max_level_index = max_level_indeces[0];
+  else if (maxLevelIndeces.length == 1) {
+    maxLevelIndex = maxLevelIndeces[0];
   }
 
   var scale;
   var testsScaled;
   
-  if(max_level_indeces.length >= 1){
-    max_box_height = widgetLevels[max_level_index].box.height;
-    scale = max_box_height/(levels[max_level_index].unit.depthLB.abs()-levels[max_level_index].unit.depthUB.abs()); // Scale is in pixels per meter
+  if(maxLevelIndeces.length >= 1){
+    maxBoxHeight = widgetLevels[maxLevelIndex].box.height;
+    scale = maxBoxHeight/(levels[maxLevelIndex].unit.depthLB.abs()-levels[maxLevelIndex].unit.depthUB.abs()); // Scale is in pixels per meter
     testsScaled = [];
   }
 
@@ -272,7 +272,7 @@ Future<String> docCreate(StateData currentState) async{
 
   for(int i = 0; i < levels.length; i++){
   try {
-    if (max_level_indeces.length >= 1){
+    if (maxLevelIndeces.length >= 1){
       levels[i].scaledRenderHeight = scale * (levels[i].unit.depthLB-levels[i].unit.depthUB);
       if (levels[i].scaledRenderHeight < 23){
         levels[i].notToScale = "*";
@@ -549,10 +549,10 @@ Future<String> docCreate(StateData currentState) async{
     build:(Context context) => <Widget>[
         Text("ERROR - Uncaught exception in PDF creation. Try spreading data across multiple boreholes.\n"+e.toString())])); // TODO - toss a toast to the user? 
   }
-  String onFinished = await pdf_write(currentState); //
+  String onFinished = await pdfWrite(currentState); //
   if(onFinished == "done"){
     //print("max level: -"+max_level.unit.depthUB.toString()+" - "+max_level.unit.depthLB.toString());
-    //print("max level size: "+max_level_size.toString());
+    //print("max level size: "+maxLevelSize.toString());
     return "done";
   } else {
     return "failed";
@@ -603,7 +603,7 @@ Future<List<handler.Unit>> getUnits(StateData currentState) async{
     return fetchedUnits;
   }
 
-Future<String> pdf_write(StateData currentState) async{
+Future<String> pdfWrite(StateData currentState) async{
   DateTime now = DateTime.now();
   await new Future.delayed(new Duration(seconds: 1));
   PermissionStatus permission =
