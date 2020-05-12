@@ -580,7 +580,12 @@ class _TestPageState extends State<TestPage> {
     } else {
       testObject.endTest = null;
     }
-    testObject.percentRecovery = _fbKey.currentState.fields["percentRecovery"].currentState.value.toString();
+    //testObject.percentRecovery = _fbKey.currentState.fields["percentRecovery"].currentState.value.toString();
+    if(double.tryParse(_fbKey.currentState.fields["percentRecovery"].currentState.value) != null) {
+      testObject.percentRecovery = double.parse(_fbKey.currentState.fields["percentRecovery"].currentState.value);
+    } else {
+      testObject.percentRecovery = null;
+    }
     testObject.soilDrivingResistance = _fbKey.currentState.fields["soilDrivingResistance"].currentState.value.toString();
     testObject.rockDiscontinuityData = _fbKey.currentState.fields["rockDiscontinuityData"].currentState.value.toString();
     testObject.rockQualityDesignation = _fbKey.currentState.fields["rockQualityDesignation"].currentState.value.toString();

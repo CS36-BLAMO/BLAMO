@@ -10,163 +10,401 @@ import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:blamo/ObjectHandler.dart' as handler;
 
 Document pdf = Document();
+List<handler.Test> testsToDisplay = [];
+double pageHeight = 763.6;
 
-// Victoria fields:
-// Log info: ID, test type, project, number, client, lat, long, location, elevation datum, borehold id, start date, end date,
-//          surface elevation, contractor, method, logged by, checked by
-// Test/hole: Begin depth, end depth, soil type, description, moisture content, dry density, liquid limit, plastic limit,
-//            fines, Blows 1, Blows 2, Blows 3, Blows count
+List<Widget> testsToWidgetList(List<handler.Test> tests){
+  // Takes a list of tests and returns a list of tests as widgets
+  List<Widget> tempWidgets = [];
+  for(var k = 0; k < tests.length; k++){
+    String testTags = tests[k].tags;
+    testTags = testTags.replaceAll('"', '');
+    testTags = testTags.replaceAll('[','');
+    testTags = testTags.replaceAll(']','');
+    testTags = testTags.replaceAll(',', ', ');
+    tempWidgets.add(Container( 
+        child: Text( // TESTS
+            tests[k].testType + 
+            "("+tests[k].beginTest.toString() + " to " + tests[k].endTest.toString() + "m)\t|\t" + 
+            "Soil tags: " + testTags + "\t|\t" + // TODO - clean up tag display
+            "% Recovery: " + tests[k].percentRecovery.toString() + "\t|\t" +
+            "SDR: " + tests[k].soilDrivingResistance + "\t|\t" +
+            "RDD: " + tests[k].rockDiscontinuityData + "\t|\t" +
+            "RQD: " + tests[k].rockQualityDesignation + "\t|\t" +
+            "Moisture content: " + tests[k].moistureContent + "\t|\t" +
+            "Dry density: " + tests[k].dryDensity + "\t|\t" +
+            "Liquid limit: " + tests[k].liquidLimit + "\t|\t" +
+            "Plastic limit: " + tests[k].plasticLimit + "\t|\t" +
+            "Fines: " + tests[k].fines + "\t|\t" +
+            "Blows 1: " + tests[k].blows1 + "\t|\t" +
+            "Blows 2: " + tests[k].blows2 + "\t|\t" + 
+            "Blows 3: " + tests[k].blows3 + "\t|\t" +
+            "Blow count: " + tests[k].blowCount, textScaleFactor: 0.65),
+          decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 0.5)),
+          padding: const EdgeInsets.all(5),
+          width: 494
+        ));
+  }
+  return tempWidgets;
+}
+
+
+Widget testsToWidget(List<handler.Test> tests, String unitDescriptor){
+    // Takes a list of tests and a unit description and returns a list of tests formatted as level widgets.
+    // Unit description is usually bounds or some other text descriptor
+    List<Widget>  widgetTests = [];
+    widgetTests = testsToWidgetList(tests);
+    return(Container(
+        child:Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+          Container(
+            constraints: BoxConstraints(maxWidth: 90),
+            child: Text(unitDescriptor, style: TextStyle(fontSize: 10)),
+            padding: const EdgeInsets.all(5),
+          ),
+          Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
+            children: widgetTests
+          )
+          ]
+        )
+      )
+    );
+}
+
+List<Level> trimSplitAtIndex(List<Level> splits, int i, double maxHeight){
+  Widget mock;
+  Document canvas = new Document();
+  mock = testsToWidget(splits[i].tests,"");
+  List<Widget> mockWrapper = [mock];
+  //mock.paint(tempContext); 
+  try{
+  canvas.addPage(MultiPage(
+    pageFormat:
+        PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
+                                      marginTop: 0.5 * PdfPageFormat.cm,
+                                      marginLeft: 0.5 * PdfPageFormat.cm,
+                                      marginRight: 0.5 * PdfPageFormat.cm), 
+    crossAxisAlignment: CrossAxisAlignment.start,
+    build: (Context context) => <Widget>[Wrap( 
+              children: mockWrapper)
+    ]));
+  }catch(e){
+
+  }
+  if (mock.box.height > maxHeight){
+    if (i+1 <= splits.length-1){ 
+      // if another free split exists, dump our last test into it.
+       splits[i+1].tests.add(splits[i].tests.last);
+       splits[i].tests.removeLast();
+       splits = trimSplitAtIndex(splits, i, maxHeight);
+    }
+    else{
+      // otherwise we need a new split.
+      splits.add(new Level());
+      splits[i+1].descriptor = splits[i].descriptor;
+      splits[i+1].tests.add(splits[i].tests.last);
+      splits[i].tests.removeLast();
+      splits = trimSplitAtIndex(splits, i, maxHeight);
+    }
+   }
+   else{
+      // touch up the layers visually before we return
+      if(splits[i].descriptor != "Unbounded tests\n"){
+          splits[i].descriptor = "*" + splits[i].descriptor;
+       }
+      List<handler.Test> tempList = [];
+      if(i+1 < splits.length){ // if we have a valid next split to sort, sort it
+        if (splits[i+1].tests.length > 1){
+          for(int x = splits[i+1].tests.length; x > 0; x--){
+            tempList.add(splits[i+1].tests[x-1]);
+          }
+          splits[i+1].tests = tempList;
+        }
+      } 
+      splits[i].scaledRenderHeight = mock.box.height;
+    }
+  return splits;
+}
+
+
+List<Level> boxSplit(Level l, double maxHeight){ 
+  List<Level> splits = [];
+  splits.add(l);
+  for (int i = 0; i < splits.length; i++){
+    if (splits[i].tests.length > 0){
+      splits = trimSplitAtIndex(splits, i, maxHeight);
+    }
+    else{
+      splits.remove(splits[i]);
+    }
+  }
+
+  return splits;
+}
 
 Future<String> docCreate(StateData currentState) async{
 
   // Create levels from provided lists of tests and units 
   var tests = await getTests(currentState);
   var units = await getUnits(currentState);
-  var loginfo = await getLogInfo(currentState.currentDocument, currentState.currentProject);
-
+  var loginfoInit = await getLogInfo(currentState.currentDocument, currentState.currentProject);
+  var loginfo = new LogInfoPDF();
+  loginfo.init(loginfoInit);
+  //var loginfo = await getLogInfo(currentState.currentDocument, currentState.currentProject);
   List<Level> levels = [];
   List<int> testIndexesStored = [];
-  var testsToDisplay = [];
+  testsToDisplay = [];
   for (var i = 0; i < tests.length; i++){
     testsToDisplay.add(tests[i]);
   }
 
+//  var max_levels = [];
+  var maxLevelIndeces = [];
+  var maxLevelSize = 0.0;
+  var maxBoxHeight = 0.0;
+  var tpm; // test per meter
   for (var i = 0; i < units.length; i++){ // TODO - need to add validator in Units page so that no Unit depths overlap.
     levels.add(new Level());
     levels[i].unit = units[i];
     levels[i].setDepth();
     print("Populating level "+i.toString());
     for (var k = 0; k < tests.length; k++){
-      if (tests[k].beginTest > levels[i].endDepth && !testIndexesStored.contains(k)){ // TODO - confirm client is ok with this functionality in output. if a test is majority in another level but starts in another, which should it be in?
+      if (tests[k].beginTest >= levels[i].beginDepth && tests[k].beginTest < levels[i].endDepth && !testIndexesStored.contains(k)){ // TODO - confirm client is ok with this functionality in output. if a test is majority in another level but starts in another, which should it be in?
         levels[i].tests.add(tests[k]);
         testIndexesStored.add(k);
         print("Stored test"+(k+1).toString());
       }
     }
+    tpm = levels[i].tests.length/(levels[i].unit.depthLB.abs() - levels[i].unit.depthUB.abs());
+    if (tpm > maxLevelSize){
+      maxLevelSize = tpm;
+      //max_levels.clear();
+      //max_levels.add(levels[i]);
+      maxLevelIndeces.clear();
+      maxLevelIndeces.add(i);
+    }
+    else if (tpm == maxLevelSize){
+      //max_levels.add(levels[i]);
+      maxLevelIndeces.add(i);
+    }
   }
 
-  
   // Convert levels to widgets
   List<Widget> widgetLevels = [];
-  List<Widget> widgetTests = [];
-  // Create test widgets
+  
+  // Convert all bounded tests to widgets, format level tags
   for(var i = 0; i < levels.length; i++){
-    widgetTests = [];
+
+    levels[i].descriptor = levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + "\n";
+    widgetLevels.add(testsToWidget(levels[i].tests, levels[i].descriptor));
+    for(var j = 0; j < levels[i].tests.length; j++){
+      testsToDisplay.remove(levels[i].tests[j]);
+    }
+
+    // format tags from unit to level object
     String unitTags = levels[i].unit.tags;
     unitTags = unitTags.replaceAll('"', '');
     unitTags = unitTags.replaceAll('[','');
     unitTags = unitTags.replaceAll(']','');
     unitTags = unitTags.replaceAll(',', ', ');
-    for(var j = 0; j < levels[i].tests.length; j++){
-      String testTags = levels[i].tests[j].tags;
-      testTags = testTags.replaceAll('"', '');
-      testTags = testTags.replaceAll('[','');
-      testTags = testTags.replaceAll(']','');
-      testTags = testTags.replaceAll(',', ', ');
-      widgetTests.add(
-        Container( 
-          child: Text( // TESTS
-            levels[i].tests[j].beginTest.toString() + "m to " + levels[i].tests[j].endTest.toString() + "m\t|\t" +
-            "Soil tags: " + testTags + "\t|\t" + // TODO - clean up tag display
-            "% Recovery: " + levels[i].tests[j].percentRecovery.toString() + "\t|\t" +
-            "SDR: " + levels[i].tests[j].soilDrivingResistance + "\t|\t" +
-            "RDD: " + levels[i].tests[j].rockDiscontinuityData + "\t|\t" +
-            "RQD: " + levels[i].tests[j].rockQualityDesignation + "\t|\t" +
-            "Moisture content: " + levels[i].tests[j].moistureContent + "\t|\t" +
-            "Dry density: " + levels[i].tests[j].dryDensity + "\t|\t" +
-            "Liquid limit: " + levels[i].tests[j].liquidLimit + "\t|\t" +
-            "Plastic limit: " + levels[i].tests[j].plasticLimit + "\t|\t" +
-            "Fines: " + levels[i].tests[j].fines + "\t|\t" +
-            "Blows 1: " + levels[i].tests[j].blows1 + "\t|\t" +
-            "Blows 2: " + levels[i].tests[j].blows2 + "\t|\t" + 
-            "Blows 3: " + levels[i].tests[j].blows3 + "\t|\t" +
-            "Blow count: " + levels[i].tests[j].blowCount, textScaleFactor: 0.75),
-          decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-          padding: const EdgeInsets.all(10),
-          width: 434
-        ));
-      testsToDisplay.remove(levels[i].tests[j]);
-    }
-
-    widgetLevels.add(
-      Container(
-        decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-        margin: const EdgeInsets.only(bottom:10),
-        child:Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-          Container(
-            constraints: BoxConstraints(maxWidth: 150),
-            child: Text(levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + "\n" + 
-                        unitTags + "\n" + 
-                        levels[i].unit.drillingMethods + "\n"),
-            padding: const EdgeInsets.all(10),
-          ),
-          Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
-            children: widgetTests
-          )
-          ]
-        )
-      )
-    );
+    levels[i].tags = unitTags;
   }
 
-  // unbounded test handling
-  // SUPER gross, should tuck these all away into a function to clean up the file. TODO
+  // sort so they go in descending order
+  levels.sort((a,b)=> a.beginDepth.compareTo(b.beginDepth));
+
+  // Dump all uncaught tests into a level at the end
   if (testsToDisplay.length > 0){
-    widgetTests = [];
-    for (var i = 0; i < testsToDisplay.length; i++){
-      String testTags = testsToDisplay[i].tags;
-      testTags = testTags.replaceAll('"', '');
-      testTags = testTags.replaceAll('[','');
-      testTags = testTags.replaceAll(']','');
-      testTags = testTags.replaceAll(',', ', ');
-      widgetTests.add(
-        Container( 
-          child: Text( // TESTS
-            testsToDisplay[i].beginTest.toString() + "m to " + testsToDisplay[i].endTest.toString() + "m\t|\t" +
-            "Soil tags: " + testTags + "\t|\t" + // TODO - clean up tag display
-            "% Recovery: " + testsToDisplay[i].percentRecovery.toString() + "\t|\t" +
-            "SDR: " + testsToDisplay[i].soilDrivingResistance + "\t|\t" +
-            "RDD: " + testsToDisplay[i].rockDiscontinuityData + "\t|\t" +
-            "RQD: " + testsToDisplay[i].rockQualityDesignation + "\t|\t" +
-            "Moisture content: " + testsToDisplay[i].moistureContent + "\t|\t" +
-            "Dry density: " + testsToDisplay[i].dryDensity + "\t|\t" +
-            "Liquid limit: " + testsToDisplay[i].liquidLimit + "\t|\t" +
-            "Plastic limit: " + testsToDisplay[i].plasticLimit + "\t|\t" +
-            "Fines: " + testsToDisplay[i].fines + "\t|\t" +
-            "Blows 1: " + testsToDisplay[i].blows1 + "\t|\t" +
-            "Blows 2: " + testsToDisplay[i].blows2 + "\t|\t" + 
-            "Blows 3: " + testsToDisplay[i].blows3 + "\t|\t" +
-            "Blow count: " + testsToDisplay[i].blowCount, textScaleFactor: 0.75),
-          decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-          padding: const EdgeInsets.all(10),
-          width: 434
-        ));
-    }
-    widgetLevels.add(
-      Container(
-        decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
-        margin: const EdgeInsets.only(bottom:10),
-        child:Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-          Container(
-            width: 150,
-            child: Text("Unbounded Tests"),
-            padding: const EdgeInsets.all(10),
-          ),
-          Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
-            children: widgetTests
-          )
-          ]
-        )
-      )
-    );
+    Level overflowLevel = new Level();
+    overflowLevel.tests = testsToDisplay;
+    overflowLevel.descriptor = "Unbounded tests\n";
+    levels.add(overflowLevel);
+    widgetLevels.add(testsToWidget(testsToDisplay, "Unbounded tests\n"));
   }
+
+
+
+  //"render" the pdf to get the flex height of level with most tests
+  try{
+  pdf.addPage(MultiPage(
+    pageFormat:
+        PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
+                                      marginTop: 0.5 * PdfPageFormat.cm,
+                                      marginLeft: 0.5 * PdfPageFormat.cm,
+                                      marginRight: 0.5 * PdfPageFormat.cm), 
+    crossAxisAlignment: CrossAxisAlignment.start,
+    build: (Context context) => <Widget>[Wrap( 
+              children: widgetLevels)
+  ]));
+  }catch(e){
+
+  }
+
+  var maxLevelIndex;
+  if (maxLevelIndeces.length > 1){
+    var highestBox = 0.0;
+    for(int i = 0; i < maxLevelIndeces.length; i++){
+      if (widgetLevels[maxLevelIndeces[i]].box.height > highestBox){
+        highestBox = widgetLevels[maxLevelIndeces[i]].box.height;
+        maxLevelIndex = maxLevelIndeces[i];
+      }
+    }
+  }
+  else if (maxLevelIndeces.length == 1) {
+    maxLevelIndex = maxLevelIndeces[0];
+  }
+
+  var scale;
+  var testsScaled;
+  
+  if(maxLevelIndeces.length >= 1){
+    maxBoxHeight = widgetLevels[maxLevelIndex].box.height;
+    scale = maxBoxHeight/(levels[maxLevelIndex].unit.depthLB.abs()-levels[maxLevelIndex].unit.depthUB.abs()); // Scale is in pixels per meter
+    testsScaled = [];
+  }
+
+  for(int i = 0; i < levels.length; i++){
+    if(levels[i].descriptor == "Unbounded tests\n"){
+      levels[i].scaledRenderHeight = widgetLevels.last.box.height;
+    }
+  }
+
+  for(int i = 0; i < levels.length; i++){
+  try {
+    if (maxLevelIndeces.length >= 1){
+      levels[i].scaledRenderHeight = scale * (levels[i].unit.depthLB-levels[i].unit.depthUB);
+      if (levels[i].scaledRenderHeight < 23){
+        levels[i].notToScale = "*";
+        levels[i].descriptor = levels[i].notToScale + levels[i].descriptor;
+        levels[i].scaledRenderHeight = 23;
+      }
+      testsScaled.add(i);
+    }
+    else{
+      levels[i].scaledRenderHeight = 1;
+    }
+  } catch(e){
+    continue;
+  }
+  }
+
+  // Once rendered and scaled, iterate over and split oversized levels so they can fit on individual pages
+  List<Level> pageScaledLevels = [];
+  for(int j = 0; j < levels.length; j++){
+    if (levels[j].scaledRenderHeight > pageHeight){ 
+      levels[j].notToScale = "*";
+
+    // if we can't display on one page, need to handle it
+      if (levels[j].tests.length > 0){              
+        // if we have tests, split box over pages and redistribute tests
+        List<Level> splitLevels = boxSplit(levels[j], pageHeight);
+        for (int k = 0; k < splitLevels.length; k++){
+          pageScaledLevels.add(splitLevels[k]);
+        }
+      }
+      else{                                        
+         // if we don't have tests, just trim to display range
+        levels[j].scaledRenderHeight = 23;
+        pageScaledLevels.add(levels[j]);        
+      }
+    }
+    else{
+    // we're good to display on one page with current scaling, add to lsit
+      pageScaledLevels.add(levels[j]);
+    }
+  }
+
+  List<Widget> widgetScaledLevels = [];
+  for(int i = 0; i < pageScaledLevels.length; i++){
+      widgetScaledLevels.add(testsToWidget(pageScaledLevels[i].tests, pageScaledLevels[i].descriptor));
+  }
+
+  for(int i = 0; i < widgetScaledLevels.length; i++){
+    //if(testsScaled.contains(i)){
+    if(pageScaledLevels[i].scaledRenderHeight is double){
+      // if scaled, add it with the scaled height.
+      widgetScaledLevels[i] = Container(height: pageScaledLevels[i].scaledRenderHeight,
+                                  decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                                  //child: widgetLevels[i]);
+                                  child: widgetScaledLevels[i]);
+    }
+    else{
+      // if not, add it without.
+      widgetScaledLevels[i] = Container(decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                                  //child: widgetLevels[i]);
+                                  child: widgetScaledLevels[i]);
+    }
+  }
+
+  String leveltags = "";
+  int consecutiveChars = 0;
+  //build unit tag text block
+  for(int i = 0; i < levels.length; i++){
+    // have to manually trim overflowing information. pdf library flexes atomically on words, not characters
+    // maxchar set to 256 in form validation
+  
+    if(levels[i].descriptor != "Unbounded tests\n"){
+      leveltags = leveltags + levels[i].notToScale+"("+levels[i].unit.depthUB.toString() + " to " + levels[i].unit.depthLB.toString() + ")"+"  |  Tags: ";
+      
+      consecutiveChars = 0;
+      for(int j = 0; j < levels[i].tags.length; j++){
+        if (levels[i].tags[j] == " " || levels[i].tags[j] == "\n"){
+          consecutiveChars = 0;
+        }
+        if (consecutiveChars == 100){
+           leveltags = leveltags + "\n";
+           consecutiveChars = 0;
+        }
+        else {
+          leveltags = leveltags + levels[i].tags[j];
+          consecutiveChars++;
+        }
+      }
+
+      consecutiveChars = 0;
+      leveltags = leveltags + ' | Methods: ';
+      for(int j = 0; j < levels[i].unit.drillingMethods.length; j++){
+        if (levels[i].unit.drillingMethods[j] == " " || levels[i].unit.drillingMethods[j] == "\n"){
+          consecutiveChars = 0;
+        }
+        if (consecutiveChars == 100){
+          leveltags = leveltags + "\n";
+          consecutiveChars = 0;
+        }
+        else {
+          leveltags = leveltags + levels[i].unit.drillingMethods[j];
+          consecutiveChars++;
+        }
+      }
+
+      consecutiveChars = 0;
+      leveltags = leveltags + ' | Notes: ';
+      for(int j = 0; j < levels[i].unit.notes.length; j++){
+        if (levels[i].unit.notes[j] == " " || levels[i].unit.notes[j] == "\n"){
+          consecutiveChars = 0;
+        }
+        if (consecutiveChars == 100){
+          leveltags = leveltags + "\n";
+          consecutiveChars = 0;
+        }
+        else {
+          leveltags = leveltags + levels[i].unit.notes[j];
+          consecutiveChars++;
+        }
+      }
+      leveltags = leveltags + '\n';
+                      //levels[i].tags + ' | Methods: ' + levels[i].unit.drillingMethods + ' | Notes: ' + levels[i].unit.notes + '\n';
+    }
+  } 
+  leveltags = leveltags + "* = layer not displayed to scale in output";
+
+  pdf = Document();
 
   // Build it all
+  try{ // DEBUG - set maxPages to 1 and create a doc larger than 1 page to induce error.
   pdf.addPage(MultiPage(
+    maxPages: 50,
     pageFormat:
         PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
                                       marginTop: 0.5 * PdfPageFormat.cm,
@@ -180,7 +418,7 @@ Future<String> docCreate(StateData currentState) async{
         child: Text('DRILL LOG | '+ loginfo.client.toUpperCase() + ' | Page ${context.pageNumber} of ${context.pagesCount}',
                 style: Theme.of(context)
                     .defaultTextStyle
-                    .copyWith(color: PdfColors.grey)));
+                    .copyWith(color: PdfColors.grey, fontSize: 10)));
     },
     build: (Context context) => <Widget>[
             Header(
@@ -188,30 +426,133 @@ Future<String> docCreate(StateData currentState) async{
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('DRILL LOG\n'+ loginfo.client.toUpperCase(), textScaleFactor: 1)
+                      Text('DRILL LOG | ' + loginfo.project +'\n'+ loginfo.client.toUpperCase(), textScaleFactor: 1)
                     ])),
-            Paragraph(
-                text:
-                    loginfo.project),
+                    
             Table.fromTextArray(context: context, data: <List<String>>[
-              <String>['Number', 'Start Date', 'End Date', 'Northing', 'Easting', 'Location'],
-              <String>[loginfo.number, loginfo.startDate, loginfo.endDate, loginfo.north, loginfo.east, loginfo.location]
+              // TODO - LatLong in pdf or North East?
+              <String>['Start Date: '+loginfo.startDate, 'End Date: '+loginfo.endDate, 'ID: '+loginfo.boreholeID, 'Number: '+loginfo.number,  'Latitude: '+loginfo.lat, 'Longitude: '+loginfo.long, 'Location: '+loginfo.location]
             ]),
             Table.fromTextArray(context: context, data: <List<String>>[
-              <String>['Highway', 'County', 'Elevation Datum', 'Surface Elevation', 'Tube Height'],
-              <String>[loginfo.highway, loginfo.county, loginfo.elevationDatum, loginfo.surfaceElevation, loginfo.tubeHeight]
+              //<String>['Highway', 'County', 'Elevation Datum', 'Surface Elevation', 'Tube Height'],
+              <String>['Highway: '+loginfo.highway, 'County: '+loginfo.county, 'Elevation Datum: '+loginfo.elevationDatum, 'Surface Elevation: '+loginfo.surfaceElevation, 'Tube Height: '+loginfo.tubeHeight]
             ]),
             Table.fromTextArray(context: context, data: <List<String>>[
-              <String>['Contractor', 'Equipment', 'Method', 'Logged By', 'Checked By'],
-              <String>[loginfo.contractor, loginfo.equipment, loginfo.method, loginfo.loggedBy, loginfo.checkedBy],
+              //<String>['Contractor', 'Equipment', 'Method', 'Logged By', 'Checked By'],
+              <String>['Projection: '+loginfo.projection, 'Equipment: '+loginfo.equipment, 'Method: '+loginfo.method],
             ]),
-            Paragraph(text:"\n"),
+            Table.fromTextArray(context: context, data: <List<String>>[
+              <String>['Contractor: '+loginfo.contractor, 'Logged by: '+loginfo.loggedBy, 'Checked by: '+loginfo.checkedBy]
+            ]),
+            Container(
+              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    constraints: BoxConstraints(maxWidth: 114, maxHeight: 80),
+                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text("Test Type", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 9)),
+                        ),
+                        Container(
+                          child: Text('"A" - Auger Core\n"X" - Auger"\n"C" - Core, Barrel Type\n"N" - Standard Penetration\n"U" - Undisturbed Sample\n"T" - Test Pit', style: TextStyle(fontSize: 8)) 
+                        ),
+                      ]
+                    )
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    constraints: BoxConstraints(maxWidth: 254, maxHeight: 80),
+                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text("Rock Abbreviations", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 9)),
+                        ),
+                        Container(
+                          //child: Text("Discontinuity\tShape\tSurface Roughness")
+                          child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                                Container(constraints: BoxConstraints(maxWidth: 80), child:Text('Discontinuity\nJ - Joint\nF - Fault\nB - Bedding\nFo - Foliation\nS - Shear', style: TextStyle(fontSize: 8))),
+                                Container(constraints: BoxConstraints(maxWidth: 80), child:Text('Shape\nPl - Planar\nC - Curved\nU - Undulating\nSt - Stepped\nIr - Irregular', style: TextStyle(fontSize: 8))),
+                                Container(constraints: BoxConstraints(maxWidth: 80), child:Text('Surface Roughness\nP - Polished\nSl - Slickensided\nSm - Smooth\nR - Rough\nVR - Very Rough', style: TextStyle(fontSize: 8))) 
+                            ] 
+                          )
+                        )
+                      ]
+                    )),
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    constraints: BoxConstraints(maxWidth: 214, maxHeight: 80),
+                    decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text("Typical Drilling Abbreviations", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 9))
+                        ),
+                        Container(
+                          child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                                Container(constraints: BoxConstraints(maxWidth: 90), child:Text('Drilling Methods\nWL - Wire Line\nHS - Hollow Stem Auger\nDP - Drill Fluid\nSA - Solid Fligh Auger\nCA - Casing Advancer\nHA - Hand Auger', style: TextStyle(fontSize: 7))),
+                                Container(constraints: BoxConstraints(maxWidth: 90), child:Text('Drilling Remarks\nLW - Lost Water\nWR - Water Return\nWC - Water Color\nD - Down Pressure\nDR - Drill Rate\nDA - Drill Action', style: TextStyle(fontSize: 7))),
+                            ] 
+                          )
+                        ),
+                      ]
+                    )),
+                ],
+              )
+            ),
+            //]),
             //Column(mainAxisAlignment: MainAxisAlignment.start,
+            Container(
+              padding: const EdgeInsets.all(5),
+              constraints: BoxConstraints(maxWidth: 582),
+              decoration: BoxDecoration(border: new BoxBorder(left: true, top: true, right: true, bottom: true, color: PdfColors.black, width: 1.0)),
+              child: Text(leveltags, style: TextStyle(fontSize: 10))
+                    //Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center,
+                     // children: <Widget>[
+                     //   Container(
+                     //     padding: const EdgeInsets.only(bottom: 2),
+                     //     child: Flexible(
+                     //             fit: FlexFit.tight,
+                     //             child:Text(leveltags)))
+                     // ]
+                    //)
+            ),
             Wrap( 
-              children: widgetLevels)
+              children: widgetScaledLevels),
             ]));
-  String onFinished = await pdf_write(currentState); //
+  }catch(e){
+    pdf = Document();
+    pdf.addPage(MultiPage(
+    pageFormat:
+        PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
+                                      marginTop: 0.5 * PdfPageFormat.cm,
+                                      marginLeft: 0.5 * PdfPageFormat.cm,
+                                      marginRight: 0.5 * PdfPageFormat.cm), 
+    crossAxisAlignment: CrossAxisAlignment.start,
+    footer: (Context context) {
+      return Container(
+        alignment: Alignment.centerRight,
+        margin: const EdgeInsets.only(top: 1.0 * PdfPageFormat.cm),
+        child: Text('ERROR',
+                style: Theme.of(context)
+                    .defaultTextStyle
+                    .copyWith(color: PdfColors.grey, fontSize: 10)));
+    },
+    build:(Context context) => <Widget>[
+        Text("ERROR - Uncaught exception in PDF creation. Try spreading data across multiple boreholes.\n"+e.toString())])); // TODO - toss a toast to the user? 
+  }
+  String onFinished = await pdfWrite(currentState); //
   if(onFinished == "done"){
+    //print("max level: -"+max_level.unit.depthUB.toString()+" - "+max_level.unit.depthLB.toString());
+    //print("max level size: "+maxLevelSize.toString());
     return "done";
   } else {
     return "failed";
@@ -262,7 +603,7 @@ Future<List<handler.Unit>> getUnits(StateData currentState) async{
     return fetchedUnits;
   }
 
-Future<String> pdf_write(StateData currentState) async{
+Future<String> pdfWrite(StateData currentState) async{
   DateTime now = DateTime.now();
   await new Future.delayed(new Duration(seconds: 1));
   PermissionStatus permission =
