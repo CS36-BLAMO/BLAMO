@@ -18,7 +18,7 @@ import 'package:getflutter/getflutter.dart';
 class ExportPage extends StatefulWidget {
   final StateData pass; //Passes the StateData object to the stateful constructor
 
-  ExportPage(this.pass);
+  ExportPage(this.pass, {Key key}) : super(key:key);
 
   @override
   _ExportPageState createState() => _ExportPageState(pass);
@@ -147,6 +147,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
               fit: FlexFit.loose,
               child: new DropdownButtonHideUnderline(
                   child: DropdownButton(
+                    key: Key('docDropdown'),
                     hint: Text(
                       'Borehole',
                       style: TextStyle(
@@ -162,6 +163,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                         value: value,
                         child: new Text(
                           value,
+                          key: Key('doc_' + value),
                           style: TextStyle(
                               fontSize: 23,
                               color: Color.fromRGBO(89,89,89,1),
@@ -183,6 +185,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
               fit: FlexFit.tight,
               child: new DropdownButtonHideUnderline(
                   child: DropdownButton(
+                      key: Key('typeDropdown'),
                       hint: Text(
                           'Type',
                           style: TextStyle(
@@ -198,6 +201,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                           value: value,
                           child: new Text(
                               value,
+                              key: Key('type_' + value),
                               style: TextStyle(
                                 fontSize: 20,
                                 color: Color.fromRGBO(89,89,89,1),
@@ -221,6 +225,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
           width: double.infinity,
           child: new MaterialButton(
             child: setEmailButton(),
+            key: Key('sendEmail'),
             onPressed: () async {
               print("Pressing send email");
               if(pickedDoc != null && pickedDocType != null) {
@@ -333,6 +338,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                       width: 150,
                       child: new MaterialButton(
                         child: setPDF(),
+                        key: Key('savePDF'),
                         onPressed: () async {
                           setState(() {
                             if(_pdfState == 0) {
@@ -375,6 +381,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                       width: 150,
                       child: new MaterialButton(
                         child: setCSV(),
+                        key: Key('saveCSV'),
                         onPressed: () async {
                           setState(() {
                             if(_csvState == 0) {

@@ -450,7 +450,7 @@ class Test {
   String testType;
   double beginTest;
   double endTest;
-  String percentRecovery;
+  double percentRecovery;
   String soilDrivingResistance;
   String rockDiscontinuityData;
   String rockQualityDesignation;
@@ -489,6 +489,7 @@ class Test {
   factory Test.fromJSON(Map<String, dynamic> parsedJSON){
     double beginTestConverted;
     double endTestConverted;
+    double percentRecoveryConverted;
     //Negative values are Strings for some reason, so check type
     if(parsedJSON["beginTest"] != "null" && parsedJSON["beginTest"].runtimeType.toString() == "Double"){
       beginTestConverted = parsedJSON["beginTest"].value;
@@ -500,12 +501,16 @@ class Test {
     } else if(parsedJSON["endTest"] != "null" && parsedJSON["endTest"].runtimeType.toString() == "String"){
       endTestConverted = double.parse(parsedJSON["endTest"].replaceAll(new RegExp('d'), ''));
     }
-
+    if(parsedJSON["percentRecovery"] != "null" && parsedJSON["percentRecovery"].runtimeType.toString() == "Double"){
+      percentRecoveryConverted = parsedJSON["percentRecovery"].value;
+    } else if(parsedJSON["percentRecovery"] != "null" && parsedJSON["percentRecovery"].runtimeType.toString() == "String"){
+      percentRecoveryConverted = double.parse(parsedJSON["percentRecovery"].replaceAll(new RegExp('d'), ''));
+    }
     return Test(
         testType: parsedJSON["testType"],
         beginTest: beginTestConverted,
         endTest: endTestConverted,
-        percentRecovery: parsedJSON["percentRecovery"],
+        percentRecovery: percentRecoveryConverted,
         soilDrivingResistance: parsedJSON["soilDrivingResistance"],
         rockDiscontinuityData: parsedJSON["rockDiscontinuityData"],
         rockQualityDesignation: parsedJSON["rockQualityDesignation"],

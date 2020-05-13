@@ -10,7 +10,7 @@ import 'package:blamo/CustomActionBar.dart';
 class TestsPage extends StatefulWidget {
   final StateData pass; 
 
-  TestsPage(this.pass);
+  TestsPage(this.pass, {Key key}) : super(key:key);
   @override
   _TestsPageState createState() => new _TestsPageState(pass);
 }
@@ -172,6 +172,7 @@ class _TestsPageState extends State<TestsPage> {
 
                   child: new Material(
                     child: InkWell(
+                      key: Key('test_' + (i+1).toString()),
                       onTap: () => _onTileClicked(i),
                       onLongPress: () => _onTileLongClicked(i),
                       splashColor: Colors.grey,
@@ -218,6 +219,7 @@ class _TestsPageState extends State<TestsPage> {
             new FlatButton(
                 child: Text("DELETE"),
                 textColor: Colors.red,
+                key: Key('deleteTest'),
                 onPressed: () {
                   Navigator.pop(context, "DELETE");
                 }),

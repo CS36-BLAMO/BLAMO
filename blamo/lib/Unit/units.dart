@@ -15,7 +15,7 @@ import 'package:intl/intl.dart';
 class UnitsPage extends StatefulWidget {
   final StateData pass;
 
-  UnitsPage(this.pass);
+  UnitsPage(this.pass, {Key key}) : super(key:key);
   @override
   _UnitsPageState createState() => new _UnitsPageState(pass);
 }
@@ -109,7 +109,7 @@ class _UnitsPageState extends State<UnitsPage> {
 
     String newUnit ="Unit_" + nextUnitNum.toString() + ',';
     String newUnitNoComma = "Unit_" + nextUnitNum.toString();
-    String unit = "{depthUB:null,depthLB:null,drillingMethods:null,note:null,tags:null}";
+    String unit = "{depthUB:null,depthLB:null,drillingMethods:null,notes:null,tags:null}";
     String toWrite = '';
     toWrite = "${currentState.currentDocument}\n${currentState.testList.length}\n${currentState.unitList.length + 1}\n";
     for(int i = 0; i < currentState.testList.length; i++){
@@ -166,6 +166,7 @@ class _UnitsPageState extends State<UnitsPage> {
 
                   child: new Material(
                     child: InkWell(
+                      key: Key('unit_' + (i+1).toString()),
                       onTap: () => _onTileClicked(i),
                       onLongPress: () => _onTileLongClicked(i),
                       splashColor: Colors.grey,
@@ -213,6 +214,7 @@ class _UnitsPageState extends State<UnitsPage> {
           actions: <Widget>[
             new FlatButton(
                 child: Text("DELETE"),
+                key: Key('deleteUnit'),
                 textColor: Colors.red,
                 onPressed: () {
                   Navigator.pop(context, "DELETE");

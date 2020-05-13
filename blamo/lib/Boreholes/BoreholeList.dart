@@ -62,7 +62,7 @@ class BoreholePage extends StatefulWidget {
   //--Toremove
   //final PersistentStorage storage = PersistentStorage();
 
-  BoreholePage(this.pass);
+  BoreholePage(this.pass, {Key key}) : super(key:key);
 
   @override
   _BoreholePageState createState() => _BoreholePageState(pass);
@@ -211,7 +211,9 @@ class _BoreholePageState extends State<BoreholePage> {
                     textColor: Colors.red,
                     onPressed: () {
                       Navigator.pop(context, "DELETE");
-                    }),
+                    },
+                    key: Key('boreholeDelete'),
+                ),
                 new FlatButton(
                   child: Text("CANCEL"),
                   onPressed: () {
@@ -290,6 +292,7 @@ class _BoreholePageState extends State<BoreholePage> {
       return new FloatingActionButton.extended(
         label: Text("New Borehole"),
         tooltip: 'New Borehole Document',
+        key: Key('newBorehole'),
         icon: new Icon(Icons.add),
         foregroundColor: Colors.black,
         backgroundColor: Colors.grey,
@@ -333,7 +336,8 @@ class _BoreholePageState extends State<BoreholePage> {
                               style: TextStyle(fontWeight: FontWeight.bold),
                           )
                       ),
-                    )
+                    ),
+                    key: Key('borehole_' + toReturn),
                 ),
                 color: Colors.transparent,
               ),
