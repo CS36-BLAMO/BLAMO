@@ -143,12 +143,53 @@ List<Level> boxSplit(Level l, double maxHeight){
   return splits;
 }
 
+void addFailed(String e){
+    pdf = Document();
+    pdf.addPage(MultiPage(
+    pageFormat:
+        PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
+                                      marginTop: 0.5 * PdfPageFormat.cm,
+                                      marginLeft: 0.5 * PdfPageFormat.cm,
+                                      marginRight: 0.5 * PdfPageFormat.cm), 
+    crossAxisAlignment: CrossAxisAlignment.start,
+    footer: (Context context) {
+      return Container(
+        alignment: Alignment.centerRight,
+        margin: const EdgeInsets.only(top: 1.0 * PdfPageFormat.cm),
+        child: Text('ERROR',
+                style: Theme.of(context)
+                    .defaultTextStyle
+                    .copyWith(color: PdfColors.grey, fontSize: 10)));
+    },
+    build:(Context context) => <Widget>[
+        Text("ERROR - Exception in PDF creation.\n"+e)])); // TODO - toss a toast to the user? 
+}
+
+
+
+//
 Future<String> docCreate(StateData currentState) async{
 
-  // Create levels from provided lists of tests and units 
-  var tests = await getTests(currentState);
-  var units = await getUnits(currentState);
-  var loginfoInit = await getLogInfo(currentState.currentDocument, currentState.currentProject);
+  // Create levels from provided lists of tests and units
+  var tests;
+  var units;
+  var loginfoInit; 
+
+  try{
+    // fetch information from disk
+    tests = await getTests(currentState);
+    units = await getUnits(currentState);
+    loginfoInit = await getLogInfo(currentState.currentDocument, currentState.currentProject);
+  } catch (e){
+    // if error reading from disk, abort and write failed pdf
+    addFailed("There was an error reading the log data from disk. Make sure all of your data is valid.\n"+ e.toString());
+    String onFinish = await pdfWrite(currentState);
+    if(onFinish == "done"){
+      return "error";
+    } else {
+      return "failed";
+    }
+  }
   var loginfo = new LogInfoPDF();
   loginfo.init(loginfoInit);
   //var loginfo = await getLogInfo(currentState.currentDocument, currentState.currentProject);
@@ -400,7 +441,7 @@ Future<String> docCreate(StateData currentState) async{
   leveltags = leveltags + "* = layer not displayed to scale in output";
 
   pdf = Document();
-
+  bool failed = false;
   // Build it all
   try{ // DEBUG - set maxPages to 1 and create a doc larger than 1 page to induce error.
   pdf.addPage(MultiPage(
@@ -529,31 +570,16 @@ Future<String> docCreate(StateData currentState) async{
               children: widgetScaledLevels),
             ]));
   }catch(e){
-    pdf = Document();
-    pdf.addPage(MultiPage(
-    pageFormat:
-        PdfPageFormat.letter.copyWith(marginBottom: 0.5 * PdfPageFormat.cm,
-                                      marginTop: 0.5 * PdfPageFormat.cm,
-                                      marginLeft: 0.5 * PdfPageFormat.cm,
-                                      marginRight: 0.5 * PdfPageFormat.cm), 
-    crossAxisAlignment: CrossAxisAlignment.start,
-    footer: (Context context) {
-      return Container(
-        alignment: Alignment.centerRight,
-        margin: const EdgeInsets.only(top: 1.0 * PdfPageFormat.cm),
-        child: Text('ERROR',
-                style: Theme.of(context)
-                    .defaultTextStyle
-                    .copyWith(color: PdfColors.grey, fontSize: 10)));
-    },
-    build:(Context context) => <Widget>[
-        Text("ERROR - Uncaught exception in PDF creation. Try spreading data across multiple boreholes.\n"+e.toString())])); // TODO - toss a toast to the user? 
+    addFailed("There was an error writing borehole data to the PDF. Try spreading your data across multiple boreholes.\n" +e.toString());
+    failed = true;
   }
   String onFinished = await pdfWrite(currentState); //
-  if(onFinished == "done"){
+  if(onFinished == "done" && !failed){
     //print("max level: -"+max_level.unit.depthUB.toString()+" - "+max_level.unit.depthLB.toString());
     //print("max level size: "+maxLevelSize.toString());
     return "done";
+  } else if(onFinished == "done" && failed){
+    return "error";
   } else {
     return "failed";
   }
