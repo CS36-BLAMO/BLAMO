@@ -299,9 +299,6 @@ Future<String> docCreate(StateData currentState) async{
           levels[i].scaledRenderHeight = 23;
         }
       }
-      else{
-        levels[i].scaledRenderHeight = 1;
-      }
     } catch(e){
       continue;
     }
@@ -558,10 +555,15 @@ Future<List<handler.Test>> getTests(StateData currentState) async{              
     for(int i = 0; i < currentState.testList.length; i++){
       print("(pdf): Searching: ${currentState.currentDocument}");
       await objectHandler.getTestData(currentState.testList[i], currentState.currentDocument).then((onValue){
+        try{
           onValue.beginTest = onValue.beginTest - (2*onValue.beginTest); 
           onValue.endTest = onValue.endTest - (2*onValue.endTest);     
           fetchedTests.add(onValue);
           print("(pdf): ${currentState.testList[i]} added");
+        } catch(e){
+          print('Omitting a null test at index '+i.toString());
+        }
+
       });
     }
     return fetchedTests;
@@ -574,10 +576,14 @@ Future<List<handler.Unit>> getUnits(StateData currentState) async{              
     for(int i = 0; i < currentState.unitList.length; i++){
       print("(pdf): Searching: ${currentState.currentDocument}");
       await objectHandler.getUnitData(currentState.unitList[i], currentState.currentDocument).then((onValue){
+        try{
           onValue.depthUB = onValue.depthUB - (2*onValue.depthUB);   
           onValue.depthLB = onValue.depthLB - (2*onValue.depthLB);
           fetchedUnits.add(onValue);
           print("(pdf): ${currentState.unitList[i]} added");
+        } catch(e){
+          print('Omitting a null unit at index '+i.toString());
+        }
       });
     }
     return fetchedUnits;
