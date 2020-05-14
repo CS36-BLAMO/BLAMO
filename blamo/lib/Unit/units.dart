@@ -42,6 +42,7 @@ class _UnitsPageState extends State<UnitsPage> {
 
     if(!dirty){
       debugPrint("Returning scaffold $units");
+      purgeNulls();
       return getScaffold(units);
     }
     else {
@@ -267,5 +268,33 @@ class _UnitsPageState extends State<UnitsPage> {
           });
       });
     }
+  }
+
+  Future<void> deleteUnitAtIndex(int i) async{
+    await currentState.storage.deleteUnit(
+        currentState.currentDocument, currentState.unitList[i]);
+    currentState.unitList.removeAt(i);
+    String toWrite = "${currentState.currentDocument}\n${currentState.testList
+        .length}\n${currentState.unitList.length}\n";
+    for (int i = 0; i < currentState.testList.length; i++) {
+      toWrite = toWrite + currentState.testList[i] + ',';
+    }
+    for (int i = 0; i < currentState.unitList.length; i++) {
+      toWrite = toWrite + currentState.unitList[i] + ',';
+    }
+    debugPrint(toWrite);
+    await currentState.storage.overWriteDocument(
+        currentState.currentDocument, toWrite);
+  }
+
+  Future<void> purgeNulls() async{
+      for(int j = units.length-1; j >= 0; j--){
+        if (!(units[j].depthUB is double) || !(units[j].depthLB is double)){
+          deleteUnitAtIndex(j);
+          units = [];
+          getUnitSet(currentState.unitList, currentState.currentDocument);
+        }
+      }
+      
   }
 }

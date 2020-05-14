@@ -38,6 +38,7 @@ class _TestsPageState extends State<TestsPage> {
 
     if(!dirty){
       //debugPrint("Returning scaffold $tests");
+      purgeNulls();
       return getScaffold(tests);
     }
     else {
@@ -278,5 +279,34 @@ class _TestsPageState extends State<TestsPage> {
         dirty = false;
       });
     });
+  }
+
+  Future<void> deleteTestAtIndex(int i) async{
+      await currentState.storage.deleteTest(
+          currentState.currentDocument, currentState.testList[i]);
+      currentState.testList.removeAt(i);
+
+      String toWrite = "${currentState.currentDocument}\n${currentState.testList
+          .length}\n${currentState.unitList.length}\n";
+      for (int i = 0; i < currentState.testList.length; i++) {
+        toWrite = toWrite + currentState.testList[i] + ',';
+      }
+      for (int i = 0; i < currentState.unitList.length; i++) {
+        toWrite = toWrite + currentState.unitList[i] + ',';
+      }
+      debugPrint(toWrite);
+
+      await currentState.storage.overWriteDocument(
+          currentState.currentDocument, toWrite);
+  }
+
+  Future<void> purgeNulls() async{
+      for(int j = tests.length-1; j >= 0; j--){
+        if (!(tests[j].beginTest is double) || !(tests[j].endTest is double)){
+          deleteTestAtIndex(j);
+          tests = [];
+          getTestSet(currentState.testList, currentState.currentDocument);
+        }
+      }
   }
 }
