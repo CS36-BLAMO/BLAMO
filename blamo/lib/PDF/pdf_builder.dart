@@ -560,7 +560,7 @@ Future<List<handler.Test>> getTests(StateData currentState) async{              
           onValue.endTest = onValue.endTest - (2*onValue.endTest);     
           fetchedTests.add(onValue);
           print("(pdf): ${currentState.testList[i]} added");
-        } catch(e){
+        } catch(NoSuchMethodError){
           print('Omitting a null test at index '+i.toString());
         }
 
@@ -581,7 +581,7 @@ Future<List<handler.Unit>> getUnits(StateData currentState) async{              
           onValue.depthLB = onValue.depthLB - (2*onValue.depthLB);
           fetchedUnits.add(onValue);
           print("(pdf): ${currentState.unitList[i]} added");
-        } catch(e){
+        } catch(NoSuchMethodError){
           print('Omitting a null unit at index '+i.toString());
         }
       });
