@@ -526,16 +526,20 @@ class _TestPageState extends State<TestPage> {
     for(int i = 0; i < currentState.testList.length; i++){
       Test currentCheck = await objectHandler.getTestData(currentState.testList[i], currentState.currentDocument);
       if (currentState.currentTest != currentState.testList[i]) {
-        if(testObject.beginTest < currentCheck.beginTest && testObject.beginTest > currentCheck.endTest) {
-          return false;
-        } else if(testObject.endTest < currentCheck.beginTest && testObject.endTest > currentCheck.endTest) {
-          return false;
-        } else if (testObject.beginTest == currentCheck.beginTest || testObject.endTest == currentCheck.endTest) {
-          return false;
-        } else if (currentCheck.beginTest < testObject.beginTest && currentCheck.beginTest > testObject.endTest) {
-          return false;
-        } else if (currentCheck.endTest < testObject.beginTest && currentCheck.endTest > testObject.endTest) {
-          return false;
+        try{
+          if(testObject.beginTest < currentCheck.beginTest && testObject.beginTest > currentCheck.endTest) {
+            return false;
+          } else if(testObject.endTest < currentCheck.beginTest && testObject.endTest > currentCheck.endTest) {
+            return false;
+          } else if (testObject.beginTest == currentCheck.beginTest || testObject.endTest == currentCheck.endTest) {
+            return false;
+          } else if (currentCheck.beginTest < testObject.beginTest && currentCheck.beginTest > testObject.endTest) {
+            return false;
+          } else if (currentCheck.endTest < testObject.beginTest && currentCheck.endTest > testObject.endTest) {
+            return false;
+          }
+        }catch(NoSuchMethodError){
+          continue;
         }
       }
     }
