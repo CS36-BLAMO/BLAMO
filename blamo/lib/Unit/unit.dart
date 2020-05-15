@@ -357,16 +357,20 @@ class _UnitPageState extends State<UnitPage> {
     for(int i = 0; i < currentState.unitList.length; i++){
       Unit currentCheck = await objectHandler.getUnitData(currentState.unitList[i], currentState.currentDocument);
       if(currentState.currentUnit != currentState.unitList[i]) {
-        if (unitObject.depthUB < currentCheck.depthUB && unitObject.depthUB > currentCheck.depthLB) {
-          return false;
-        } else if (unitObject.depthLB < currentCheck.depthUB && unitObject.depthLB > currentCheck.depthLB) {
-          return false;
-        } else if (unitObject.depthUB == currentCheck.depthUB || unitObject.depthLB == currentCheck.depthLB) {
-          return false;
-        } else if (currentCheck.depthUB < unitObject.depthUB && currentCheck.depthUB > unitObject.depthLB) {
-          return false;
-        } else if (currentCheck.depthLB < unitObject.depthUB && currentCheck.depthLB > unitObject.depthLB) {
-          return false;
+        try{
+          if (unitObject.depthUB < currentCheck.depthUB && unitObject.depthUB > currentCheck.depthLB) {
+            return false;
+          } else if (unitObject.depthLB < currentCheck.depthUB && unitObject.depthLB > currentCheck.depthLB) {
+            return false;
+          } else if (unitObject.depthUB == currentCheck.depthUB || unitObject.depthLB == currentCheck.depthLB) {
+            return false;
+          } else if (currentCheck.depthUB < unitObject.depthUB && currentCheck.depthUB > unitObject.depthLB) {
+            return false;
+          } else if (currentCheck.depthLB < unitObject.depthUB && currentCheck.depthLB > unitObject.depthLB) {
+            return false;
+          }
+        } catch(NoSuchMethodError){ // null handling
+          continue;
         }
       }
     }
