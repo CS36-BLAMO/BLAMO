@@ -315,6 +315,19 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                                   textColor: Colors.white,
                                   fontSize: 18
                               );
+                            } else if (finish == "error"){
+                              setState(() {
+                                _pdfState = 2;
+                              });
+                              Fluttertoast.showToast(
+                                  msg: "Error in PDF creation - see written PDF for details.",
+                                  toastLength: Toast.LENGTH_LONG,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIos: 3,
+                                  backgroundColor: Color(0xFF3B3B3B),
+                                  textColor: Colors.white,
+                                  fontSize: 18
+                              );
                             }
                           }
                         },
