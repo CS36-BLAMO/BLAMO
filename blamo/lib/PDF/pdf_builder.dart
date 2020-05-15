@@ -590,12 +590,10 @@ Future<List<handler.Unit>> getUnits(StateData currentState) async{              
   }
 
 Future<String> pdfWrite(StateData currentState) async{                                      // ask for user permissions, generate filename, write to filepath
-  //DateTime now = DateTime.now();
   await new Future.delayed(new Duration(seconds: 1));
   PermissionStatus permission =
     await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
   if (permission.toString() != "PermissionStatus.granted") {
-    //Map<PermissionGroup, PermissionStatus> permissions = 
       await PermissionHandler().requestPermissions([PermissionGroup.storage]);
   } 
   await new Future.delayed(new Duration(seconds: 1));
