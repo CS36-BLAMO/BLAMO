@@ -28,9 +28,11 @@ class PersistentStorage {
 
   PersistentStorage.withExtension(this.fileName, this.pathExtension, [this.nameIterator = 0]);
 
-  /*This block handles directory navigation
+  /*This block handles directory navigation, most files have the structure (x can be unit/test/loginfo, or borehole pdf's/csv's):
+  * projectName_boreholeName_X.extension
   *    fileName -> name of the file you're working with
   *    pathExtension -> name of the extended path from device native path
+  *    projectPrepend -> idicates the project that is being worked on
   *    nameIterator -> Iterative file name (test1, test2, ... , test$nameIterator)
   * */
   void changeFilename(String newFileName){
@@ -105,8 +107,9 @@ class PersistentStorage {
 * file system.
 *    readManifest -> reads state data needed to persist through reboots
 *    readDocument -> reads document meta-data (ideally used to map out the file system) requires document number
-*    readTest     -> reads test data and expects 2 integers (Document number, Test number)
-*    readUnit     -> reads unit data and expects 2 integers (Document number, Unit number)
+*    readTest     -> reads test data and expects 2 strings (DocumentName, testName)
+*    readUnit     -> reads unit data and expects 2 strings  (DocumentName, unitName)
+*    readLogInfo  -> reads log info data and expects 1 string (DocumentName)
 */
   Future<String> readManifest() async {
     changePathExtension("");
@@ -126,7 +129,7 @@ class PersistentStorage {
 
   Future<String> readDocument(String documentName) async {
     //--Debug
-    debugPrint("(FH)Reading from: /" + projectPrepend + "$documentName"  + "_Document-Meta.txt\n");
+    //debugPrint("(FH)Reading from: /" + projectPrepend + "$documentName"  + "_Document-Meta.txt\n");
 
     changePathExtension(documentName);
     changeFilename('_Document-Meta.txt');
@@ -145,7 +148,7 @@ class PersistentStorage {
 
   Future<String> readTest(String documentName, String testName) async {
     //--Debug
-    debugPrint("(FH)Reading from: /" + projectPrepend + "$documentName"  + "_$testName.txt\n");
+    //debugPrint("(FH)Reading from: /" + projectPrepend + "$documentName"  + "_$testName.txt\n");
 
     changePathExtension(documentName);
     changeFilename('_$testName.txt');
@@ -183,7 +186,7 @@ class PersistentStorage {
 
     Future<String> readLogInfo(String documentName) async {
     //--Debug
-    debugPrint("(FH)Reading from: /$projectPrepend"+ "$documentName" + "_LogInfo.txt\n");
+    //debugPrint("(FH)Reading from: /$projectPrepend"+ "$documentName" + "_LogInfo.txt\n");
 
     changePathExtension(documentName);
     changeFilename('_LogInfo.txt');
@@ -202,11 +205,12 @@ class PersistentStorage {
 
   /*---End Read Operations Block---*/
 
-/*This block handles all of the creation/overwrite opperations for file IO 
+/*This block handles all of the creation/overwrite opps for file IO
 * overWriteManifest -> Creates and writes into the manifest doc in the root
-* overWriteDocument -> Creates and writes into the Document-meta.text (requires document number)
-* overWriteTest     -> Creates and writes into the test document (requires: document number and test number)
-* overWrite         -> Creates and writes into the unit document (requires: document number and unit number)
+* overWriteDocument -> Creates and writes into the Document-meta.text (requires documentName)
+* overWriteTest     -> Creates and writes into the test document (requires: documentName and test number)
+* overWriteUnit     -> Creates and writes into the unit document (requires: documentName and unit number)
+* overWriteLogInfo  -> Creates and writes into the log info document (requires: documentName)
 * */
   Future<File> overWriteManifest(String toWrite) async {
     //--Debug
@@ -268,6 +272,12 @@ class PersistentStorage {
   }
   /*---End OverWrite Block---*/
 
+  /*This block contains all of the append write opps that require a file to write to. As it stands these are unused.
+  * writeManifest     -> appends the given string to the manifest
+  * writeDocument     -> appends the given string to the document manifest
+  * writeTest         -> appends the given string to the Test (requires: documentName, testName, toAppend)
+  * writeUnit         -> appends the given string to the Unit (requires: documentName, unitName, toAppend)
+  * */
   Future<File> writeManifest(String toWrite) async {
     setFileToManifest();
     final file = await _localFile;
@@ -303,16 +313,17 @@ class PersistentStorage {
     // Write the file
     return await file.writeAsString(toWrite, mode: FileMode.append, encoding: utf8 ,flush: true);
   }
+  /*---End Write Block---*/
 
   /* Deletion functions for removing Documents, Units, and Tests
-  *  deleteProject      -> deletes the project, including all documents(renamed to boreholes)
-  *  deleteDocument     -> deletes the document from the manifest and all of its correlated files
-  *  deleteUnit         -> deletes an individual unit, takes in doc name and unit name
-  *  deleteTest         -> deletes an individual test, takes in doc name and test name
-  *  deleteLogInfo      -> deletes an individual loginfo, takes in doc name
-  *  deleteDocumentMeta -> deletes an individual document-meta, takes in doc name
+  *  deleteProject      -> deletes the project, including all documents(renamed to boreholes) (requires: documentName, projectName)
+  *  deleteDocument     -> deletes the document from the manifest and all of its correlated files (requires: documentName, projectName)
+  *  deleteUnit         -> deletes an individual unit (requires: documentName, unitName)
+  *  deleteTest         -> deletes an individual test (requires: documentName, testName)
+  *  deleteLogInfo      -> deletes an individual loginfo (requires: documentName)
+  *  deleteDocumentMeta -> deletes an individual document-meta (requires: documentName)
+  *  deleteProjectManifest -> deletes the project manifest, currently unused (requires: nothing)
   * */
-
   Future<int> deleteProject(String projectName) async{
     changeProjectName(projectName);
     bool isProjectInit = await checkForManifest();
@@ -486,6 +497,11 @@ class PersistentStorage {
 
   /*---Boolean file Checking, checks for the existence of Specific files---
   * checkForManifest() -> Checks the root directory if the manifest exists
+  * checkDocument()    -> Checks for a given documents existence (requires: documentName)
+  * checkTest()        -> Checks for a given test within a document (requires: documentName, testName)
+  * checkUnit()        -> Checks for a given unit within a document (requires: documentName, unitName)
+  * checkForFile()     -> Checks for a given CSV/PDF (requires: documentName, extension)
+  * getPathToFile()    -> Gets the path to a file and returns it as a string (requires: documentName, extension)
   * */
   Future<bool> checkForManifest() async {
     setFileToManifest();
@@ -506,6 +522,44 @@ class PersistentStorage {
     setFileToManifest();
     return File(await _localPath + "/$projectPrepend" + "$documentName" + '_$unitName.txt').exists();
   }
+
+  Future<bool> checkForFile(String documentName, String extension) async{
+    PermissionStatus permission =
+    await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    if (permission.toString() != "PermissionStatus.granted") {
+      Map<PermissionGroup, PermissionStatus> permissions =
+      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+    }
+    await new Future.delayed(new Duration(milliseconds: 50));
+    permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    if (permission.toString() != "PermissionStatus.granted"){
+      print("Permission denied. PDF write cancelled."); // TODO - Better handle permission denied case.
+    } else {
+      final output = await getExternalStorageDirectory();
+      String filepath = "${output.path}/$projectPrepend$documentName.$extension";
+      return File(filepath).exists();
+    }
+    return false;
+  }
+
+  Future<String> getPathToFile(String documentName, String extension) async{
+    PermissionStatus permission =
+    await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    if (permission.toString() != "PermissionStatus.granted") {
+      Map<PermissionGroup, PermissionStatus> permissions =
+      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+    }
+    await new Future.delayed(new Duration(milliseconds: 50));
+    permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    if (permission.toString() != "PermissionStatus.granted"){
+      print("Permission denied. PDF write cancelled."); // TODO - Better handle permission denied case.
+    } else {
+      final output = await getExternalStorageDirectory();
+      String filepath = "${output.path}/$projectPrepend$documentName.$extension";
+      return filepath;
+    }
+    return null;
+  }
   /*---End Of file checking functions---*/
 
   //Updates the statedata object with the currentDocument
@@ -515,6 +569,8 @@ class PersistentStorage {
     toRead.testList = [];
     toRead.unitList = [];
     changeProjectName(toRead.currentProject);
+
+    //If the user has accessed the homescreen or just the boreholes page
     if(toRead.currentRoute == "/" || toRead.currentRoute == "/BoreholeList") {
       setFileToManifest();
       toParse = await readManifest();
@@ -561,42 +617,5 @@ class PersistentStorage {
       }
     }
     return toRead;
-  }
-  Future<bool> checkForFile(String documentName, String extension) async{
-    PermissionStatus permission =
-    await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
-    if (permission.toString() != "PermissionStatus.granted") {
-      Map<PermissionGroup, PermissionStatus> permissions =
-      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
-    }
-    await new Future.delayed(new Duration(milliseconds: 50));
-    permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
-    if (permission.toString() != "PermissionStatus.granted"){
-      print("Permission denied. PDF write cancelled."); // TODO - Better handle permission denied case.
-    } else {
-      final output = await getExternalStorageDirectory();
-      String filepath = "${output.path}/$projectPrepend$documentName.$extension";
-      return File(filepath).exists();
-    }
-    return false;
-  }
-
-  Future<String> getPathToFile(String documentName, String extension) async{
-    PermissionStatus permission =
-    await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
-    if (permission.toString() != "PermissionStatus.granted") {
-      Map<PermissionGroup, PermissionStatus> permissions =
-      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
-    }
-    await new Future.delayed(new Duration(milliseconds: 50));
-    permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
-    if (permission.toString() != "PermissionStatus.granted"){
-      print("Permission denied. PDF write cancelled."); // TODO - Better handle permission denied case.
-    } else {
-      final output = await getExternalStorageDirectory();
-      String filepath = "${output.path}/$projectPrepend$documentName.$extension";
-      return filepath;
-    }
-    return null;
   }
 }
