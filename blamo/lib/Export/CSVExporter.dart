@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 class CSVExporter {
   ObjectHandler objectHandler;
   StateData stateData;
+  StateData tempData;
   LogInfo logInfo;
   List<Unit> units;
   List<Test> tests;
@@ -16,6 +17,11 @@ class CSVExporter {
 
   CSVExporter(this.stateData){
     objectHandler = new ObjectHandler(stateData.currentProject);
+    tempData = new StateData("/Export");
+    tempData.currentProject = stateData.currentProject;
+    tempData.list = stateData.list;
+    tempData.unitList = stateData.unitList;
+    tempData.testList = stateData.testList;
   }
 
   Future<String> exportToCSV() async{
@@ -26,6 +32,25 @@ class CSVExporter {
     debugPrint("toWrite: $toWrite");
     String response = await csvWrite(toWrite, stateData.currentDocument);
     return response;
+  }
+
+
+  Future<String> exportProjectToCSV() async {
+    String toWrite;
+    String header = "OBJECTID,Test Type,PROJECT,Number,Client,LATITUDE,LONGITUDE,Projection,North,East,Location,Elevation Datum,Borehole ID,Date Started,Date Completed,Surface Elevation (ft),Contractor/Driller,Method,Logged By,Checked By,Begin Depth (ft),End Depth (ft),Soil Type,Description,Moisture Content,Dry Density (pcf),Liquid Limit (%),Plastic Limit (%),Fines (%),Blows 1st,Blows 2nd,Blows 3rd,N Value";
+    lines.add(header);
+    for(int i = 0; i < tempData.list.length; i++){
+      debugPrint('tempData.list[$i]: ${tempData.list[i]}');
+      if(tempData.list[i] != ''){
+        tempData.currentDocument = tempData.list[i];
+        await tempData.storage.setStateData(tempData);
+        await getProjectData();
+        await new Future.delayed(new Duration(milliseconds: 100));
+        buildProjectCSVLines();
+      }
+    }
+    toWrite = formatLinesToString();
+    debugPrint('Writing to csv: \n $toWrite');
   }
 
   Future<int> getData() async{
@@ -43,6 +68,30 @@ class CSVExporter {
     }
     debugPrint("SUCCESS");
     return 0;
+  }
+
+  Future<int> getProjectData() async{
+    logInfo = await objectHandler.getLogInfoData(tempData.currentDocument);
+    try{
+      units = await objectHandler.getUnitsData(tempData.unitList, tempData.currentDocument);
+    } catch (e){
+      debugPrint("(CSV)ERROR getting units");
+    }
+    try{
+      tests = await objectHandler.getTestsData(tempData.testList, tempData.currentDocument);
+    } catch (e){
+      debugPrint("(CSV)ERROR getting tests");
+    }
+    debugPrint("SUCCESS");
+    return 0;
+  }
+
+  String scrubData(String toScrub){
+    if(toScrub != null){
+      return toScrub.replaceAll(",", " ").replaceAll('\n', '') + ",";
+    } else {
+      return ",";
+    }
   }
 
   void buildCSVLines(){
@@ -84,6 +133,49 @@ class CSVExporter {
           "${tests[i].blows2.replaceAll(",", " ").replaceAll('\n', '')},"
           "${tests[i].blows3.replaceAll(",", " ").replaceAll('\n', '')},"
           "${tests[i].blowCount.replaceAll(",", " ").replaceAll('\n', '')}");
+    }
+  }
+
+  void buildProjectCSVLines() {
+//    String header = "OBJECTID,Test Type,PROJECT,Number,Client,LATITUDE,LONGITUDE,Projection,North,East,Location,Elevation Datum,Borehole ID,Date Started,Date Completed,Surface Elevation (ft),Contractor/Driller,Method,Logged By,Checked By,Begin Depth (ft),End Depth (ft),Soil Type,Description,Moisture Content,Dry Density (pcf),Liquid Limit (%),Plastic Limit (%),Fines (%),Blows 1st,Blows 2nd,Blows 3rd,N Value";
+//    lines.add(header);
+    //TODO SizeofTest
+    for (int i = 0; i < tests.length; i++) {
+      lines.add("$i,"
+          + scrubData(tests[i].testType)
+          + scrubData(logInfo.project)
+          + scrubData(logInfo.number)
+          + scrubData(logInfo.client)
+          + scrubData(logInfo.lat)
+          + scrubData(logInfo.long)
+          + scrubData(logInfo.projection)
+          + scrubData(logInfo.north)
+          + scrubData(logInfo.east)
+          + scrubData(logInfo.location)
+          + scrubData(logInfo.elevationDatum)
+          + scrubData(logInfo.boreholeID)
+          + scrubData(logInfo.startDate)
+          + scrubData(logInfo.endDate)
+          + scrubData(logInfo.surfaceElevation)
+          + scrubData(logInfo.contractor)
+          + scrubData(logInfo.method)
+          + scrubData(logInfo.loggedBy)
+          + scrubData(logInfo.checkedBy)
+          + scrubData("${tests[i].beginTest}")
+          + scrubData("${tests[i].endTest}")
+          + ","
+          + scrubData(formatTags(tests[i].tags))
+          + scrubData(tests[i].moistureContent)
+          + scrubData(tests[i].dryDensity)
+          + scrubData(tests[i].liquidLimit)
+          + scrubData(tests[i].plasticLimit)
+          + scrubData(tests[i].fines)
+          + scrubData(tests[i].blows1)
+          + scrubData(tests[i].blows2)
+          + scrubData(tests[i].blows3)
+          + scrubData(tests[i].blowCount)
+          + "\n\n"
+      );
     }
   }
   String formatTags(String tags){

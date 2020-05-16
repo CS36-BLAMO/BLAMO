@@ -354,7 +354,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                           });
                           if(_csvState == 1){
                             CSVExporter csvExporter = new CSVExporter(currentState);
-                            String finish = await csvExporter.exportToCSV();
+                            String finish = await csvExporter.exportProjectToCSV();
                             if(finish == "done"){
                               setState(() {
                                 _csvState = 2;
