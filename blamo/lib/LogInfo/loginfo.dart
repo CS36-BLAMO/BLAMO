@@ -1,15 +1,15 @@
-import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:blamo/SideMenu.dart';
-import 'package:blamo/CustomActionBar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
+
+import 'package:blamo/Boreholes/BoreholeList.dart';
+import 'package:blamo/CustomActionBar.dart';
 import 'package:blamo/ObjectHandler.dart';
+import 'package:blamo/SideMenu.dart';
 
 class LogInfoPage extends StatefulWidget {
-  final StateData pass; //Passes the StateData object to the stateful constructor
+  final StateData pass; // Passes the StateData object to the stateful constructor
 
   LogInfoPage(this.pass, {Key key}) : super(key:key);
 
@@ -21,7 +21,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
   final routeName = '/TestPage';
   StateData currentState;
   _LogInfoPageState(this.currentState);
-  var formNodes = new List<FocusNode>(21); //Handle passing focus from one field to the next
+  var formNodes = new List<FocusNode>(21); // Handle passing focus from one field to the next
 
   bool dirty = true;
   LogInfo logInfoObject;
@@ -49,12 +49,11 @@ class _LogInfoPageState extends State<LogInfoPage> {
   @override
   Widget build(BuildContext context) {
     if(currentState.currentRoute != null) {
-      currentState.currentRoute = '/LogInfoPage'; //Assigns currentState.currentRoute to the name of the current named route
+      currentState.currentRoute = '/LogInfoPage'; // Assigns currentState.currentRoute to the name of the current named route
     }
 
     if(!dirty){
       debugPrint("After setState: (${logInfoObject.county})");
-      //debugPrint("Returning scaffold $toTest1, $toTest2");
       return getLogInfoScaffold(logInfoObject);
     } else {
       debugPrint("Returning empty Scaffold");
@@ -71,7 +70,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
     }
 
   }
-  //takes you back to Overview of borehole with dialog pop up to confirm loss of data
+  // takes you back to Overview of borehole with dialog pop up to confirm loss of data
   Future<bool> backPressed() async {
     bool userInput = await showDialog(
         context: context,
@@ -100,7 +99,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
             ]
         )
     );
-    if(userInput) {   //If a user decides to leave the page it sets the page to navigate to
+    if(userInput) {   // If a user decides to leave the page it sets the page to navigate to
       currentState.currentRoute = "/Document";
       Navigator.pushReplacementNamed(
         context,
@@ -108,6 +107,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
         arguments: currentState,
       );
     }
+    return userInput;
   }
 
   void updateLogInfoData(String documentName) async{
@@ -121,6 +121,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
     });
   }
 
+  // This function formats null values
   String formatValue(String value){
     if(value == "null"){
       return "";
@@ -153,18 +154,18 @@ class _LogInfoPageState extends State<LogInfoPage> {
                         child: Column(
                             children: <Widget>[
                               FormBuilderTextField(
-                                key: Key('projectField'),
-                                textInputAction: TextInputAction.next,
-                                focusNode: formNodes[0],
-                                attribute: 'project',
-                                validators: [],
-                                maxLength: 100,
+                                key: Key('projectField'),                       // used for testing purposes
+                                textInputAction: TextInputAction.next,          // changes the 'enter' icon on the keyboard
+                                focusNode: formNodes[0],                        // used for controlling which field has focus
+                                attribute: 'project',                           // used for identifying fields
+                                validators: [],                                 // user input checks
+                                maxLength: 100,                                 // restricts user input to 100 characters
                                 maxLengthEnforced: true,
-                                decoration: InputDecoration(labelText: "Project", counterText:""),
-                                initialValue: formatValue(logInfoToBuildFrom.project),
-                                onChanged: (void nbd){updateLogObject();}, //Update field when it is changed
+                                decoration: InputDecoration(labelText: "Project", counterText:""),  // Labels the field and hides the character counter
+                                initialValue: formatValue(logInfoToBuildFrom.project),              // the initial value to be displayed
+                                onChanged: (void nbd){updateLogObject();},      //Update field when it is changed
                                 onFieldSubmitted: (v){
-                                  FocusScope.of(context).requestFocus(formNodes[1]); //The next field gets focus when this field is submitted
+                                  FocusScope.of(context).requestFocus(formNodes[1]);                // The next field gets focus when this field is submitted
                                 },
                               ),
                               FormBuilderTextField(
@@ -484,11 +485,10 @@ class _LogInfoPageState extends State<LogInfoPage> {
                     )
                   ],
                 ))),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: FloatingActionButton(         // save button
           key: Key('saveLogInfo'),
           onPressed: () {
-            if (_fbKey.currentState.saveAndValidate()) {
-              //print(_fbKey.currentState.value); // formbuilders have onEditingComplete property, could be worth looking into. Run it by client.
+            if (_fbKey.currentState.saveAndValidate()) {    // check user input and save
               updateLogObject();
               saveLogObject();
               _showToast("Success", Colors.green);
@@ -502,6 +502,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
     );
   }
 
+  // Helper function to display toasts
   void _showToast(String toShow, MaterialColor color){
     Fluttertoast.showToast(
         msg: toShow,
@@ -514,6 +515,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
     );
   }
 
+  // Used to keep the fields updated as the user enters info
   void updateLogObject(){
     logInfoObject.project = _fbKey.currentState.fields["project"].currentState.value;
     logInfoObject.number = _fbKey.currentState.fields["number"].currentState.value;
@@ -550,6 +552,7 @@ class _LogInfoPageState extends State<LogInfoPage> {
     logInfoObject.checkedBy = _fbKey.currentState.fields["checkedBy"].currentState.value;
   }
 
+  // Saves the field values
   void saveLogObject() async{
     ObjectHandler toHandle = new ObjectHandler(currentState.currentProject);
     try {

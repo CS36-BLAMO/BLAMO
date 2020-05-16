@@ -1,16 +1,9 @@
-import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter/services.dart';
-//import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:blamo/ObjectHandler.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:blamo/SideMenu.dart';
-import 'package:blamo/CustomActionBar.dart';
 
-//ToRemove
-/*
-import 'package:intl/intl.dart';
- */
+import 'package:blamo/Boreholes/BoreholeList.dart';
+import 'package:blamo/CustomActionBar.dart';
+import 'package:blamo/ObjectHandler.dart';
+import 'package:blamo/SideMenu.dart';
 
 class UnitsPage extends StatefulWidget {
   final StateData pass;
@@ -21,7 +14,6 @@ class UnitsPage extends StatefulWidget {
 }
 
 class _UnitsPageState extends State<UnitsPage> {
-  //TextEditingController _textFieldController = TextEditingController();
   final routeName = '/UnitsPage';
   StateData currentState;
   _UnitsPageState(this.currentState);
@@ -34,7 +26,7 @@ class _UnitsPageState extends State<UnitsPage> {
     dirty = false;
     getUnitSet(currentState.unitList, currentState.currentDocument);
   }
-  //final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+
   Widget build(BuildContext context) {
     if(currentState.currentRoute != null) {
       currentState.currentRoute = '/UnitsPage';
@@ -54,11 +46,11 @@ class _UnitsPageState extends State<UnitsPage> {
                 child: SideMenu(currentState)
             ),
         ),
-      );}
+      );
+    }
   }
-  //@override
-  Widget getScaffold(List<Unit> units){
 
+  Widget getScaffold(List<Unit> units){
     return WillPopScope(
       onWillPop: backPressed,
       child: new Scaffold(
@@ -83,7 +75,7 @@ class _UnitsPageState extends State<UnitsPage> {
     );
   }
 
-  //takes you back to overview of current borehole
+  // takes you back to overview of current borehole
   Future<bool> backPressed() async {
     Navigator.pushReplacementNamed(
       context,
@@ -96,15 +88,12 @@ class _UnitsPageState extends State<UnitsPage> {
     //Create a unit with the number of the last unit in unitList and increment by 1
     //Cannot rename or shuffle names after created.
     var nextUnitNum;
-    //debugPrint("Length of Unit list: " + currentState.unitList.length.toString());
     if (currentState.unitList.length == 0) {
       nextUnitNum = 1;
     } else {
-      //debugPrint("Last Unit in List: " + currentState.unitList[currentState.unitList.length - 1]); //Last item in list is - 1 index(Dart language req)
       var lastUnitName = currentState.unitList[currentState.unitList.length - 1];
-      var lastUnitNum = lastUnitName.substring(lastUnitName.indexOf('_') + 1, lastUnitName.length); //Takes string after _ in name to grab integer
+      var lastUnitNum = lastUnitName.substring(lastUnitName.indexOf('_') + 1, lastUnitName.length); // Takes string after _ in name to grab integer
       nextUnitNum = int.parse(lastUnitNum) + 1;
-      //debugPrint("next unit num: " + nextUnitNum.toString());
     }
 
     String newUnit ="Unit_" + nextUnitNum.toString() + ',';
@@ -126,7 +115,7 @@ class _UnitsPageState extends State<UnitsPage> {
     currentState.currentUnit = newUnitNoComma;
     currentState.currentRoute = '/UnitPage';
 
-    //Await for the test page to get popped
+    // Await for the test page to get popped
     await Navigator.pushNamed(
       context,
       "/UnitPage",
@@ -185,7 +174,7 @@ class _UnitsPageState extends State<UnitsPage> {
     currentState.currentUnit=currentState.unitList[i];
     debugPrint("(Units)Clicked on: " + currentState.unitList[i] + "\n");
 
-    if(currentState.currentRoute != '/UnitPage'){ // TODO - dynamically populate unit edit page
+    if(currentState.currentRoute != '/UnitPage'){
       currentState.currentRoute = '/UnitPage';
       await Navigator.pushNamed(
         context,

@@ -1,20 +1,23 @@
-import 'package:flutter_driver/flutter_driver.dart';
-import 'package:test/test.dart';
 import 'dart:io';
 
-//How to perform flutter drive tests:
-//Open emulator
-//run flutter drive --target=test_driver/blamo.dart
+import 'package:flutter_driver/flutter_driver.dart';
+import 'package:test/test.dart';
 
-//note: you must allow blamo access to files every time during the export test
+// How to perform flutter drive tests:
+// Open emulator
+// run flutter drive --target=test_driver/blamo.dart
+// note: you must manually allow blamo access to files every time during the export test
 void main() {
 
+  // Takes a screenshot of the emulator screen and saves it to screenshots folder
+  // Screenshots can be used to inspect ui elements after the tests have been run
   Future<void> takeScreenshot(FlutterDriver driver, String path) async {
     final List<int> pixels = await driver.screenshot();
     final File file = new File(path);
     await file.writeAsBytes(pixels);
   }
 
+  // Helper function that creates project and opens it
   Future<void> createProject(FlutterDriver driver) async {
     final newProjectFinder = find.byValueKey('newProject');
     final projectTextFieldFinder = find.byValueKey('projectTextField');
@@ -29,12 +32,15 @@ void main() {
     await driver.tap(projectFinder);
   }
 
+  // Helper function that creates a borehole
   Future<void> createBorehole(FlutterDriver driver) async {
     final newBoreholeFinder = find.byValueKey('newBorehole');
     await driver.tap(newBoreholeFinder);
   }
 
+  // This group of tests covers the entire workflow of the app
   group('BLAMO App', () {
+    // Finders are used to locate ui elements
     final newProjectFinder = find.byValueKey('newProject');
     final projectTextFieldFinder = find.byValueKey('projectTextField');
     final projectAcceptFinder = find.byValueKey('projectAccept');
@@ -52,6 +58,7 @@ void main() {
       }
     });
 
+    // This tests project creation and deletion
     test('create and delete project', () async {
       await driver.tap(newProjectFinder);
       await takeScreenshot(driver, 'screenshots/test1_screenshot1.png');
@@ -69,6 +76,8 @@ void main() {
       await driver.tap(drawerOpenFinder);
       final homeNavFinder = find.byValueKey('homeNav');
       await driver.tap(homeNavFinder);
+      // There is no native way to long press a ui element with flutter driver
+      // This is a workaround, scrolling for half a second while not moving
       await driver.scroll(projectFinder, 0, 0, Duration(milliseconds: 500));
       await takeScreenshot(driver, 'screenshots/test1_screenshot6.png');
       final projectDeleteFinder = find.byValueKey('projectDelete');
@@ -76,6 +85,7 @@ void main() {
       await takeScreenshot(driver, 'screenshots/test1_screenshot7.png');
     });
 
+    // This tests borehole creation and deletion
     test('create and delete borehole', () async {
       createProject(driver);
       //create and delete borehole
@@ -95,9 +105,9 @@ void main() {
       await takeScreenshot(driver, 'screenshots/test2_screenshot4.png');
     });
 
+    // This test navigates to the log info form and then enters info into all
+    // fields before saving.
     test('LogInfo', () async {
-      //create project and borehole
-      //createProject(driver);
       createBorehole(driver);
       //enter text in LogInfo
       final drawerOpenFinder = find.byTooltip('Open navigation menu');
@@ -113,11 +123,10 @@ void main() {
         '10000.00', '9999.99', '-122.00', '45.00', 'location', 'elevationDatum',
         '100', 'boreholeID', '12345.5', 'contractor', 'equipment', 'method',
         'loggedBy', 'checkedBy'];
-      final logInfoScrollFinder = find.byValueKey('logInfoScroll');
+      // Go through all text fields
       for(int i = 0; i < fieldKeys.length; i++) {
         SerializableFinder formFieldFinder = find.byValueKey(fieldKeys[i] + 'Field');
         await driver.waitFor(formFieldFinder);
-        //await driver.scrollUntilVisible(logInfoScrollFinder, formFieldFinder, alignment: 0, dxScroll: 0, dyScroll: -10, timeout: Duration(seconds: 10));
         await driver.scrollIntoView(formFieldFinder, alignment: 0, timeout: Duration(seconds: 10));
         await driver.tap(formFieldFinder);
         await driver.enterText(fieldInputs[i]);
@@ -127,20 +136,18 @@ void main() {
       final startDateFinder = find.byValueKey('startDateField');
       final endDateFinder = find.byValueKey('endDateField');
 
-      //await driver.scrollUntilVisible(logInfoScrollFinder, projectionDropdownFinder, alignment: 0, dxScroll: 0, dyScroll: 10, timeout: Duration(seconds: 10));
+      // Interact with projection dropdown
       await driver.scrollIntoView(projectionDropdownFinder, alignment: 0, timeout: Duration(seconds: 10));
       await driver.tap(projectionDropdownFinder);
       final selectProjectionFinder = find.byValueKey('projection_GCS WGS 1984');
       await driver.tap(selectProjectionFinder);
 
-
-      //await driver.scrollUntilVisible(logInfoScrollFinder, startDateFinder, alignment: 0, dxScroll: 0, dyScroll: -10, timeout: Duration(seconds: 10));
+      // Interact with both date pickers
       await driver.scrollIntoView(startDateFinder, alignment: 0, timeout: Duration(seconds: 10));
       await driver.tap(startDateFinder);
       final startDateOkFinder = find.text('OK');
       await driver.tap(startDateOkFinder);
 
-      //await driver.scrollUntilVisible(logInfoScrollFinder, endDateFinder, alignment: 0, dxScroll: 0, dyScroll: -10, timeout: Duration(seconds: 10));
       await driver.scrollIntoView(endDateFinder, alignment: 0, timeout: Duration(seconds: 10));
       await driver.tap(endDateFinder);
       final endDateDayFinder = find.text('30');
@@ -157,6 +164,8 @@ void main() {
       await driver.tap(overviewNavFinder);
     }, timeout: Timeout(Duration(minutes: 1)));
 
+    // This test creates 10 units and enter info for all of them then deletes
+    // the last unit
     test('Units', () async {
       final drawerOpenFinder = find.byTooltip('Open navigation menu');
       await driver.tap(drawerOpenFinder);
@@ -164,7 +173,6 @@ void main() {
       await driver.tap(unitsNavFinder);
 
       await takeScreenshot(driver, 'screenshots/test4_screenshot1.png');
-      //var fieldKeys = ['depth-ub', 'depth-lb', 'methods', 'notes'];
       for(int i = 0; i < 10; i++) {
         SerializableFinder newUnitFinder = find.byTooltip('New Unit');
         await driver.tap(newUnitFinder);
@@ -202,6 +210,7 @@ void main() {
       await driver.tap(overviewNavFinder);
     }, timeout: Timeout(Duration(minutes: 1)));
 
+    // This test creates 10 tests and enter info for all, then deletes the last test
     test('Tests', () async {
       final drawerOpenFinder = find.byTooltip('Open navigation menu');
       await driver.tap(drawerOpenFinder);
@@ -226,10 +235,8 @@ void main() {
         await driver.enterText('-' + (i+0.1).toString());
         await driver.tap(endTestFinder);
         await driver.enterText('-' + (i+0.9).toString());
-        SerializableFinder testScrollFinder = find.byValueKey('testScroll');
         for(int j = 0; j < fieldKeys.length; j++) {
           SerializableFinder formFieldFinder = find.byValueKey(fieldKeys[j] + 'Field');
-          //await driver.scrollUntilVisible(testScrollFinder, formFieldFinder, alignment: 0, dxScroll: 0, dyScroll: -10, timeout: Duration(seconds: 10));
           await driver.scrollIntoView(formFieldFinder, alignment: 0, timeout: Duration(seconds: 10));
           await driver.tap(formFieldFinder);
           await driver.enterText(fieldInputs[j]);
@@ -254,6 +261,9 @@ void main() {
       await driver.tap(overviewNavFinder);
     }, timeout: Timeout(Duration(minutes: 5)));
 
+    // This tests the functions of the export page, including pdf and csv creation
+    // as well as the email button. There is no way to automate email sending, so
+    // there is a 30 second window to manually send an email if need be.
     test('Export', () async {
       final drawerOpenFinder = find.byTooltip('Open navigation menu');
       await driver.tap(drawerOpenFinder);
