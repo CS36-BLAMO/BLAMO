@@ -14,42 +14,50 @@ class CSVExporter {
   List<Test> tests;
   List<String> lines = [];
 
+  //returns a CSVExporter object with an initialized object handler (relies on object handler to handle Unit/Test/Loginfo I/O)
   CSVExporter(this.stateData){
     objectHandler = new ObjectHandler(stateData.currentProject);
   }
 
+  /*Initializes the exporting process, this depends on local buildCSVLines(), formatLinesToString(), and csvWrite().
+  *Additionally, this depends on the currentState.currentDocument and currentState.currentProject to be set appropriately
+  */
   Future<String> exportToCSV() async{
     String toWrite;
     await getData();
     buildCSVLines();
     toWrite = formatLinesToString();
-    debugPrint("toWrite: $toWrite");
+    //debugPrint("toWrite: $toWrite");
     String response = await csvWrite(toWrite, stateData.currentDocument);
     return response;
   }
 
+  //Gets the stored logInfo/Units/Tests by calling the object handler and building the local lists for each respective category.
   Future<int> getData() async{
+    //gets the logInfo data for the currentDocument
     logInfo = await objectHandler.getLogInfoData(stateData.currentDocument);
     try{
+      //gets the List<units> data for the currentDocument
       units = await objectHandler.getUnitsData(stateData.unitList, stateData.currentDocument);
     } catch (e){
       debugPrint("(CSV)ERROR getting units");
     }
 
     try{
+      //gets the List<test> data for the currentDocument
       tests = await objectHandler.getTestsData(stateData.testList, stateData.currentDocument);
     } catch (e){
       debugPrint("(CSV)ERROR getting tests");
     }
-    debugPrint("SUCCESS");
+    //debugPrint("SUCCESS");
     return 0;
   }
 
+  //Loops through all of the tests and builds the rows for the CSV
   void buildCSVLines(){
     String header = "OBJECTID,Test Type,PROJECT,Number,Client,LATITUDE,LONGITUDE,Projection,North,East,Location,Elevation Datum,Borehole ID,Date Started,Date Completed,Surface Elevation (ft),Contractor/Driller,Method,Logged By,Checked By,Begin Depth (ft),End Depth (ft),Soil Type,Description,Moisture Content,Dry Density (pcf),Liquid Limit (%),Plastic Limit (%),Fines (%),Blows 1st,Blows 2nd,Blows 3rd,N Value";
     lines.add(header);
 
-    //TODO SizeofTest
     for(int i = 0; i < tests.length; i++){
       lines.add("$i,"
           "${tests[i].testType.replaceAll(",", " ").replaceAll('\n', '')},"
@@ -86,27 +94,30 @@ class CSVExporter {
           "${tests[i].blowCount.replaceAll(",", " ").replaceAll('\n', '')}");
     }
   }
+
+  //Formats the parsed Tags to be locally readable
   String formatTags(String tags){
     String formattedTags;
-    debugPrint("(CSV)tags: $tags");
+    //debugPrint("(CSV)tags: $tags");
     if(tags != "[]") {
       List<String> parsedList;
       formattedTags = tags.substring(2, tags.length - 2);
-      debugPrint("(CSV)tagsFormatted: $formattedTags");
+      //debugPrint("(CSV)tagsFormatted: $formattedTags");
       parsedList = formattedTags.split("\",\"");
       formattedTags = '';
       for (int i = 0; i < parsedList.length; i++) {
-        debugPrint("(CSV) parsedList $i: ${parsedList[i]}");
+        //debugPrint("(CSV) parsedList $i: ${parsedList[i]}");
         formattedTags += parsedList[i] + "; ";
       }
 
-      debugPrint("(CSV)tagsFormatted: $formattedTags");
+      //debugPrint("(CSV)tagsFormatted: $formattedTags");
     } else {
       formattedTags = "";
     }
     return formattedTags;
   }
 
+  //loops through lines[] to build the string that is written into the csv file
   String formatLinesToString(){
     String formattedString = '';
     for(int i = 0; i < lines.length; i++){
@@ -115,6 +126,7 @@ class CSVExporter {
     return formattedString;
   }
 
+  //creates and writes to the CSV file
   Future<String> csvWrite(String toWrite, String csvName) async {
     await new Future.delayed(new Duration(milliseconds: 50));
     PermissionStatus permission =
@@ -141,7 +153,7 @@ class CSVExporter {
   }
 
   //testing
-  void testStuff() async{
+  /*void testStuff() async{
     String toWrite;
     debugPrint("(CSV) Currentdoc: ${stateData.currentDocument}");
     for(int i = 0; i < stateData.unitList.length; i++){
@@ -173,6 +185,6 @@ class CSVExporter {
 
     csvWrite(toWrite, "Testing");
 
-  }
+  }*/
 
 }
