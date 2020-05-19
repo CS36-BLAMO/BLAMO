@@ -204,17 +204,26 @@ class _TestsPageState extends State<TestsPage> {
     result = await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Are you sure you want to delete this test?"),
+          title: Text("Are you sure you want to delete this test?",
+            style: TextStyle(
+              fontSize: 20,
+            ),),
           actions: <Widget>[
             new FlatButton(
-                child: Text("DELETE"),
-                textColor: Colors.red,
+                child: Text("Delete",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.red,
+                  ),),
                 key: Key('deleteTest'),
                 onPressed: () {
                   Navigator.pop(context, "DELETE");
                 }),
             new FlatButton(
-              child: Text("CANCEL"),
+              child: Text("Cancel",
+                style: TextStyle(
+                  fontSize: 20,
+                ),),
               onPressed: (){
                 Navigator.pop(context, "CANCEL");
               },

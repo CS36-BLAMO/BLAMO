@@ -85,27 +85,30 @@ class _TestPageState extends State<TestPage> {
       return showDialog(
           context: context,
           builder: (context) => AlertDialog(
-              title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
+              title: Text("Are you sure you want to leave this page?\n\nAll unsaved data will be discarded.",
+                style: TextStyle(
+                  fontSize: 20,
+                ),),
               actions: <Widget>[
-                FlatButton(
-                  child: Text(
-                    "No",
-                    style: TextStyle(
-                      fontSize: 25,
-                    ),
-                  ),
-                  onPressed: () => Navigator.pop(context,false),
-                ),
                 FlatButton(
                   child: Text(
                     "Yes",
                     style: TextStyle(
-                        fontSize: 25,
+                        fontSize: 20,
                         color: Colors.red
                     ),
                   ),
                   onPressed: () => Navigator.pop(context,true),
-                )
+                ),
+                FlatButton(
+                  child: Text(
+                    "No",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  onPressed: () => Navigator.pop(context,false),
+                ),
               ]
           )
       );
@@ -113,27 +116,30 @@ class _TestPageState extends State<TestPage> {
       return showDialog(
           context: context,
           builder: (context) => AlertDialog(
-              title: Text("There are fields with invalid inputs\n\nTest will be deleted"),
+              title: Text("There are fields with invalid inputs\n\nTest will be deleted",
+                style: TextStyle(
+                  fontSize: 20,
+                ),),
               actions: <Widget>[
-                FlatButton(
-                  child: Text(
-                    "Edit",
-                    style: TextStyle(
-                      fontSize: 25,
-                    ),
-                  ),
-                  onPressed: () => Navigator.pop(context,false),
-                ),
                 FlatButton(
                   child: Text(
                     "Delete",
                     style: TextStyle(
-                        fontSize: 25,
+                        fontSize: 20,
                         color: Colors.red
                     ),
                   ),
                   onPressed: () => deleteBadTest(),
-                )
+                ),
+                FlatButton(
+                  child: Text(
+                    "Edit",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  onPressed: () => Navigator.pop(context,false),
+                ),
               ]
           )
       );
@@ -491,9 +497,7 @@ class _TestPageState extends State<TestPage> {
               bool noOverlap = await checkTestDepthOverlap();
               if(noOverlap) {
                 await saveTestObject();
-                currentState.currentRoute = '/TestsPage';
                 _showToast("Success", Colors.green);
-                Navigator.pop(context, "Success");
               } else {
                 _showToast("Test overlaps another Test", Colors.red);
               }

@@ -1,5 +1,6 @@
-import 'package:blamo/Boreholes/BoreholeList.dart';
 import 'package:flutter/material.dart';
+
+import 'package:blamo/Boreholes/BoreholeList.dart';
 
 //Side menu class that creates the side menu state
 class SideMenu extends StatefulWidget {
@@ -78,7 +79,48 @@ class _SideMenuState extends State<SideMenu> {
                       color: Colors.blue
                   ),
                   onTap: () {
-                    if (currentState.currentRoute != '/') {
+                    if (currentState.currentRoute == '/LogInfoPage') {
+                      showDialog(
+                        context: context,
+                        builder: (context) =>
+                        AlertDialog(
+                          title: Text(
+                              "Are you sure you want to leave this page?\n\nAll unsaved data will be discarded.",
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text(
+                                "Yes",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              onPressed: () {
+                                currentState.currentRoute = '/';
+                                currentState.currentDocument = "";
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  "/",
+                                  arguments: currentState,
+                                );
+                              }
+                            ),
+                            FlatButton(
+                              child: Text(
+                                "No",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
+                              ),
+                              onPressed: () => Navigator.pop(context, false),
+                            ),
+                          ]
+                        )
+                      );
+                    } else if (currentState.currentRoute != '/') {
                       currentState.currentRoute = '/';
                       currentState.currentDocument = "";
                       Navigator.pushReplacementNamed(
@@ -99,7 +141,47 @@ class _SideMenuState extends State<SideMenu> {
                       color: Colors.blue
                   ),
                   onTap: () {
-                    if (currentState.currentRoute != '/ExportPage') {
+                    if (currentState.currentRoute == '/LogInfoPage') {
+                      showDialog(
+                        context: context,
+                        builder: (context) =>
+                        AlertDialog(
+                          title: Text(
+                              "Are you sure you want to leave this page?\n\nAll unsaved data will be discarded.",
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text(
+                                "Yes",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              onPressed: () {
+                                currentState.currentRoute = '/ExportPage';
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  "/ExportPage",
+                                  arguments: currentState,
+                                );
+                              }
+                            ),
+                            FlatButton(
+                              child: Text(
+                                "No",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
+                              ),
+                              onPressed: () => Navigator.pop(context, false),
+                            ),
+                          ]
+                        )
+                      );
+                    } else if (currentState.currentRoute != '/ExportPage') {
                       currentState.currentRoute = '/ExportPage';
                       Navigator.pushReplacementNamed(
                         context,
@@ -120,7 +202,48 @@ class _SideMenuState extends State<SideMenu> {
                       color: Colors.blue
                   ),
                   onTap: () {
-                    if (currentState.currentRoute != '/BoreholeList') {
+                    if (currentState.currentRoute == '/LogInfoPage') {
+                      showDialog(
+                          context: context,
+                          builder: (context) =>
+                              AlertDialog(
+                                  title: Text(
+                                      "Are you sure you want to leave this page?\n\nAll unsaved data will be discarded.",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                    ),),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text(
+                                        "Yes",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        currentState.currentRoute = '/BoreholeList';
+                                        currentState.currentDocument="";
+                                        Navigator.pushReplacementNamed(
+                                          context,
+                                          "/BoreholeList",
+                                          arguments: currentState,
+                                        );
+                                      }
+                                    ),
+                                    FlatButton(
+                                      child: Text(
+                                        "No",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      onPressed: () => Navigator.pop(context, false),
+                                    ),
+                                  ]
+                              )
+                      );
+                    } else if (currentState.currentRoute != '/BoreholeList') {
                       currentState.currentRoute = '/BoreholeList';
                       currentState.currentDocument="";
                       Navigator.pushReplacementNamed(
@@ -142,7 +265,47 @@ class _SideMenuState extends State<SideMenu> {
                       color: Colors.blue
                   ),
                   onTap: () {
-                    if (currentState.currentRoute != '/Document') {
+                    if (currentState.currentRoute == '/LogInfoPage') {
+                      showDialog(
+                          context: context,
+                          builder: (context) =>
+                              AlertDialog(
+                                  title: Text(
+                                      "Are you sure you want to leave this page?\n\nAll unsaved data will be discarded.",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                    ),),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text(
+                                        "Yes",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        currentState.currentRoute = '/Document';
+                                        Navigator.pushReplacementNamed(
+                                          context,
+                                          "/Document",
+                                          arguments: currentState,
+                                        );
+                                      }
+                                    ),
+                                    FlatButton(
+                                      child: Text(
+                                        "No",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      onPressed: () => Navigator.pop(context, false),
+                                    ),
+                                  ]
+                              )
+                      );
+                    } else if (currentState.currentRoute != '/Document') {
                       currentState.currentRoute = '/Document';
                       Navigator.pushReplacementNamed(
                         context,
@@ -183,7 +346,46 @@ class _SideMenuState extends State<SideMenu> {
                       color: Colors.blue
                   ),
                   onTap: () {
-                    if (currentState.currentRoute != '/UnitsPage') {
+                    if (currentState.currentRoute == '/LogInfoPage') {
+                      showDialog(
+                          context: context,
+                          builder: (context) =>
+                              AlertDialog(
+                                  title: Text(
+                                      "Are you sure you want to leave this page?\n\nAll unsaved data will be discarded.",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                    ),),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text(
+                                        "Yes",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pushReplacementNamed(
+                                          context,
+                                          "/UnitsPage",
+                                          arguments: currentState,
+                                        );
+                                      }
+                                    ),
+                                    FlatButton(
+                                      child: Text(
+                                        "No",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      onPressed: () => Navigator.pop(context, false),
+                                    ),
+                                  ]
+                              )
+                      );
+                    } else if (currentState.currentRoute != '/UnitsPage') {
                       Navigator.pushReplacementNamed(
                         context,
                         "/UnitsPage",
@@ -203,7 +405,46 @@ class _SideMenuState extends State<SideMenu> {
                       color: Colors.blue
                   ),
                   onTap: () {
-                    if (currentState.currentRoute != '/TestsPage') {
+                    if (currentState.currentRoute == '/LogInfoPage') {
+                      showDialog(
+                          context: context,
+                          builder: (context) =>
+                              AlertDialog(
+                                  title: Text(
+                                      "Are you sure you want to leave this page?\n\nAll unsaved data will be discarded.",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                    ),),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      child: Text(
+                                        "Yes",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pushReplacementNamed(
+                                          context,
+                                          "/TestsPage",
+                                          arguments: currentState,
+                                        );
+                                      }
+                                    ),
+                                    FlatButton(
+                                      child: Text(
+                                        "No",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      onPressed: () => Navigator.pop(context, false),
+                                    ),
+                                  ]
+                              )
+                      );
+                    } else if (currentState.currentRoute != '/TestsPage') {
                       Navigator.pushReplacementNamed(
                         context,
                         "/TestsPage",

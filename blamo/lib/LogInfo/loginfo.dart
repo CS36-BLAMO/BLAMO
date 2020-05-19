@@ -75,27 +75,27 @@ class _LogInfoPageState extends State<LogInfoPage> {
     bool userInput = await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-            title: Text("Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
+            title: Text("Are you sure you want to leave this page?\n\nAll unsaved data will be discarded."),
             actions: <Widget>[
-              FlatButton(
-                child: Text(
-                  "No",
-                  style: TextStyle(
-                      fontSize: 25,
-                  ),
-                ),
-                onPressed: () => Navigator.pop(context,false),
-              ),
               FlatButton(
                 child: Text(
                   "Yes",
                   style: TextStyle(
-                      fontSize: 25,
+                      fontSize: 20,
                       color: Colors.red
                   ),
                 ),
                 onPressed: () => Navigator.pop(context,true),
-              )
+              ),
+              FlatButton(
+                child: Text(
+                  "No",
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context,false),
+              ),
             ]
         )
     );

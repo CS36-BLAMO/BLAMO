@@ -1,10 +1,10 @@
-
-import 'package:blamo/Boreholes/BoreholeList.dart';
-import 'package:blamo/routeGenerator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:blamo/Boreholes/BoreholeList.dart';
+import 'package:blamo/routeGenerator.dart';
 
 void main() => runApp(BLAMO());
 
@@ -184,17 +184,26 @@ class _HomePageState extends State<HomePage> {
         context: context,
         builder: (context) =>
             AlertDialog(
-              title: Text("Are you sure you want to delete ${projectName}?"),
+              title: Text("Are you sure you want to delete $projectName?",
+                style: TextStyle(
+                  fontSize: 20,
+                ),),
               actions: <Widget>[
                 new FlatButton(
-                    child: Text("DELETE"),
+                    child: Text("Delete",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.red,
+                      ),),
                     key: Key('projectDelete'),
-                    textColor: Colors.red,
                     onPressed: () {
                       Navigator.pop(context, "DELETE");
                     }),
                 new FlatButton(
-                  child: Text("CANCEL"),
+                  child: Text("Cancel",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),),
                   onPressed: () {
                     Navigator.pop(context, "CANCEL");
                   },
@@ -231,7 +240,10 @@ class _HomePageState extends State<HomePage> {
         showDialog(
             context: context,
           builder:(context) => AlertDialog(
-            title: Text('Enter Project Name'),
+            title: Text('Enter Project Name',
+              style: TextStyle(
+                fontSize: 20,
+              ),),
             content: TextField(
               maxLength: 20,
               controller: _textFieldController,
@@ -241,14 +253,20 @@ class _HomePageState extends State<HomePage> {
             ),
             actions: <Widget>[
               new FlatButton(
-                child: new Text('CANCEL'),
-                textColor: Colors.red,
+                child: new Text('Cancel',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.red,
+                  ),),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               new FlatButton(
-                child: new Text('Accept'),
+                child: new Text('Accept',
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),),
                 key: Key('projectAccept'),
                 onPressed: () async {
                   if(_textFieldController.text.isNotEmpty && !currentState.list.contains(_textFieldController.text.toString())) {
@@ -276,27 +294,30 @@ class _HomePageState extends State<HomePage> {
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(
-            title: Text("Do you want to exit the BLAMO application?"),
+            title: Text("Do you want to exit the BLAMO application?",
+              style: TextStyle(
+                fontSize: 20,
+              ),),
             actions: <Widget>[
-              FlatButton(
-                child: Text(
-                  "No",
-                  style: TextStyle(
-                    fontSize: 25,
-                  ),
-                ),
-                onPressed: () => Navigator.pop(context,false),
-              ),
               FlatButton(
                 child: Text(
                   "Yes",
                   style: TextStyle(
-                      fontSize: 25,
+                      fontSize: 20,
                       color: Colors.red
                   ),
                 ),
                 onPressed: () => Navigator.pop(context,true),
-              )
+              ),
+              FlatButton(
+                child: Text(
+                  "No",
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context,false),
+              ),
             ]
         )
     );

@@ -1,10 +1,9 @@
-import 'package:blamo/routeGenerator.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:blamo/CustomActionBar.dart';
 import 'package:blamo/File_IO/FileHandler.dart';
 import 'package:blamo/SideMenu.dart';
-import 'package:blamo/CustomActionBar.dart';
-import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 //This class will be used to house all the data between each route
 class StateData {
@@ -32,25 +31,11 @@ class StateData {
   }
 }
 
- /* the idea behind the home page is a series of existing logs will appear in the white space, While the button in
-  * the bottom right will allow users to create a new log
-  * (the "second page" in this code is mostly a demonstration and can/should be removed in later implimentation) additionally,
-  * the drawer will provide easy familiar navigation between setting, export, etc. Activities/pages of the project
-  */
-//void main() => runApp(BLAMO());
-
-/* This builds the initial context and offloads
-*  route navigation to the routeGenerator class
+/* the idea behind the home page is a series of existing logs will appear in the white space, While the button in
+* the bottom right will allow users to create a new log
+* (the "second page" in this code is mostly a demonstration and can/should be removed in later implimentation) additionally,
+* the drawer will provide easy familiar navigation between setting, export, etc. Activities/pages of the project
 */
-/*class BLAMO extends StatelessWidget {
-  @override
-  Widget build(BuildContext context){
-    return MaterialApp(
-      initialRoute: '/',
-      onGenerateRoute: RouteGenerator.generateRoute,
-    );
-  }
-}*/
 
 /* All pages must take in state data. The Stateful widget sole job
 *  is to pass the StateData object to the constructor during the
@@ -59,8 +44,6 @@ class StateData {
 * */
 class BoreholePage extends StatefulWidget {
   final StateData pass;
-  //--Toremove
-  //final PersistentStorage storage = PersistentStorage();
 
   BoreholePage(this.pass, {Key key}) : super(key:key);
 
@@ -77,8 +60,6 @@ class _BoreholePageState extends State<BoreholePage> {
   StateData currentState;
   _BoreholePageState(this.currentState);
 
-  TextEditingController _textFieldController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -86,9 +67,6 @@ class _BoreholePageState extends State<BoreholePage> {
       setState(() {
         currentState.list = recieved.list;
         currentState.currentRoute = '/BoreholeList';
-//
-        //TODO: REMOVE THIS LINE WHEN DONE WITH NEW MAIN
-        //currentState.currentProject = 'Salem Bridge';
 
         currentState.dirty = 1;
       });
@@ -152,12 +130,12 @@ class _BoreholePageState extends State<BoreholePage> {
   }
 
   //Creates a new document manifest
-  void createNewDocument(String docName) async{
+  Future<void> createNewDocument(String docName) async{
     await currentState.storage.overWriteDocument(docName, "$docName\n0\n0");
   }
 
   //Updates the currentState object to reflect the manifest document
-  void updateStateData() async{
+  Future<void> updateStateData() async{
     await currentState.storage.setStateData(currentState).then((StateData recieved) {
       currentState.list = recieved.list;
       currentState.dirty = 0;
@@ -180,7 +158,6 @@ class _BoreholePageState extends State<BoreholePage> {
       "/Document",
       arguments: currentState,
     );
-    //currentState.currentDocument = "";
   }
 
   void _showToast(String toShow, MaterialColor color){
@@ -203,19 +180,29 @@ class _BoreholePageState extends State<BoreholePage> {
         context: context,
         builder: (context) =>
             AlertDialog(
-              title: Text("Are you sure you want to delete ${currentState
-                  .currentDocument}?"),
+              title:
+                Text("Are you sure you want to delete ${currentState
+                  .currentDocument}?",
+                style: TextStyle(
+                    fontSize: 20,
+                ),),
               actions: <Widget>[
                 new FlatButton(
-                    child: Text("DELETE"),
-                    textColor: Colors.red,
+                    child: Text("Delete",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.red,
+                      ),),
                     onPressed: () {
                       Navigator.pop(context, "DELETE");
                     },
                     key: Key('boreholeDelete'),
                 ),
                 new FlatButton(
-                  child: Text("CANCEL"),
+                  child: Text("Cancel",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),),
                   onPressed: () {
                     Navigator.pop(context, "CANCEL");
                   },
@@ -270,7 +257,7 @@ class _BoreholePageState extends State<BoreholePage> {
        newestDoc = 'BH_' + nextHoleNum.toString();
      }
      await currentState.storage.overWriteManifest(toWrite);
-     await currentState.storage.overWriteLogInfo('BH_' + nextHoleNum.toString(), "{project:null,number:null,client:null,highway:null,county:null,projection:NAD 1983 2011 Oregon Statewide Lambert Ft Intl,north:null,east:null,lat:null,long:null,location:null,elevationDatum:null,tubeHeight:null,boreholeID:null,startDate:null,endDate:null,surfaceElevation:null,contractor:null,equipment:null,method:null,loggedBy:null,checkedBy:null}");
+     await currentState.storage.overWriteLogInfo('BH_' + nextHoleNum.toString(), "{project:"+currentState.currentProject+",number:\""+nextHoleNum.toString()+"\",client:null,highway:null,county:null,projection:NAD 1983 2011 Oregon Statewide Lambert Ft Intl,north:null,east:null,lat:null,long:null,location:null,elevationDatum:null,tubeHeight:null,boreholeID:null,startDate:null,endDate:null,surfaceElevation:null,contractor:null,equipment:null,method:null,loggedBy:null,checkedBy:null}");
      await updateStateDataCreateDoc(newestDoc);
      //setState(() {});
 

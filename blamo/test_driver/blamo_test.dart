@@ -115,14 +115,13 @@ void main() {
       final logInfoNavFinder = find.byValueKey('loginfoNav');
       await driver.tap(logInfoNavFinder);
       await takeScreenshot(driver, 'screenshots/test3_screenshot1.png');
-      var fieldKeys = ['project', 'number', 'client', 'highway', 'county',
-        'north', 'east', 'lat', 'long', 'location', 'elevationDatum',
-        'tubeHeight', 'boreholeID', 'surfaceElevation', 'contractor',
-        'equipment', 'method', 'loggedBy', 'checkedBy'];
-      var fieldInputs = ['project', '1001', 'client', 'highway', 'county',
-        '10000.00', '9999.99', '-122.00', '45.00', 'location', 'elevationDatum',
-        '100', 'boreholeID', '12345.5', 'contractor', 'equipment', 'method',
-        'loggedBy', 'checkedBy'];
+      var fieldKeys = ['client', 'highway', 'county', 'north', 'east', 'lat',
+        'long', 'location', 'elevationDatum', 'tubeHeight', 'boreholeID',
+        'surfaceElevation', 'contractor', 'equipment', 'method', 'loggedBy',
+        'checkedBy'];
+      var fieldInputs = ['client', 'highway', 'county', '10000.00', '9999.99',
+        '-122.00', '45.00', 'location', 'elevationDatum', '100', 'boreholeID',
+        '12345.5', 'contractor', 'equipment', 'method', 'loggedBy', 'checkedBy'];
       // Go through all text fields
       for(int i = 0; i < fieldKeys.length; i++) {
         SerializableFinder formFieldFinder = find.byValueKey(fieldKeys[i] + 'Field');
@@ -162,6 +161,8 @@ void main() {
       await driver.tap(drawerOpenFinder);
       final overviewNavFinder = find.byValueKey('overviewNav');
       await driver.tap(overviewNavFinder);
+      final dialogFinder = find.text('Yes');
+      await driver.tap(dialogFinder);
     }, timeout: Timeout(Duration(minutes: 1)));
 
     // This test creates 10 units and enter info for all of them then deletes
@@ -195,6 +196,10 @@ void main() {
 
         SerializableFinder saveUnitFinder = find.byValueKey('saveUnit');
         await driver.tap(saveUnitFinder);
+        SerializableFinder backOutFinder = find.pageBack();
+        await driver.tap(backOutFinder);
+        SerializableFinder dialogFinder = find.text('Yes');
+        await driver.tap(dialogFinder);
       }
       await takeScreenshot(driver, 'screenshots/test4_screenshot2.png');
 
@@ -246,6 +251,10 @@ void main() {
 
         SerializableFinder saveTestFinder = find.byValueKey('saveTest');
         await driver.tap(saveTestFinder);
+        SerializableFinder backOutFinder = find.pageBack();
+        await driver.tap(backOutFinder);
+        SerializableFinder dialogFinder = find.text('Yes');
+        await driver.tap(dialogFinder);
       }
       await takeScreenshot(driver, 'screenshots/test5_screenshot2.png');
 

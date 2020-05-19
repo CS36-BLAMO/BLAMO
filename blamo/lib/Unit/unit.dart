@@ -91,27 +91,30 @@ class _UnitPageState extends State<UnitPage> {
           builder: (context) =>
               AlertDialog(
                   title: Text(
-                      "Are you sure you want to leave this page? \n\n All unsaved data will be discarded."),
+                      "Are you sure you want to leave this page?\n\nAll unsaved data will be discarded.",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),),
                   actions: <Widget>[
-                    FlatButton(
-                      child: Text(
-                        "No",
-                        style: TextStyle(
-                          fontSize: 25,
-                        ),
-                      ),
-                      onPressed: () => Navigator.pop(context, false),
-                    ),
                     FlatButton(
                       child: Text(
                         "Yes",
                         style: TextStyle(
-                            fontSize: 25,
+                            fontSize: 20,
                             color: Colors.red
                         ),
                       ),
                       onPressed: () => Navigator.pop(context, true),
-                    )
+                    ),
+                    FlatButton(
+                      child: Text(
+                        "No",
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context, false),
+                    ),
                   ]
               )
       );
@@ -121,27 +124,30 @@ class _UnitPageState extends State<UnitPage> {
           builder: (context) =>
               AlertDialog(
                   title: Text(
-                      "There are fields with invalid inputs\n\nUnit will be deleted"),
+                      "There are fields with invalid inputs\n\nUnit will be deleted",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),),
                   actions: <Widget>[
-                    FlatButton(
-                      child: Text(
-                        "Edit",
-                        style: TextStyle(
-                          fontSize: 25,
-                        ),
-                      ),
-                      onPressed: () => Navigator.pop(context, false),
-                    ),
                     FlatButton(
                       child: Text(
                         "Delete",
                         style: TextStyle(
-                            fontSize: 25,
+                            fontSize: 20,
                             color: Colors.red
                         ),
                       ),
                       onPressed: () => deleteBadUnit(),
-                    )
+                    ),
+                    FlatButton(
+                      child: Text(
+                        "Edit",
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context, false),
+                    ),
                   ]
               )
       );
@@ -397,9 +403,7 @@ class _UnitPageState extends State<UnitPage> {
               bool noOverlap = await checkUnitDepthOverlap();
               if (noOverlap) {
                 await saveObject();
-                currentState.currentRoute = '/UnitsPage';
                 _showToast("Success", Colors.green);
-                Navigator.pop(context, "Success");
               } else {
                 _showToast("Unit overlaps another Unit", Colors.red);
               }
