@@ -1,3 +1,6 @@
+import 'dart:html';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:blamo/Boreholes/BoreholeList.dart';
@@ -14,6 +17,14 @@ class CSVExporter {
   List<Unit> units;
   List<Test> tests;
   List<String> lines = [];
+
+  List<String> PROJECT = [];
+  List<String> POINT = [];
+  List<String> REMARKS = [];
+  List<String> WATER_LEVELS = [];
+  List<String> WELL = [];
+  List<String> LITHOLOGY = [];
+  List<String> SAMPLE = [];
 
   CSVExporter(this.stateData){
     objectHandler = new ObjectHandler(stateData.currentProject);
@@ -37,7 +48,85 @@ class CSVExporter {
 
   Future<String> exportProjectToCSV() async {
     String toWrite;
-    String header = "OBJECTID,Test Type,PROJECT,Number,Client,LATITUDE,LONGITUDE,Projection,North,East,Location,Elevation Datum,Borehole ID,Date Started,Date Completed,Surface Elevation (ft),Contractor/Driller,Method,Logged By,Checked By,Begin Depth (ft),End Depth (ft),Soil Type,Description,Moisture Content,Dry Density (pcf),Liquid Limit (%),Plastic Limit (%),Fines (%),Blows 1st,Blows 2nd,Blows 3rd,N Value";
+    String header = "PointID"
+        +",Name"
+        +",Highway"
+        +",Geologist"
+        +",County"
+        +",EA_Number"
+        +",Input Units"
+        +",Output Units"
+        +",Depth Log Page"
+        +","
+        +",PointID"
+        +",North"
+        +",East"
+        +",Equipment"
+        +",Start_Date"
+        +",End_Date"
+        +",Purpose"
+        +",Driller"
+        +",Recorder"
+        +",HoleDepth"
+        +",Key_No"
+        +",Start_Card_No"
+        +",Bridge_No"
+        +",Elevation"
+        +",Depth Log Page"
+        +",Tube_Height"
+        +",Plunge"
+        +","
+        +",PointID"
+        +",Depth"
+        +",Description"
+        +",Show_Pointer"
+        +","
+        +",PointID"
+        +",DateTime"
+        +",Depth"
+        +",Note"
+        +","
+        +",PointID"
+        +",Depth"
+        +",Bottom"
+        +",Graphic"
+        +","
+        +",PointID"
+        +",Depth"
+        +",Bottom"
+        +",Graphic"
+        +",Description"
+        +",Formation"
+        +","
+        +",PointID"
+        +",Depth"
+        +",Bottom"
+        +",Type"
+        +",Number"
+        +",Recovery"
+        +",Driving_Resist"
+        +",N Value"
+        +",Discontinuities"
+        +",Percent_Moist"
+        +",RQD"
+        +",Description"
+        +",Soil_Name"
+        +",USCS"
+        +",Soil_Color"
+        +",Plasticity"
+        +",Moisture"
+        +",Consistency"
+        +",Soil_Texture"
+        +",Soil_Structure"
+        +",Soil_Other"
+        +",Soil_Origin"
+        +",Rock_Name"
+        +",Rock_Color"
+        +",Weathering"
+        +",Hardness"
+        +",Rock_Structure"
+        +",Rock_Other"
+        +",Formation";
     lines.add(header);
     for(int i = 0; i < tempData.list.length; i++){
       debugPrint('tempData.list[$i]: ${tempData.list[i]}');
@@ -46,10 +135,16 @@ class CSVExporter {
         await tempData.storage.setStateData(tempData);
         await getProjectData();
         await new Future.delayed(new Duration(milliseconds: 100));
-        buildProjectCSVLines();
+        buildProjectSegment();
+        buildPointSegment();
+        buildRemarksSegment();
+        buildWaterLevelsSegment();
+        buildWellSegment();
+        buildLithologySegment();
+        buildSampleSegment();
       }
     }
-    toWrite = formatLinesToString();
+    toWrite = formatProjectLinesToString();
     debugPrint('Writing to csv: \n $toWrite');
   }
 
@@ -94,11 +189,20 @@ class CSVExporter {
     }
   }
 
+  String scrubDataDouble(double toScrub){
+    if(toScrub != null){
+      return "%" + toScrub.toString() + ",";
+    } else {
+      return ",";
+    }
+  }
+
   void buildCSVLines(){
     String header = "OBJECTID,Test Type,PROJECT,Number,Client,LATITUDE,LONGITUDE,Projection,North,East,Location,Elevation Datum,Borehole ID,Date Started,Date Completed,Surface Elevation (ft),Contractor/Driller,Method,Logged By,Checked By,Begin Depth (ft),End Depth (ft),Soil Type,Description,Moisture Content,Dry Density (pcf),Liquid Limit (%),Plastic Limit (%),Fines (%),Blows 1st,Blows 2nd,Blows 3rd,N Value";
     lines.add(header);
 
-    //TODO SizeofTest
+    //TODO - Update CSV format
+
     for(int i = 0; i < tests.length; i++){
       lines.add("$i,"
           "${tests[i].testType.replaceAll(",", " ").replaceAll('\n', '')},"
@@ -178,6 +282,118 @@ class CSVExporter {
       );
     }
   }
+
+  String buildProjectSegment() {
+    PROJECT.add(
+          scrubData(logInfo.project)
+        + "," //Name
+        + scrubData(logInfo.highway)
+        + scrubData(logInfo.loggedBy)
+        + scrubData(logInfo.county)
+        + scrubData(logInfo.number)
+        + "," //Input Units
+        + "," //Output Units
+        + "," //Depth Log page
+    );
+  }
+
+  String buildPointSegment() {
+    POINT.add(
+        scrubData(logInfo.project)
+      + scrubData(logInfo.north)
+      + scrubData(logInfo.east)
+      + scrubData(logInfo.equipment)
+      + scrubData(logInfo.startDate)
+      + scrubData(logInfo.endDate)
+      + "," //Purpose
+      + "," //Driller
+      + scrubData(logInfo.loggedBy)
+      + "," //Hole Depth
+      + "," //Key_No
+      + "," //Start_Card_No
+      + "," //Bridge_No
+      + scrubData(logInfo.surfaceElevation)
+      + "," //Depth Log
+      + scrubData(logInfo.tubeHeight)
+      + "," //Plunge
+    );
+  }
+
+  String buildRemarksSegment() {
+    REMARKS.add(
+        scrubData(logInfo.project)
+      + "," //Depth
+      + "," //Description
+      + "," //Show_Pointer
+    );
+  }
+
+  String buildWaterLevelsSegment() {
+    WATER_LEVELS.add(
+        scrubData(logInfo.project)
+      + "," //DateTime
+      + "," //Depth
+      + "," //Note
+    );
+  }
+
+  String buildWellSegment() {
+    WELL.add(
+        scrubData(logInfo.project)
+      + "," //Depth
+      + "," //Bottom
+      + "," //Graphic
+    );
+  }
+
+  String buildLithologySegment() {
+    for(int i = 0; i < units.length; i++){
+      LITHOLOGY.add(
+          scrubData(logInfo.project)
+        + scrubData("${units[i].depthLB}")
+        + scrubData("${units[i].depthUB}")
+        + "," //Grapic
+        + scrubData(formatTags(units[i].tags))
+        + "," //Formation
+      );
+    }
+  }
+
+  String buildSampleSegment() {
+    for(int i = 0; i < tests.length; i++){
+      SAMPLE.add(
+          scrubData(logInfo.project)
+        + scrubData("${tests[i].beginTest}")
+        + scrubData("${tests[i].endTest}")
+        + scrubData(tests[i].testType)
+        + scrubData(i.toString())
+        + scrubDataDouble(tests[i].percentRecovery)
+        + scrubData(tests[i].soilDrivingResistance)
+        + "," //N_value
+        + scrubData(tests[i].rockDiscontinuityData)
+        + "," //Percent Moisture
+        + "," //RQD
+        + scrubData(formatTags(tests[i].tags))
+        + "," //Soil_Name
+        + "," //USCS
+        + "," //Soil_Color
+        + scrubData(tests[i].moistureContent)
+        + "," //Consistency
+        + "," //Soil_Texture
+        + "," //Soil_Structure
+        + "," //Soil_Other
+        + "," //Soil_Origin
+        + "," //Rock_Name
+        + "," //Rock_Color
+        + "," //Weathering
+        + "," //Hardness
+        + "," //Rock_Structure
+        + "," //Rock_Other
+        + "," //Formation
+      );
+    }
+  }
+
   String formatTags(String tags){
     String formattedTags;
     debugPrint("(CSV)tags: $tags");
@@ -203,6 +419,68 @@ class CSVExporter {
     String formattedString = '';
     for(int i = 0; i < lines.length; i++){
       formattedString = formattedString + lines[i] + '\n';
+    }
+    return formattedString;
+  }
+
+  String formatProjectLinesToString(){
+    String formattedString = '';
+    List<int> tempArray = [PROJECT.length, POINT.length, REMARKS.length, WATER_LEVELS.length, WELL.length, LITHOLOGY.length, SAMPLE.length];
+    int bound = 0;
+    for(int i = 0; i < tempArray.length; i++){
+      if(bound < tempArray[i]){
+        bound = tempArray[i];
+      }
+    }
+    for(int i = 0; i < bound; i++){
+      //Check if there is a project to append for the given index
+      if(i >= PROJECT.length){
+
+      } else {
+
+      }
+
+      //Check if there is a point to append for the given index
+      if(i >= POINT.length){
+
+      } else {
+
+      }
+
+      //Check if there is a remark to append for the given index
+      if(i >= REMARKS.length){
+
+      } else {
+
+      }
+
+      //Check if there is a water_level to append for the given index
+      if(i >= WATER_LEVELS.length){
+
+      } else {
+
+      }
+
+      //Check if there is a well to append for the given index
+      if(i >= WELL.length){
+
+      } else {
+
+      }
+
+      //Check if there is a lithology to append for the given index
+      if(i >= LITHOLOGY.length){
+
+      } else {
+
+      }
+
+      //Check if there is a sample to append for the given index
+      if(i >= SAMPLE.length){
+
+      } else {
+
+      }
     }
     return formattedString;
   }
