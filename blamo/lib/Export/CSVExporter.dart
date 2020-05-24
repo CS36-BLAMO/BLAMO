@@ -1,11 +1,10 @@
-import 'dart:html';
-import 'dart:math';
-
+//import 'dart:html';
+//import 'dart:math';
+import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:blamo/ObjectHandler.dart';
 import 'package:blamo/Boreholes/BoreholeList.dart';
-import 'dart:io';
-import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -38,8 +37,9 @@ class CSVExporter {
   Future<String> exportToCSV() async{
     String toWrite;
     await getData();
-    buildCSVLines();
-    toWrite = formatLinesToString();
+    //buildCSVLines();
+    buildProjectCSVController();
+    toWrite = formatProjectLinesToString();
     debugPrint("toWrite: $toWrite");
     String response = await csvWrite(toWrite, stateData.currentDocument);
     return response;
@@ -48,86 +48,6 @@ class CSVExporter {
 
   Future<String> exportProjectToCSV() async {
     String toWrite;
-    String header = "PointID"
-        +",Name"
-        +",Highway"
-        +",Geologist"
-        +",County"
-        +",EA_Number"
-        +",Input Units"
-        +",Output Units"
-        +",Depth Log Page"
-        +","
-        +",PointID"
-        +",North"
-        +",East"
-        +",Equipment"
-        +",Start_Date"
-        +",End_Date"
-        +",Purpose"
-        +",Driller"
-        +",Recorder"
-        +",HoleDepth"
-        +",Key_No"
-        +",Start_Card_No"
-        +",Bridge_No"
-        +",Elevation"
-        +",Depth Log Page"
-        +",Tube_Height"
-        +",Plunge"
-        +","
-        +",PointID"
-        +",Depth"
-        +",Description"
-        +",Show_Pointer"
-        +","
-        +",PointID"
-        +",DateTime"
-        +",Depth"
-        +",Note"
-        +","
-        +",PointID"
-        +",Depth"
-        +",Bottom"
-        +",Graphic"
-        +","
-        +",PointID"
-        +",Depth"
-        +",Bottom"
-        +",Graphic"
-        +",Description"
-        +",Formation"
-        +","
-        +",PointID"
-        +",Depth"
-        +",Bottom"
-        +",Type"
-        +",Number"
-        +",Recovery"
-        +",Driving_Resist"
-        +",N Value"
-        +",Discontinuities"
-        +",Percent_Moist"
-        +",RQD"
-        +",Description"
-        +",Soil_Name"
-        +",USCS"
-        +",Soil_Color"
-        +",Plasticity"
-        +",Moisture"
-        +",Consistency"
-        +",Soil_Texture"
-        +",Soil_Structure"
-        +",Soil_Other"
-        +",Soil_Origin"
-        +",Rock_Name"
-        +",Rock_Color"
-        +",Weathering"
-        +",Hardness"
-        +",Rock_Structure"
-        +",Rock_Other"
-        +",Formation";
-    lines.add(header);
     for(int i = 0; i < tempData.list.length; i++){
       debugPrint('tempData.list[$i]: ${tempData.list[i]}');
       if(tempData.list[i] != ''){
@@ -135,17 +55,13 @@ class CSVExporter {
         await tempData.storage.setStateData(tempData);
         await getProjectData();
         await new Future.delayed(new Duration(milliseconds: 100));
-        buildProjectSegment();
-        buildPointSegment();
-        buildRemarksSegment();
-        buildWaterLevelsSegment();
-        buildWellSegment();
-        buildLithologySegment();
-        buildSampleSegment();
+        buildProjectCSVController();
       }
     }
     toWrite = formatProjectLinesToString();
     debugPrint('Writing to csv: \n $toWrite');
+    String response = await csvWrite(toWrite, stateData.currentDocument);
+    return response;
   }
 
   Future<int> getData() async{
@@ -283,17 +199,28 @@ class CSVExporter {
     }
   }
 
+  int buildProjectCSVController(){
+    buildProjectSegment();
+    buildPointSegment();
+    buildRemarksSegment();
+    buildWaterLevelsSegment();
+    buildWellSegment();
+    buildLithologySegment();
+    buildSampleSegment();
+  }
+
   String buildProjectSegment() {
     PROJECT.add(
-          scrubData(logInfo.project)
-        + "," //Name
-        + scrubData(logInfo.highway)
-        + scrubData(logInfo.loggedBy)
-        + scrubData(logInfo.county)
-        + scrubData(logInfo.number)
-        + "," //Input Units
-        + "," //Output Units
-        + "," //Depth Log page
+        scrubData(logInfo.project)
+      + "," //Name
+      + scrubData(logInfo.highway)
+      + scrubData(logInfo.loggedBy)
+      + scrubData(logInfo.county)
+      + scrubData(logInfo.number)
+      + "," //Input Units
+      + "," //Output Units
+      + "," //Depth Log page
+      + "," //Gap
     );
   }
 
@@ -316,6 +243,7 @@ class CSVExporter {
       + "," //Depth Log
       + scrubData(logInfo.tubeHeight)
       + "," //Plunge
+      + "," //Gap
     );
   }
 
@@ -325,6 +253,7 @@ class CSVExporter {
       + "," //Depth
       + "," //Description
       + "," //Show_Pointer
+      + "," //Gap
     );
   }
 
@@ -334,6 +263,7 @@ class CSVExporter {
       + "," //DateTime
       + "," //Depth
       + "," //Note
+      + "," //Gap
     );
   }
 
@@ -343,6 +273,7 @@ class CSVExporter {
       + "," //Depth
       + "," //Bottom
       + "," //Graphic
+      + "," //Gap
     );
   }
 
@@ -355,6 +286,7 @@ class CSVExporter {
         + "," //Grapic
         + scrubData(formatTags(units[i].tags))
         + "," //Formation
+        + "," //Gap
       );
     }
   }
@@ -390,6 +322,7 @@ class CSVExporter {
         + "," //Rock_Structure
         + "," //Rock_Other
         + "," //Formation
+        + "," //Gap
       );
     }
   }
@@ -425,6 +358,88 @@ class CSVExporter {
 
   String formatProjectLinesToString(){
     String formattedString = '';
+    String header = "PointID"
+        +",Name"
+        +",Highway"
+        +",Geologist"
+        +",County"
+        +",EA_Number"
+        +",Input Units"
+        +",Output Units"
+        +",Depth Log Page"
+        +","
+        +",PointID"
+        +",North"
+        +",East"
+        +",Equipment"
+        +",Start_Date"
+        +",End_Date"
+        +",Purpose"
+        +",Driller"
+        +",Recorder"
+        +",HoleDepth"
+        +",Key_No"
+        +",Start_Card_No"
+        +",Bridge_No"
+        +",Elevation"
+        +",Depth Log Page"
+        +",Tube_Height"
+        +",Plunge"
+        +","
+        +",PointID"
+        +",Depth"
+        +",Description"
+        +",Show_Pointer"
+        +","
+        +",PointID"
+        +",DateTime"
+        +",Depth"
+        +",Note"
+        +","
+        +",PointID"
+        +",Depth"
+        +",Bottom"
+        +",Graphic"
+        +","
+        +",PointID"
+        +",Depth"
+        +",Bottom"
+        +",Graphic"
+        +",Description"
+        +",Formation"
+        +","
+        +",PointID"
+        +",Depth"
+        +",Bottom"
+        +",Type"
+        +",Number"
+        +",Recovery"
+        +",Driving_Resist"
+        +",N Value"
+        +",Discontinuities"
+        +",Percent_Moist"
+        +",RQD"
+        +",Description"
+        +",Soil_Name"
+        +",USCS"
+        +",Soil_Color"
+        +",Plasticity"
+        +",Moisture"
+        +",Consistency"
+        +",Soil_Texture"
+        +",Soil_Structure"
+        +",Soil_Other"
+        +",Soil_Origin"
+        +",Rock_Name"
+        +",Rock_Color"
+        +",Weathering"
+        +",Hardness"
+        +",Rock_Structure"
+        +",Rock_Other"
+        +",Formation\n";
+
+    formattedString += header;
+
     List<int> tempArray = [PROJECT.length, POINT.length, REMARKS.length, WATER_LEVELS.length, WELL.length, LITHOLOGY.length, SAMPLE.length];
     int bound = 0;
     for(int i = 0; i < tempArray.length; i++){
@@ -435,52 +450,53 @@ class CSVExporter {
     for(int i = 0; i < bound; i++){
       //Check if there is a project to append for the given index
       if(i >= PROJECT.length){
-
+        formattedString += ",,,,,,,,,,";
       } else {
-
+        formattedString += PROJECT[i];
       }
 
       //Check if there is a point to append for the given index
       if(i >= POINT.length){
-
+        formattedString += ",,,,,,,,,,,,,,,,,";
       } else {
-
+        formattedString += POINT[i] ;
       }
 
       //Check if there is a remark to append for the given index
       if(i >= REMARKS.length){
-
+        formattedString += ",,,,,";
       } else {
-
+        formattedString += REMARKS[i];
       }
 
       //Check if there is a water_level to append for the given index
       if(i >= WATER_LEVELS.length){
-
+        formattedString += ",,,,,";
       } else {
-
+        formattedString += WATER_LEVELS[i];
       }
 
       //Check if there is a well to append for the given index
       if(i >= WELL.length){
-
+        formattedString += ",,,,,,";
       } else {
-
+        formattedString += WELL[i];
       }
 
       //Check if there is a lithology to append for the given index
       if(i >= LITHOLOGY.length){
-
+        formattedString += ",,,,,,,";
       } else {
-
+        formattedString += LITHOLOGY[i];
       }
 
       //Check if there is a sample to append for the given index
       if(i >= SAMPLE.length){
-
+        formattedString += ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,";
       } else {
-
+        formattedString += SAMPLE[i];
       }
+      formattedString += "\n";
     }
     return formattedString;
   }
