@@ -1,19 +1,16 @@
-import 'package:blamo/Boreholes/BoreholeList.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:blamo/ObjectHandler.dart';
-import 'package:blamo/SideMenu.dart';
-import 'dart:convert';
-import 'package:blamo/CustomActionBar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-//TORemove
-/*
-import 'package:intl/intl.dart';
-import 'package:flutter_test/flutter_test.dart';*/
+import 'package:blamo/Boreholes/BoreholeList.dart';
+import 'package:blamo/CustomActionBar.dart';
+import 'package:blamo/ObjectHandler.dart';
+import 'package:blamo/SideMenu.dart';
 
 class TestPage extends StatefulWidget {
-  final StateData pass; //Passes the StateData object to the stateful constructor
+  final StateData pass; // Passes the StateData object to the stateful constructor
 
   TestPage(this.pass, {Key key}) : super(key:key);
   @override
@@ -51,13 +48,12 @@ class _TestPageState extends State<TestPage> {
   @override
   Widget build(BuildContext context) {
     if(currentState.currentRoute != null) {
-      currentState.currentRoute = '/TestPage'; //Assigns currentState.currentRoute to the name of the current named route
+      currentState.currentRoute = '/TestPage'; // Assigns currentState.currentRoute to the name of the current named route
     }
     currentState.currentRoute = '/TestPage';
 
     if(!dirty){
       debugPrint("After setState: (${testObject.blows1})");
-      //debugPrint("Returning scaffold $toTest1, $toTest2");
       return getTestScaffold(testObject);
     } else {
       debugPrint("Returning empty Scaffold");
@@ -82,7 +78,7 @@ class _TestPageState extends State<TestPage> {
     }
   }
 
-  //takes you back to units page with pop up to protect data
+  // takes you back to units page with pop up to protect data
   // from being lost without saving
   Future<bool> backPressed() async {
     if(_fbKey.currentState.validate()) {
@@ -149,9 +145,6 @@ class _TestPageState extends State<TestPage> {
       onWillPop: backPressed,
       child: new Scaffold(
         backgroundColor: Colors.white,
-        /*drawer: new Drawer(
-          child: SideMenu(currentState),
-        ),*/
         appBar: CustomActionBar("Test Page: ${currentState.currentTest}").getAppBar(),
         body: Padding(
             padding: EdgeInsets.fromLTRB(40,0,40,40),
@@ -423,12 +416,12 @@ class _TestPageState extends State<TestPage> {
                                 initialValue: formatValue(testObjectToBuildFrom.blowCount),
                                 onChanged: (void nbd){updateTestObject();},
                               ),
-                              FormBuilderCheckboxList( //TODO - redirect to longer comprehensive list of tags? Refactor to a list of autocompleting text fields? (SEE: unit.dart, 51)
+                              FormBuilderCheckboxList(
                                 attribute: 'description',
                                 validators: [],
                                 decoration: InputDecoration(labelText: "Description"),
                                 initialValue: getTags(testObjectToBuildFrom),
-                                options: [ // TODO need gint's set of tags, ability for user to make own tags.
+                                options: [
                                   FormBuilderFieldOption(value: "Asphalt", key: Key('testAsphaltTag'),),
                                   FormBuilderFieldOption(value: "Basalt"),
                                   FormBuilderFieldOption(value: "Bedrock"),
@@ -504,13 +497,6 @@ class _TestPageState extends State<TestPage> {
               } else {
                 _showToast("Test overlaps another Test", Colors.red);
               }
-
-              /*Navigator.pushReplacementNamed(
-                      context,
-                      "/TestsPage",
-                      arguments: currentState,
-                    );*/
-
             } else {
               _showToast("Error in Fields", Colors.red);
             }
@@ -521,6 +507,7 @@ class _TestPageState extends State<TestPage> {
     );
   }
 
+  // This function is called on save, checks that this test does not overlap with other tests
   Future<bool> checkTestDepthOverlap() async {
     ObjectHandler objectHandler = new ObjectHandler(currentState.currentProject);
     for(int i = 0; i < currentState.testList.length; i++){
@@ -558,6 +545,7 @@ class _TestPageState extends State<TestPage> {
     );
   }
 
+  // This function formats the soil description tags
   List<String> getTags(Test testObj) {
     List<String> toReturn = [];
     List<dynamic> ba;
@@ -584,7 +572,6 @@ class _TestPageState extends State<TestPage> {
     } else {
       testObject.endTest = null;
     }
-    //testObject.percentRecovery = _fbKey.currentState.fields["percentRecovery"].currentState.value.toString();
     if(double.tryParse(_fbKey.currentState.fields["percentRecovery"].currentState.value) != null) {
       testObject.percentRecovery = double.parse(_fbKey.currentState.fields["percentRecovery"].currentState.value);
     } else {
@@ -603,22 +590,16 @@ class _TestPageState extends State<TestPage> {
     testObject.blows3 = _fbKey.currentState.fields["blows3"].currentState.value.toString();
     testObject.blowCount = _fbKey.currentState.fields["blowCount"].currentState.value.toString();
     testObject.tags = jsonEncode(_fbKey.currentState.fields['description'].currentState.value);
-
   }
 
   Future<void> saveTestObject() async{
     ObjectHandler toHandle = new ObjectHandler(currentState.currentProject);
-    //TODO
-    //unitObject.tags = ;
-
     try {
       toHandle.saveTestData(
           currentState.currentTest, currentState.currentDocument, testObject);
     } finally {
       debugPrint("Async calls done");
     }
-
-    //debugPrint("saving the testObject: \nLB = ${testObject.beginTest}\nUB = ${testObject.endTest}\nMethods = ${testObject.blows3}");
   }
 
   void updateTestData(String testName, String documentName) async{
@@ -632,6 +613,7 @@ class _TestPageState extends State<TestPage> {
     });
   }
 
+  // If a user wants to leave a test that has errors in the fields they can choose to delete that test
   void deleteBadTest() async {
     await currentState.storage.deleteTest(
         currentState.currentDocument, currentState.currentTest);

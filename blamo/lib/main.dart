@@ -1,7 +1,5 @@
 
 import 'package:blamo/Boreholes/BoreholeList.dart';
-import 'package:blamo/CustomActionBar.dart';
-import 'package:blamo/SideMenu.dart';
 import 'package:blamo/routeGenerator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -161,6 +159,7 @@ class _HomePageState extends State<HomePage> {
       );
   }
 
+  //Function for accessing a project. Use a tap to initiate
   void _onTileClicked(String projectName) async {
     currentState.currentProject = projectName;
     currentState.currentDocument = "/BoreholeList";
@@ -175,10 +174,12 @@ class _HomePageState extends State<HomePage> {
 
   }
 
+  //Function for deleting a project. Use a long hold to initiate
   void _onTileLongClicked(String projectName) async{
     debugPrint("(main)LongPressed on: $projectName");
-
     String result;
+
+    //Awaits the return value for the dialog
     result = await showDialog(
         context: context,
         builder: (context) =>
@@ -201,6 +202,8 @@ class _HomePageState extends State<HomePage> {
               ],
             )
     );
+
+    //If the returned value from the dialog is DELETE, delete the selected project
     if (result == "DELETE") {
       await currentState.storage.deleteProject(projectName);
       _showToast("$projectName Deleted!", Colors.red);
@@ -215,6 +218,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  //Builds the floating action button (add project) and implements the dialog for users naming their projects
   FloatingActionButton floatingActionButtonBuilder(){
     return new FloatingActionButton.extended(
       label: Text("Create New Project"),
@@ -267,6 +271,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  //Overrides the back button to prompt the user to confirm they wish to exit the BLAMO application
   Future<bool> backPressed() {
     return showDialog(
         context: context,
@@ -297,6 +302,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  //Shows a toast at the bottom with the given test (toShow) and the given color (color)
   void _showToast(String toShow, MaterialColor color){
     Fluttertoast.showToast(
         msg: toShow,
@@ -309,6 +315,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  //Function called that initializes the project before navigating to it
   Future<void> createProject(String projectName) async {
     String toWrite = '';
 

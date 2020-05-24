@@ -197,7 +197,9 @@ class ObjectHandler {
   }
 
   /*Retrieves the content from storage
-  *
+  * retrieveLocalUnit()    -> gets the raw string value stored in a file for a unit (requires: unitName, documentName)
+  * retrieveLocalTest()    -> gets the raw string value stored in a file for a test (requires: testName, documentName)
+  * retrieveLocalLogInfo() -> gets the raw string value stored in a file for log info (requires: documentName)
   */
   Future<String> retrieveLocalUnit(String unitName, String documentName) async{
     //Take docname and unit name and get local storage
@@ -221,8 +223,15 @@ class ObjectHandler {
   }
 
   /*Functions the UI calls to get data objects
-   * Unit,Test,LogInfo
-   */
+  * getUnitData()        -> depends on retrieveLocalUnit() to get the raw string from the unit file, then parses it and returns a Unit object (requires: unitName, documentName)
+  * getTestData()        -> depends on retrieveLocalTest() to get the raw string from the test file, then parses it and returns a Test object (requires: testName, documentName)
+  * getLogInfoData()     -> depends on retrieveLocalLogInfo() to get the raw string from the logInfo file, then parses it and returns a LogInfo object (requires: documentName)
+  * getUnitsData()       -> depends on getUnitData() to loop through a given list of unit names, building a list<unit> to return (requires: List<string> unitNames, documentName)
+  * getTestsData()       -> depends on getTestData() to loop through a given list of test names, building a list<test> to return (requires: List<string> testNames, documentName)
+  * getLogInfoDataJson() -> depends on retrieveLocalLogInfo() to get the raw string from the logInfo file, then returns the raw JSON string (requires: documentName)
+  * getUnitsDataJSON()   -> depends on retrieveLocalUnit() to get a list of raw strings (JSON) to build the units from (requires: List<string> unitNames, documentName)
+  * getTestsDataJSON()   -> depends on retrieveLocalTest() to get a list of raw strings (JSON) to build the tests from (requires: List<string> testNames, documentName)
+  */
 
   Future<Unit> getUnitData(String unitName, String documentName) async {
     Unit returnUnitData = new Unit();
@@ -235,7 +244,7 @@ class ObjectHandler {
   Future<Test> getTestData(String testName, String documentName) async {
     Test returnTestData = new Test();
     String testLocal = await retrieveLocalTest(testName,documentName);
-    //take JSON and put into Unit object
+    //take JSON and put into Test object
     returnTestData = parseTestJSON(testLocal);
     //return Test Object
     return returnTestData;
@@ -291,6 +300,8 @@ class ObjectHandler {
     return returnTestsData;
   }
 
+  /*---End Get Data---*/
+
   Future<String> getPathToFile(String documentName, String extension) async {
     String filePath;
     bool fileExists = await storage.checkForFile(documentName, extension);
@@ -303,11 +314,17 @@ class ObjectHandler {
       return filePath;
     } else {
       debugPrint("OBJECT HANDLER - There is no compiled $extension version for $documentName");
-
       return null;
     }
   }
 }
+
+  /* Schemas for the JSON parsing
+  *  LogInfo -> represents all of the fields within a log info page
+  *  Unit    -> represents all of the fields within a unit page
+  *  Test    -> represents all of the fields within a test page
+  */
+
 class Document {
   LogInfo logInfo;
   Tests tests;
