@@ -221,7 +221,7 @@ class CSVExporter {
   String buildProjectSegment() {
     PROJECT.add(
         scrubData(logInfo.project)
-      + "," //Name
+      + scrubData(tempData.currentProject) //Name
       + scrubData(logInfo.highway)
       + scrubData(logInfo.loggedBy)
       + scrubData(logInfo.county)
@@ -242,9 +242,9 @@ class CSVExporter {
       + scrubData(logInfo.startDate)
       + scrubData(logInfo.endDate)
       + "," //Purpose
-      + "," //Driller
+      + scrubData(logInfo.contractor) //Driller
       + scrubData(logInfo.loggedBy)
-      + "," //Hole Depth
+      + scrubData(logInfo.tubeHeight) //Hole Depth
       + "," //Key_No
       + "," //Start_Card_No
       + "," //Bridge_No
@@ -313,7 +313,7 @@ class CSVExporter {
         + "," //N_value
         + scrubData(tests[i].rockDiscontinuityData)
         + "," //Percent Moisture
-        + "," //RQD
+        + scrubData(tests[i].rockQualityDesignation)//RQD
         + scrubData(formatTags(tests[i].tags))
         + "," //Soil_Name
         + "," //USCS
