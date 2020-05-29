@@ -23,5 +23,8 @@ Once you have a running emulator you can build the project and run it on either 
 		* flutter doctor - Status check for all components related to the flutter project
 #### Troubleshooting    
  - **Android Studio** If you're having trouble building and running the application make sure to check Settings-> Languages & Frameworks -> Click on Flutter and Dart and make sure they have the proper SDK path. If these are blank and the plugin doesn't manage that for you. You must manually download the SDK's for both Flutter and Dart and put the explicit path in the settings.    
-    
+
+### Testing Application
+We have developed an automated group of tests that cover the entire workflow of the app. In order to run these tests you must first start an emulator. Then run the command `flutter driver --target=test_driver/blamo.dart` from the /BLAMO/blamo directory. Unfortunately, flutter driver currently provides no way to interact with system dialogues, so you must manually allow file access permission each time the test is run; this dialog will pop up during the test of the export page. Additionally, there is a 30 second window at the end of the export test where you can manually send the documents created by the test.
+
 #### Developed by James Trotter, Evan Amaya, Sean Spink, Alex Smith

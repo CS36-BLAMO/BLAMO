@@ -199,17 +199,26 @@ class _UnitsPageState extends State<UnitsPage> {
     result = await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Are you sure you want to delete this unit?"),
+          title: Text("Are you sure you want to delete this unit?",
+            style: TextStyle(
+              fontSize: 20,
+            ),),
           actions: <Widget>[
             new FlatButton(
-                child: Text("DELETE"),
+                child: Text("Delete",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.red,
+                  ),),
                 key: Key('deleteUnit'),
-                textColor: Colors.red,
                 onPressed: () {
                   Navigator.pop(context, "DELETE");
                 }),
             new FlatButton(
-              child: Text("CANCEL"),
+              child: Text("Cancel",
+                style: TextStyle(
+                  fontSize: 20,
+                ),),
               onPressed: (){
                 Navigator.pop(context, "CANCEL");
               },
